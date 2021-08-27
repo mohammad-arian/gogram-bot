@@ -10,8 +10,10 @@ import (
 
 type Bot struct {
 	Token  string
+	Port   string
 	Result Result `json:"result"`
 }
+
 type Result struct {
 	Id                    int    `json:"id"`
 	FirstName             string `json:"first_name"`
@@ -19,7 +21,7 @@ type Result struct {
 	SupportsInlineQueries bool   `json:"supports_inline_queries"`
 }
 
-func NewBot(token string) Bot {
+func NewBot(token string, port string) Bot {
 	res, err := http.Get(fmt.Sprintf("https://api.telegram.org/bot%s/getme", token))
 	if err != nil {
 		log.Fatalln(err)
@@ -30,14 +32,25 @@ func NewBot(token string) Bot {
 	if resToMap["ok"] == false {
 		log.Fatalln("Your token is wrong")
 	}
-	bot := Bot{Token: token}
+	bot := Bot{Token: token, Port: port}
 	_ = json.Unmarshal(resToByte, &bot)
-	fmt.Println(bot)
 	return bot
 }
+
+// SetWebhook sets the webhook url
+// Telegram server sends updates to url
 func (b Bot) SetWebhook(url string) {
 	_, err := http.Get(fmt.Sprintf("https://api.telegram.org/bot%s/setWebhook?url=%s", b.Token, url))
 	if err != nil {
 		return
 	}
+}
+
+func (b Bot) Listener() {
+	http.HandleFunc("/", handle)
+	_ = http.ListenAndServe(":"+b.Port, nil)
+}
+func handle(w http.ResponseWriter, r *http.Request) {
+	res, _ := ioutil.ReadAll(r.Body)
+	log.Println(string(res))
 }
