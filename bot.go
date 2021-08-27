@@ -9,11 +9,13 @@ import (
 )
 
 type Bot struct {
-	Token                 string
-	Port                  int
+	Token  string
+	Result Result `json:"result"`
+}
+type Result struct {
 	Id                    int    `json:"id"`
 	FirstName             string `json:"first_name"`
-	UserName              string `json:"username"`
+	Username              string `json:"username"`
 	SupportsInlineQueries bool   `json:"supports_inline_queries"`
 }
 
@@ -23,14 +25,14 @@ func NewBot(token string) Bot {
 		log.Fatalln(err)
 	}
 	resToMap := map[string]interface{}{}
-	resToString, _ := ioutil.ReadAll(res.Body)
-
-	err = json.Unmarshal(resToString, &resToMap)
-	if err != nil {
-		log.Fatalln(err)
+	resToByte, _ := ioutil.ReadAll(res.Body)
+	_ = json.Unmarshal(resToByte, &resToMap)
+	if resToMap["ok"] == false {
+		log.Fatalln("Your token is wrong")
 	}
-	fmt.Println(resToMap)
-	bot := Bot{}
+	bot := Bot{Token: token}
+	_ = json.Unmarshal(resToByte, &bot)
+	fmt.Println(bot)
 	return bot
 }
 func (b Bot) SetWebhook(url string) {
