@@ -9,12 +9,12 @@ import (
 )
 
 type Bot struct {
-	Token  string
-	Port   string
-	Result Result `json:"result"`
+	Token string
+	Port  string
+	User  User `json:"result"`
 }
 
-type Result struct {
+type User struct {
 	Id                    int    `json:"id"`
 	FirstName             string `json:"first_name"`
 	Username              string `json:"username"`
