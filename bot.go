@@ -8,29 +8,48 @@ import (
 	"net/http"
 )
 
+// Bot represents a bot
+// All fields are required
 type Bot struct {
-	Token          string
-	Port           string
+	// Token of your bot
+	Token string
+	// Port which server will listen to
+	Port string
+	// MassageHandler invokes when webhook sends a new update
 	MassageHandler func(message Message)
-	User           User `json:"result"`
+
+	Self User `json:"result"`
 }
 
 type User struct {
-	Id                    int    `json:"id"`
-	FirstName             string `json:"first_name"`
-	Username              string `json:"username"`
-	SupportsInlineQueries bool   `json:"supports_inline_queries"` // this field is only for bot itself
+	Id        int    `json:"id"`
+	FirstName string `json:"first_name"`
+	Username  string `json:"username"`
+	// SupportsInlineQueries indicates if bot supports inline queries
+	// This field is only for bot itself
+	SupportsInlineQueries bool `json:"supports_inline_queries"`
 }
 
+// Update from webhook
 type Update struct {
 	Message Message `json:"message"`
 }
 
 type Message struct {
-	MessageId int    `json:"message_id"`
-	User      User   `json:"from"`
-	Chat      Chat   `json:"chat"`
-	Text      string `json:"text"`
+	MessageId int  `json:"message_id"`
+	User      User `json:"from"`
+	Chat      Chat `json:"chat"`
+	Type      MassageType
+	Text      string    `json:"text"`
+	Animation Animation `json:"animation"`
+}
+
+type Animation struct {
+	FileId string `json:"file_id"`
+}
+
+type MassageType struct {
+	Text string
 }
 
 type Chat struct {
