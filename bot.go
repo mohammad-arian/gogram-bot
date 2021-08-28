@@ -76,5 +76,5 @@ func handle(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	log.Println(update)
+	log.Printf("%+v\n", update)
 }
