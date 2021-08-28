@@ -9,18 +9,35 @@ import (
 )
 
 type Bot struct {
-	Token string
-	Port  string
-	User  User `json:"result"`
+	Token          string
+	Port           string
+	MassageHandler func(message Message)
+	User           User `json:"result"`
 }
 
 type User struct {
 	Id                    int    `json:"id"`
 	FirstName             string `json:"first_name"`
 	Username              string `json:"username"`
-	SupportsInlineQueries bool   `json:"supports_inline_queries"`
+	SupportsInlineQueries bool   `json:"supports_inline_queries"` // this field is only for bot itself
 }
 
+type Update struct {
+	Message Message `json:"message"`
+}
+
+type Message struct {
+	MessageId int    `json:"message_id"`
+	User      User   `json:"from"`
+	Chat      Chat   `json:"chat"`
+	Text      string `json:"text"`
+}
+
+type Chat struct {
+	Id int `json:"id"`
+}
+
+// NewBot creates a Bot
 func NewBot(token string, port string) Bot {
 	res, err := http.Get(fmt.Sprintf("https://api.telegram.org/bot%s/getme", token))
 	if err != nil {
@@ -46,11 +63,18 @@ func (b Bot) SetWebhook(url string) {
 	}
 }
 
+// Listener listens to upcoming webhook updates
 func (b Bot) Listener() {
 	http.HandleFunc("/", handle)
 	_ = http.ListenAndServe(":"+b.Port, nil)
 }
+
 func handle(w http.ResponseWriter, r *http.Request) {
 	res, _ := ioutil.ReadAll(r.Body)
-	log.Println(string(res))
+	update := Update{}
+	err := json.Unmarshal(res, &update)
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println(update)
 }
