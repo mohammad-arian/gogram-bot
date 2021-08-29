@@ -99,4 +99,5 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 	log.Printf("%+v\n", update)
+	log.Println(update.Message.Type(update.Message))
 }
