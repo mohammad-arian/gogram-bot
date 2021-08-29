@@ -8,9 +8,8 @@ import (
 	"net/http"
 )
 
-// Bot represents a bot
-// All fields are required
-type Bot struct {
+// bot represents a bot
+type bot struct {
 	// Token of your bot
 	Token string
 	// Port which server will listen to
@@ -18,6 +17,23 @@ type Bot struct {
 	// MassageHandler invokes when webhook sends a new update
 	MassageHandler func(message Message)
 	Self           User `json:"result"`
+}
+
+// NewBot creates a Bot
+func NewBot(token string, port string) bot {
+	res, err := http.Get(fmt.Sprintf("https://api.telegram.org/bot%s/getme", token))
+	if err != nil {
+		log.Fatalln(err)
+	}
+	resToMap := map[string]interface{}{}
+	resToByte, _ := ioutil.ReadAll(res.Body)
+	_ = json.Unmarshal(resToByte, &resToMap)
+	if resToMap["ok"] == false {
+		log.Fatalln("Your token is wrong")
+	}
+	newBot := bot{Token: token, Port: port}
+	_ = json.Unmarshal(resToByte, &newBot)
+	return newBot
 }
 
 type User struct {
@@ -58,26 +74,9 @@ type Chat struct {
 	Id int `json:"id"`
 }
 
-// NewBot creates a Bot
-func NewBot(token string, port string) Bot {
-	res, err := http.Get(fmt.Sprintf("https://api.telegram.org/bot%s/getme", token))
-	if err != nil {
-		log.Fatalln(err)
-	}
-	resToMap := map[string]interface{}{}
-	resToByte, _ := ioutil.ReadAll(res.Body)
-	_ = json.Unmarshal(resToByte, &resToMap)
-	if resToMap["ok"] == false {
-		log.Fatalln("Your token is wrong")
-	}
-	bot := Bot{Token: token, Port: port}
-	_ = json.Unmarshal(resToByte, &bot)
-	return bot
-}
-
 // SetWebhook sets the webhook url
 // Telegram server sends updates to url
-func (b Bot) SetWebhook(url string) {
+func (b bot) SetWebhook(url string) {
 	_, err := http.Get(fmt.Sprintf("https://api.telegram.org/bot%s/setWebhook?url=%s", b.Token, url))
 	if err != nil {
 		return
@@ -85,7 +84,7 @@ func (b Bot) SetWebhook(url string) {
 }
 
 // Listener listens to upcoming webhook updates
-func (b Bot) Listener() {
+func (b bot) Listener() {
 	http.HandleFunc("/", handle)
 	_ = http.ListenAndServe(":"+b.Port, nil)
 }
@@ -99,4 +98,5 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 	log.Printf("%+v\n", update)
+	log.Println(update.Message.Type(update.Message))
 }
