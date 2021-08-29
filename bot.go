@@ -17,8 +17,7 @@ type Bot struct {
 	Port string
 	// MassageHandler invokes when webhook sends a new update
 	MassageHandler func(message Message)
-
-	Self User `json:"result"`
+	Self           User `json:"result"`
 }
 
 type User struct {
@@ -39,7 +38,10 @@ type Message struct {
 	MessageId int  `json:"message_id"`
 	User      User `json:"from"`
 	Chat      Chat `json:"chat"`
-	Type      MassageType
+	// Type function returns the type of message
+	// This make it easier to know which fields are empty and which aren't
+	// Type may return Text, Animation and etc
+	Type      func(message Message) string
 	Text      string    `json:"text"`
 	Animation Animation `json:"animation"`
 }
@@ -92,6 +94,7 @@ func handle(w http.ResponseWriter, r *http.Request) {
 	res, _ := ioutil.ReadAll(r.Body)
 	update := Update{}
 	err := json.Unmarshal(res, &update)
+	update.Message.Type = TypeIndicator
 	if err != nil {
 		log.Println(err)
 	}
