@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-// bot represents a bot
+// bot represents a Bot
 type bot struct {
 	// Token of your bot
 	Token string
@@ -18,7 +18,7 @@ type bot struct {
 }
 
 // NewBot creates a bot
-func NewBot(token string, port string) bot {
+func NewBot(token string) bot {
 	res, err := http.Get(fmt.Sprintf("https://api.telegram.org/bot%s/getme", token))
 	if err != nil {
 		log.Fatalln(err)
@@ -42,6 +42,13 @@ type User struct {
 	// This field is only for bots
 	SupportsInlineQueries bool `json:"supports_inline_queries"`
 }
+
+//func SendMessage (b bot, text string) {
+//	req, _ := http.NewRequest("GET", fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", b.Token), nil)
+//	q := req.URL.Query()
+//	q.Add("chat_id", strconv.Itoa(u.Id))
+//	q.Add("text", text)
+//}
 
 // Update from webhook
 type Update struct {
@@ -74,6 +81,9 @@ type Animation struct {
 	FileId string `json:"file_id"`
 }
 
+// Chat id is a unique identification number of a Telegram chat (personal or group chat).
+// However, the Telegram User id is a unique identification number of a particular Telegram user.
+// Use Chat id for groups, and User id for a specific user
 type Chat struct {
 	Id int `json:"id"`
 }
@@ -89,11 +99,11 @@ func (b bot) SetWebhook(url string) {
 
 // Listener listens to upcoming webhook updates
 func (b bot) Listener(port string) {
-	http.HandleFunc("/", handle)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { webhookHandler(w, r, b) })
 	_ = http.ListenAndServe(":"+port, nil)
 }
 
-func handle(w http.ResponseWriter, r *http.Request) {
+func webhookHandler(w http.ResponseWriter, r *http.Request, bot bot) {
 	res, _ := ioutil.ReadAll(r.Body)
 	update := Update{}
 	err := json.Unmarshal(res, &update)
@@ -101,4 +111,6 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 	log.Printf("%+v\n", update)
+	log.Println(string(res))
+	bot.MassageHandler(update.Message)
 }
