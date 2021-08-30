@@ -112,5 +112,5 @@ func webhookHandler(w http.ResponseWriter, r *http.Request, bot bot) {
 	}
 	log.Printf("%+v\n", update)
 	log.Println(string(res))
-	bot.MassageHandler(update.Message)
+	//bot.MassageHandler(update.Message)
 }
