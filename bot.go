@@ -14,12 +14,12 @@ type bot struct {
 	// Token of your bot
 	Token string
 	// MassageHandler invokes when webhook sends a new update
-	MassageHandler func(message Message)
+	MassageHandler func(message Message, bot bot)
 	Self           User `json:"result"`
 }
 
 // NewBot creates a bot
-func NewBot(token string, handler func(message Message)) bot {
+func NewBot(token string, handler func(message Message, bot bot)) bot {
 	res, err := http.Get(fmt.Sprintf("https://api.telegram.org/bot%s/getme", token))
 	if err != nil {
 		log.Fatalln(err)
@@ -123,6 +123,6 @@ func webhookHandler(w http.ResponseWriter, r *http.Request, bot bot) {
 	log.Printf("%+v\n", update)
 	log.Println(string(res))
 	if bot.MassageHandler != nil {
-		bot.MassageHandler(update.Message)
+		bot.MassageHandler(update.Message, bot)
 	}
 }
