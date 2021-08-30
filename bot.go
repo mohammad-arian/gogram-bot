@@ -57,6 +57,12 @@ func (u User) SendMessageToUser(b bot, text string) {
 	q := req.URL.Query()
 	q.Add("chat_id", strconv.Itoa(u.Id))
 	q.Add("text", text)
+	req.URL.RawQuery = q.Encode()
+	client := &http.Client{}
+	_, err := client.Do(req)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
 
 type Message struct {
