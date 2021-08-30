@@ -1,3 +1,3 @@
 module github.com/gcoder-dev/gogram-bot
 
-go 1.17
+go 1.16
