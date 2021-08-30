@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 // bot represents a Bot
@@ -18,7 +19,7 @@ type bot struct {
 }
 
 // NewBot creates a bot
-func NewBot(token string) bot {
+func NewBot(token string, handler func(message Message)) bot {
 	res, err := http.Get(fmt.Sprintf("https://api.telegram.org/bot%s/getme", token))
 	if err != nil {
 		log.Fatalln(err)
@@ -29,9 +30,14 @@ func NewBot(token string) bot {
 	if resToMap["ok"] == false {
 		log.Fatalln("Your token is wrong")
 	}
-	var newBot = bot{Token: token}
+	var newBot = bot{Token: token, MassageHandler: handler}
 	_ = json.Unmarshal(resToByte, &newBot)
 	return newBot
+}
+
+// Update from webhook
+type Update struct {
+	Message Message `json:"message"`
 }
 
 type User struct {
@@ -43,16 +49,14 @@ type User struct {
 	SupportsInlineQueries bool `json:"supports_inline_queries"`
 }
 
-//func SendMessage (b bot, text string) {
-//	req, _ := http.NewRequest("GET", fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", b.Token), nil)
-//	q := req.URL.Query()
-//	q.Add("chat_id", strconv.Itoa(u.Id))
-//	q.Add("text", text)
-//}
-
-// Update from webhook
-type Update struct {
-	Message Message `json:"message"`
+func (u User) SendMessageToUser(b bot, text string) {
+	if u.Id == 0 {
+		log.Fatalln("User's Id field is empty")
+	}
+	req, _ := http.NewRequest("GET", fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", b.Token), nil)
+	q := req.URL.Query()
+	q.Add("chat_id", strconv.Itoa(u.Id))
+	q.Add("text", text)
 }
 
 type Message struct {
@@ -112,5 +116,7 @@ func webhookHandler(w http.ResponseWriter, r *http.Request, bot bot) {
 	}
 	log.Printf("%+v\n", update)
 	log.Println(string(res))
-	//bot.MassageHandler(update.Message)
+	if bot.MassageHandler != nil {
+		bot.MassageHandler(update.Message)
+	}
 }
