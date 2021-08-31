@@ -54,7 +54,7 @@ type User struct {
 	SupportsInlineQueries bool `json:"supports_inline_queries"`
 }
 
-func (u User) SendMessageToUser(b *Bot, text string) {
+func (u User) SendMessageToUser(b Bot, text string) {
 	if u.Id == 0 {
 		log.Fatalln("User's Id field is empty")
 	}
