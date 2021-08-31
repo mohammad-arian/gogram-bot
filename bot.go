@@ -33,7 +33,7 @@ func NewBot(token string, handler func(message Message, bot Bot)) Bot {
 	if resToMap["ok"] == false {
 		log.Fatalln("Your token is wrong")
 	}
-	var newBot = Bot{Token: token}
+	var newBot = Bot{Token: token, MassageHandler: handler}
 	_ = json.Unmarshal(resToByte, &newBot)
 	return newBot
 }
