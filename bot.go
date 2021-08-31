@@ -53,7 +53,7 @@ func (u User) SendMessageToUser(b Bot, text string) {
 	if u.Id == 0 {
 		log.Fatalln("User's Id field is empty")
 	}
-	req, _ := http.NewRequest("GET", fmt.Sprintf("https://api.telegram.org/Bot%s/sendMessage", b.Token), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", b.Token), nil)
 	q := req.URL.Query()
 	q.Add("chat_id", strconv.Itoa(u.Id))
 	q.Add("text", text)
@@ -101,7 +101,7 @@ type Chat struct {
 // SetWebhook sets the webhook url
 // Telegram server sends updates to url
 func (b Bot) SetWebhook(url string) {
-	_, err := http.Get(fmt.Sprintf("https://api.telegram.org/Bot%s/setWebhook?url=%s", b.Token, url))
+	_, err := http.Get(fmt.Sprintf("https://api.telegram.org/bot%s/setWebhook?url=%s", b.Token, url))
 	if err != nil {
 		return
 	}
