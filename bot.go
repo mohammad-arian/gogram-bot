@@ -63,6 +63,7 @@ func (u User) SendMessageToUser(b Bot, text string) {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	client.CloseIdleConnections()
 }
 
 type Message struct {
