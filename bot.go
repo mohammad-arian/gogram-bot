@@ -16,15 +16,13 @@ type Bot struct {
 	Token string
 	// MassageHandler invokes when webhook sends a new update.
 	// It must have two parameters, one of type Message
-	// the other of type Bot, you can choose any Bot that you created.
-	// later when sending something, you pass the bot to that function.
-	// this way you can send
-	MassageHandler func(message Message)
+	// the other of type Bot.
+	MassageHandler func(message Message, bot Bot)
 	Self           User `json:"result"`
 }
 
 // NewBot creates a Bot
-func NewBot(token string, handler func(message Message)) Bot {
+func NewBot(token string, handler func(message Message, bot Bot)) Bot {
 	res, err := http.Get(fmt.Sprintf("https://api.telegram.org/bot%s/getme", token))
 	if err != nil {
 		log.Fatalln(err)
@@ -46,6 +44,9 @@ type Update struct {
 }
 
 type User struct {
+	// Chat id is a unique identification number of a Telegram chat (personal or group chat).
+	// However, the Telegram User id is a unique identification number of a particular Telegram user.
+	// Use Chat id for groups, and User id for a specific user
 	Id        int    `json:"id"`
 	FirstName string `json:"first_name"`
 	Username  string `json:"username"`
@@ -54,6 +55,10 @@ type User struct {
 	SupportsInlineQueries bool `json:"supports_inline_queries"`
 }
 
+// SendMessageToUser sends message to a User.
+// b Bot parameter indicated which bot to send
+// the message with. This way you can send messages
+// with different bots
 func (u User) SendMessageToUser(b Bot, text string) {
 	if u.Id == 0 {
 		log.Fatalln("User's Id field is empty")
@@ -131,6 +136,8 @@ func webhookHandler(w http.ResponseWriter, r *http.Request, bot Bot) {
 	log.Printf("%+v\n", update)
 	log.Println(string(res))
 	if bot.MassageHandler != nil {
-		bot.MassageHandler(update.Message)
+		bot.MassageHandler(update.Message, bot)
+	} else {
+		log.Println("Warning: webhook just received something, but you have not added any handler to bot")
 	}
 }
