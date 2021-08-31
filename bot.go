@@ -20,7 +20,7 @@ type Bot struct {
 
 // NewBot creates a Bot
 func NewBot(token string, handler func(message Message, bot Bot)) Bot {
-	res, err := http.Get(fmt.Sprintf("https://api.telegram.org/Bot%s/getme", token))
+	res, err := http.Get(fmt.Sprintf("https://api.telegram.org/bot%s/getme", token))
 	if err != nil {
 		log.Fatalln(err)
 	}
