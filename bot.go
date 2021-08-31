@@ -10,11 +10,16 @@ import (
 )
 
 // Bot represents a bot
+// you can create multiple bots
 type Bot struct {
 	// Token of your Bot
 	Token string
-	// MassageHandler invokes when webhook sends a new update
-	MassageHandler func(message Message, bot Bot)
+	// MassageHandler invokes when webhook sends a new update.
+	// It must have two parameters, one of type Message
+	// the other of type Bot, you can choose any Bot that you created.
+	// later when sending something, you pass the bot to that function.
+	// this way you can send
+	MassageHandler func(message Message)
 	Self           User `json:"result"`
 }
 
@@ -30,7 +35,7 @@ func NewBot(token string, handler func(message Message, bot Bot)) Bot {
 	if resToMap["ok"] == false {
 		log.Fatalln("Your token is wrong")
 	}
-	var newBot = Bot{Token: token, MassageHandler: handler}
+	var newBot = Bot{Token: token}
 	_ = json.Unmarshal(resToByte, &newBot)
 	return newBot
 }
@@ -126,6 +131,6 @@ func webhookHandler(w http.ResponseWriter, r *http.Request, bot Bot) {
 	log.Printf("%+v\n", update)
 	log.Println(string(res))
 	if bot.MassageHandler != nil {
-		bot.MassageHandler(update.Message, bot)
+		bot.MassageHandler(update.Message)
 	}
 }
