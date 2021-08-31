@@ -9,18 +9,18 @@ import (
 	"strconv"
 )
 
-// bot represents a Bot
-type bot struct {
-	// Token of your bot
+// Bot represents a bot
+type Bot struct {
+	// Token of your Bot
 	Token string
 	// MassageHandler invokes when webhook sends a new update
-	MassageHandler func(message Message, bot bot)
+	MassageHandler func(message Message, bot Bot)
 	Self           User `json:"result"`
 }
 
-// NewBot creates a bot
-func NewBot(token string, handler func(message Message, bot bot)) bot {
-	res, err := http.Get(fmt.Sprintf("https://api.telegram.org/bot%s/getme", token))
+// NewBot creates a Bot
+func NewBot(token string, handler func(message Message, bot Bot)) Bot {
+	res, err := http.Get(fmt.Sprintf("https://api.telegram.org/Bot%s/getme", token))
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -30,7 +30,7 @@ func NewBot(token string, handler func(message Message, bot bot)) bot {
 	if resToMap["ok"] == false {
 		log.Fatalln("Your token is wrong")
 	}
-	var newBot = bot{Token: token, MassageHandler: handler}
+	var newBot = Bot{Token: token, MassageHandler: handler}
 	_ = json.Unmarshal(resToByte, &newBot)
 	return newBot
 }
@@ -44,16 +44,16 @@ type User struct {
 	Id        int    `json:"id"`
 	FirstName string `json:"first_name"`
 	Username  string `json:"username"`
-	// SupportsInlineQueries shows if bot supports inline queries
+	// SupportsInlineQueries shows if Bot supports inline queries
 	// This field is only for bots
 	SupportsInlineQueries bool `json:"supports_inline_queries"`
 }
 
-func (u User) SendMessageToUser(b bot, text string) {
+func (u User) SendMessageToUser(b Bot, text string) {
 	if u.Id == 0 {
 		log.Fatalln("User's Id field is empty")
 	}
-	req, _ := http.NewRequest("GET", fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", b.Token), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("https://api.telegram.org/Bot%s/sendMessage", b.Token), nil)
 	q := req.URL.Query()
 	q.Add("chat_id", strconv.Itoa(u.Id))
 	q.Add("text", text)
@@ -100,20 +100,20 @@ type Chat struct {
 
 // SetWebhook sets the webhook url
 // Telegram server sends updates to url
-func (b bot) SetWebhook(url string) {
-	_, err := http.Get(fmt.Sprintf("https://api.telegram.org/bot%s/setWebhook?url=%s", b.Token, url))
+func (b Bot) SetWebhook(url string) {
+	_, err := http.Get(fmt.Sprintf("https://api.telegram.org/Bot%s/setWebhook?url=%s", b.Token, url))
 	if err != nil {
 		return
 	}
 }
 
 // Listener listens to upcoming webhook updates
-func (b bot) Listener(port string) {
+func (b Bot) Listener(port string) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { webhookHandler(w, r, b) })
 	_ = http.ListenAndServe(":"+port, nil)
 }
 
-func webhookHandler(w http.ResponseWriter, r *http.Request, bot bot) {
+func webhookHandler(w http.ResponseWriter, r *http.Request, bot Bot) {
 	res, _ := ioutil.ReadAll(r.Body)
 	update := Update{}
 	err := json.Unmarshal(res, &update)
