@@ -7,20 +7,13 @@ import (
 	"strconv"
 )
 
-// SendMessageToUser sends message to a User.
-// b Bot parameter indicated which bot to send
-// the message with. This way you can send messages
-// with different bots
-func (u User) SendMessageToUser(b Bot, text string) {
-	if u.Id == 0 {
-		log.Fatalln("User's Id field is empty")
-	}
+func sendTextLogic(b Bot, id int, text string) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", b.Token), nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
 	q := req.URL.Query()
-	q.Add("chat_id", strconv.Itoa(u.Id))
+	q.Add("chat_id", strconv.Itoa(id))
 	q.Add("text", text)
 	req.URL.RawQuery = q.Encode()
 	client := &http.Client{}
@@ -28,4 +21,26 @@ func (u User) SendMessageToUser(b Bot, text string) {
 	if err != nil {
 		log.Fatalln(err)
 	}
+}
+
+// SendText sends message to a User.
+// b Bot parameter indicated which bot to send
+// the message with. This way you can send messages
+// with different bots
+func (u User) SendText(b Bot, text string) {
+	if u.Id == 0 {
+		log.Fatalln("User's Id field is empty")
+	}
+	sendTextLogic(b, u.Id, text)
+}
+
+// SendText sends message to a Chat.
+// b Bot parameter indicated which bot to send
+// the message with. This way you can send messages
+// with different bots
+func (c Chat) SendText(b Bot, text string) {
+	if c.Id == 0 {
+		log.Fatalln("User's Id field is empty")
+	}
+	sendTextLogic(b, c.Id, text)
 }

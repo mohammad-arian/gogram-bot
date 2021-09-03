@@ -17,6 +17,7 @@ type Bot struct {
 			MessageHandler invokes when webhook sends a new update.
 		    It must have two parameters, one of type Message
 		    the other of type Bot.
+
 			In the below example, we have a Bot variable called bot.
 			We passed a function of type func (message gogram.Message, bot gogram.Bot)
 			to our bot called handle.
@@ -28,7 +29,7 @@ type Bot struct {
 			bot.Listener(<Port>)
 
 			func handle(message gogram.Message, bot gogram.Bot) {
-				message.User.SendMessageToUser(bot, message.Text)
+				message.User.SendText(bot, message.Text)
 			}
 	*/
 	MessageHandler func(message Message, bot Bot)
@@ -66,8 +67,9 @@ type Message struct {
 }
 
 type User struct {
-	// Chat id is a unique identification number of a Telegram chat (personal or group chat).
-	// However, the Telegram User id is a unique identification number of a particular Telegram user.
+	// User id is a unique identification number of a particular Telegram user.
+	// However, the Telegram Chat id is a unique identification
+	// number of a Telegram chat (personal or group chat).
 	// Use Chat id for groups, and User id for a specific user
 	Id        int    `json:"id"`
 	FirstName string `json:"first_name"`
