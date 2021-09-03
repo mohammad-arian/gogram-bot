@@ -6,11 +6,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
 )
 
-// Bot represents a bot
-// you can create multiple bots
+// Bot represents a bot. you can create multiple bots
+// Token is required; but MessageHandler and Self are optional
 type Bot struct {
 	// Token of your Bot
 	Token string
@@ -58,6 +57,14 @@ type Update struct {
 	Message Message `json:"message"`
 }
 
+type Message struct {
+	MessageId int       `json:"message_id"`
+	User      User      `json:"from"`
+	Chat      Chat      `json:"chat"`
+	Text      string    `json:"text"`
+	Animation Animation `json:"animation"`
+}
+
 type User struct {
 	// Chat id is a unique identification number of a Telegram chat (personal or group chat).
 	// However, the Telegram User id is a unique identification number of a particular Telegram user.
@@ -70,35 +77,15 @@ type User struct {
 	SupportsInlineQueries bool `json:"supports_inline_queries"`
 }
 
-// SendMessageToUser sends message to a User.
-// b Bot parameter indicated which bot to send
-// the message with. This way you can send messages
-// with different bots
-func (u User) SendMessageToUser(b Bot, text string) {
-	if u.Id == 0 {
-		log.Fatalln("User's Id field is empty")
-	}
-	req, err := http.NewRequest("GET", fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", b.Token), nil)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	q := req.URL.Query()
-	q.Add("chat_id", strconv.Itoa(u.Id))
-	q.Add("text", text)
-	req.URL.RawQuery = q.Encode()
-	client := &http.Client{}
-	_, err = client.Do(req)
-	if err != nil {
-		log.Fatalln(err)
-	}
+// Chat id is a unique identification number of a Telegram chat (personal or group chat).
+// However, the Telegram User id is a unique identification number of a particular Telegram user.
+// Use Chat id for groups, and User id for a specific user
+type Chat struct {
+	Id int `json:"id"`
 }
 
-type Message struct {
-	MessageId int       `json:"message_id"`
-	User      User      `json:"from"`
-	Chat      Chat      `json:"chat"`
-	Text      string    `json:"text"`
-	Animation Animation `json:"animation"`
+type Animation struct {
+	FileId string `json:"file_id"`
 }
 
 // TypeIndicator function returns the type of message
@@ -113,17 +100,6 @@ func (m Message) TypeIndicator() string {
 	default:
 		return "Unknown"
 	}
-}
-
-type Animation struct {
-	FileId string `json:"file_id"`
-}
-
-// Chat id is a unique identification number of a Telegram chat (personal or group chat).
-// However, the Telegram User id is a unique identification number of a particular Telegram user.
-// Use Chat id for groups, and User id for a specific user
-type Chat struct {
-	Id int `json:"id"`
 }
 
 // SetWebhook sets the webhook url
