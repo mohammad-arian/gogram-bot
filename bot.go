@@ -14,10 +14,25 @@ import (
 type Bot struct {
 	// Token of your Bot
 	Token string
-	// MassageHandler invokes when webhook sends a new update.
-	// It must have two parameters, one of type Message
-	// the other of type Bot.
-	MassageHandler func(message Message, bot Bot)
+	/*
+			MessageHandler invokes when webhook sends a new update.
+		    It must have two parameters, one of type Message
+		    the other of type Bot.
+			In the below example, we have a Bot variable called bot.
+			We passed a function of type func (message gogram.Message, bot gogram.Bot)
+			to our bot called handle.
+			When telegram server sends something, handle function is invoked.
+			Then we can use bot parameter to send something back to user who sent bot message;
+			or we can use another bot.
+
+			var bot = gogram.NewBot("<Token>", handle)
+			bot.Listener(<Port>)
+
+			func handle(message gogram.Message, bot gogram.Bot) {
+				message.User.SendMessageToUser(bot, message.Text)
+			}
+	*/
+	MessageHandler func(message Message, bot Bot)
 	Self           User `json:"result"`
 }
 
@@ -33,7 +48,7 @@ func NewBot(token string, handler func(message Message, bot Bot)) Bot {
 	if resToMap["ok"] == false {
 		log.Fatalln("Your token is wrong")
 	}
-	var newBot = Bot{Token: token, MassageHandler: handler}
+	var newBot = Bot{Token: token, MessageHandler: handler}
 	_ = json.Unmarshal(resToByte, &newBot)
 	return newBot
 }
@@ -135,8 +150,8 @@ func webhookHandler(w http.ResponseWriter, r *http.Request, bot Bot) {
 	}
 	log.Printf("%+v\n", update)
 	log.Println(string(res))
-	if bot.MassageHandler != nil {
-		bot.MassageHandler(update.Message, bot)
+	if bot.MessageHandler != nil {
+		bot.MessageHandler(update.Message, bot)
 	} else {
 		log.Println("Warning: webhook just received something, but you have not added any handler to bot")
 	}
