@@ -33,7 +33,6 @@ func (u User) SendText(b Bot, text string) {
 	} else {
 		sendTextLogic(b, u.Id, text)
 	}
-	log.Fatalln()
 }
 
 // SendText sends message to a Chat.
