@@ -29,9 +29,11 @@ func sendTextLogic(b Bot, id int, text string) {
 // with different bots
 func (u User) SendText(b Bot, text string) {
 	if u.Id == 0 {
-		log.Fatalln("User's Id field is empty")
+		log.Println("User's Id field is empty")
+	} else {
+		sendTextLogic(b, u.Id, text)
 	}
-	sendTextLogic(b, u.Id, text)
+	log.Fatalln()
 }
 
 // SendText sends message to a Chat.
@@ -40,7 +42,9 @@ func (u User) SendText(b Bot, text string) {
 // with different bots
 func (c Chat) SendText(b Bot, text string) {
 	if c.Id == 0 {
-		log.Fatalln("User's Id field is empty")
+		log.Println("User's Id field is empty")
+	} else {
+		sendTextLogic(b, c.Id, text)
 	}
-	sendTextLogic(b, c.Id, text)
+
 }
