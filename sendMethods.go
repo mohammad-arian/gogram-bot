@@ -1,12 +1,12 @@
 package gogram
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 func sendTextLogic(b Bot, id int, text string) {
@@ -63,18 +63,22 @@ func sendPhotoLogic(b Bot, id int, photo string) {
 	//if err != nil {
 	//	log.Fatalln(err)
 	//}
-	data := url.Values{
-		"chat_id": {strconv.Itoa(id)},
-		"photo":   {photo},
-	}
-	resp, err := http.PostForm(fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto", b.Token), data)
+	//body := &bytes.Buffer{}
+	//writer := multipart.NewWriter(body)
+	//part, err := writer.CreateFormFile(filetype, filepath.Base(file.Name()))
+	//io.Copy(part, file)
+	//writer.Close()
+	data := url.Values{}
+	data.Set("chat_id", strconv.Itoa(id))
+	data.Set("photo", photo)
+	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto", b.Token),
+		strings.NewReader(data.Encode()))
+	client := &http.Client{}
+	res, err := client.Do(req)
 	if err != nil {
 		log.Println(err)
 	}
-	var res map[string]interface{}
-	json.NewDecoder(resp.Body).Decode(&res)
 	log.Println(res)
-
 }
 
 func (u User) SendPhoto(b Bot, photo string) {
