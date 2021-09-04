@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
+	"strings"
 )
 
 func sendTextLogic(b Bot, id int, text string) {
@@ -48,14 +50,17 @@ func (c Chat) SendText(b Bot, text string) {
 }
 
 func sendPhotoLogic(b Bot, id int, photo string) {
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto", b.Token), nil)
+	q := url.Values{}
+	q.Add("chat_id", strconv.Itoa(id))
+	q.Add("photo", photo)
+	//req.URL.RawQuery = q.Encode()
+	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto", b.Token),
+		strings.NewReader(q.Encode()))
 	if err != nil {
 		log.Fatalln(err)
 	}
-	q := req.URL.Query()
-	q.Add("chat_id", strconv.Itoa(id))
-	q.Add("photo", photo)
-	req.URL.RawQuery = q.Encode()
+	//q := req.URL.Query()
+
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
