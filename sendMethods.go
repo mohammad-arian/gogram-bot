@@ -57,10 +57,11 @@ func sendPhotoLogic(b Bot, id int, photo string) {
 	q.Add("photo", photo)
 	req.URL.RawQuery = q.Encode()
 	client := &http.Client{}
-	_, err = client.Do(req)
+	res, err := client.Do(req)
 	if err != nil {
 		log.Fatalln(err)
 	}
+	log.Println(res)
 	//body := &bytes.Buffer{}
 	//writer := multipart.NewWriter(body)
 	//part, err := writer.CreateFormFile(filetype, filepath.Base(file.Name()))
