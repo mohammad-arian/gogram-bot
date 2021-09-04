@@ -1,12 +1,12 @@
 package gogram
 
 import (
+	"bytes"
 	"fmt"
 	"log"
+	"mime/multipart"
 	"net/http"
-	"net/url"
 	"strconv"
-	"strings"
 )
 
 func sendTextLogic(b Bot, id int, text string) {
@@ -50,15 +50,35 @@ func (c Chat) SendText(b Bot, text string) {
 }
 
 func sendPhotoLogic(b Bot, id int, photo string) {
-	q := url.Values{}
-	q.Add("chat_id", strconv.Itoa(id))
-	q.Add("photo", photo)
+	var b2 bytes.Buffer
+	w := multipart.NewWriter(&b2)
+	field, err := w.CreateFormField("chat_id")
+	if err != nil {
+		return
+	}
+	_, err = field.Write([]byte(strconv.Itoa(id)))
+	if err != nil {
+		return
+	}
+	file, err := w.CreateFormFile("photo", "pic.jpg")
+	if err != nil {
+		return
+	}
+	_, err = file.Write([]byte(photo))
+	if err != nil {
+		return
+	}
 	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto", b.Token),
-		strings.NewReader(q.Encode()))
+		&b2)
 	if err != nil {
 		log.Println(err)
 	}
-	req.Header.Add("Content-Type", "multipart/form-data")
+	req.Header.Add("Content-Type", w.FormDataContentType())
+
+	//q := url.Values{}
+	//q.Add("chat_id", strconv.Itoa(id))
+	//q.Add("photo", photo)
+	//req.Header.Add("Content-Type", "multipart/form-data")
 	//q := req.URL.Query()
 
 	client := &http.Client{}
