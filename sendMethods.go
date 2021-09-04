@@ -7,6 +7,7 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -51,7 +52,7 @@ func (c Chat) SendText(b Bot, text string) {
 	}
 }
 
-func sendPhotoLogic(b Bot, id int, photo string) {
+func sendPhotoLogic(b Bot, id int, photo os.File) {
 	body := &bytes.Buffer{}
 	w := multipart.NewWriter(body)
 	field, err := w.CreateFormField("chat_id")
@@ -62,11 +63,12 @@ func sendPhotoLogic(b Bot, id int, photo string) {
 	if err != nil {
 		return
 	}
-	file, err := w.CreateFormFile("photo", "pic.jpg")
+
+	file, err := w.CreateFormFile("photo", photo.Name())
 	if err != nil {
 		return
 	}
-	_, err = file.Write([]byte(photo))
+	_, err = io.Copy(file, &photo)
 	if err != nil {
 		return
 	}
