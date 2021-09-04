@@ -93,7 +93,7 @@ func sendPhotoLogic(b Bot, id int, photo os.File) {
 	log.Println(res)
 }
 
-func (u User) SendPhoto(b Bot, photo string) {
+func (u User) SendPhoto(b Bot, photo os.File) {
 	if u.Id == 0 {
 		log.Println("User's Id field is empty")
 	} else {
@@ -101,7 +101,7 @@ func (u User) SendPhoto(b Bot, photo string) {
 	}
 }
 
-func (c Chat) SendPhoto(b Bot, photo string) {
+func (c Chat) SendPhoto(b Bot, photo os.File) {
 	if c.Id == 0 {
 		log.Println("Chat's Id field is empty")
 	} else {
