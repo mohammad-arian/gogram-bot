@@ -71,7 +71,7 @@ func sendPhotoLogic(b Bot, id int, photo string) {
 		return
 	}
 	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto", b.Token),
-		body)
+		bytes.NewReader(body.Bytes()))
 	if err != nil {
 		log.Println(err)
 	}
