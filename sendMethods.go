@@ -3,10 +3,12 @@ package gogram
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"log"
 	"mime/multipart"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 func sendTextLogic(b Bot, id int, text string) {
@@ -50,13 +52,13 @@ func (c Chat) SendText(b Bot, text string) {
 }
 
 func sendPhotoLogic(b Bot, id int, photo string) {
-	var b2 bytes.Buffer
-	w := multipart.NewWriter(&b2)
+	body := &bytes.Buffer{}
+	w := multipart.NewWriter(body)
 	field, err := w.CreateFormField("chat_id")
 	if err != nil {
 		return
 	}
-	_, err = field.Write([]byte(strconv.Itoa(id)))
+	_, err = io.Copy(field, strings.NewReader(strconv.Itoa(id)))
 	if err != nil {
 		return
 	}
@@ -69,7 +71,7 @@ func sendPhotoLogic(b Bot, id int, photo string) {
 		return
 	}
 	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto", b.Token),
-		&b2)
+		body)
 	if err != nil {
 		log.Println(err)
 	}
