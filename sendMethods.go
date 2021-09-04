@@ -1,6 +1,7 @@
 package gogram
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -66,10 +67,13 @@ func sendPhotoLogic(b Bot, id int, photo string) {
 		"chat_id": {strconv.Itoa(id)},
 		"photo":   {photo},
 	}
-	_, err := http.PostForm(fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto", b.Token), data)
+	resp, err := http.PostForm(fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto", b.Token), data)
 	if err != nil {
 		log.Println(err)
 	}
+	var res map[string]interface{}
+	json.NewDecoder(resp.Body).Decode(&res)
+	log.Println(res)
 
 }
 
