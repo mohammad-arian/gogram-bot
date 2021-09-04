@@ -58,12 +58,17 @@ type Update struct {
 	Message Message `json:"message"`
 }
 
+type Photo struct {
+	FileId string `json:"file_id"`
+}
+
 type Message struct {
 	MessageId int       `json:"message_id"`
 	User      User      `json:"from"`
 	Chat      Chat      `json:"chat"`
 	Text      string    `json:"text"`
 	Animation Animation `json:"animation"`
+	Photo     []Photo   `json:"photo"`
 }
 
 type User struct {
@@ -92,13 +97,15 @@ type Animation struct {
 
 // TypeIndicator function returns the type of message
 // This make it easier to know which fields are empty and which aren't
-// TypeIndicator may return "Text", "Animation" and etc
+// TypeIndicator may return "Text", "Animation", "Photo" and etc
 func (m Message) TypeIndicator() string {
 	switch {
 	case m.Text != "":
 		return "Text"
 	case m.Animation != Animation{}:
 		return "Animation"
+	case m.Photo != nil:
+		return "Photo"
 	default:
 		return "Unknown"
 	}
