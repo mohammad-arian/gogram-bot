@@ -58,7 +58,7 @@ func sendPhotoLogic(b Bot, id int, photo string) {
 	if err != nil {
 		log.Println(err)
 	}
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Add("Content-Type", "multipart/form-data")
 	//q := req.URL.Query()
 
 	client := &http.Client{}
