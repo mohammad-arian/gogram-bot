@@ -63,9 +63,15 @@ func sendPhotoLogic(b Bot, id int, photo interface{}) string {
 	case *os.File:
 		log.Println("type is file")
 		w := multipart.NewWriter(body)
-		field, _ := w.CreateFormField("chat_id")
-		_, _ = io.Copy(field, strings.NewReader(strconv.Itoa(id)))
-		file, _ := w.CreateFormFile("photo", p.Name())
+		field, err := w.CreateFormField("chat_id")
+		if err != nil {
+			log.Fatalln(err)
+		}
+		_, err = io.Copy(field, strings.NewReader(strconv.Itoa(id)))
+		if err != nil {
+			log.Fatalln(err)
+		}
+		file, err := w.CreateFormFile("photo", p.Name())
 		_, err = io.Copy(file, p)
 		if err != nil {
 			log.Fatalln(err)
