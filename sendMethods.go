@@ -60,6 +60,7 @@ func sendPhotoLogic(b Bot, id int, photo interface{}) string {
 	body := &bytes.Buffer{}
 	switch p := photo.(type) {
 	case *os.File:
+
 		log.Println("type is file")
 		w := multipart.NewWriter(body)
 		field, _ := w.CreateFormField("chat_id")
