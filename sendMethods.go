@@ -76,6 +76,7 @@ func sendPhotoLogic(b Bot, id int, photo interface{}) string {
 		q := req.URL.Query()
 		q.Add("chat_id", strconv.Itoa(id))
 		q.Add("photo", p)
+		req.URL.RawQuery = q.Encode()
 	}
 	res, err := client.Do(req)
 	resToString, _ := ioutil.ReadAll(res.Body)
