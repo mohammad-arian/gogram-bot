@@ -60,13 +60,13 @@ func sendPhotoLogic(b Bot, id int, photo interface{}) string {
 	client := &http.Client{}
 	body := &bytes.Buffer{}
 	switch p := photo.(type) {
-	case os.File:
+	case *os.File:
 		log.Println("type is file")
 		w := multipart.NewWriter(body)
 		field, _ := w.CreateFormField("chat_id")
 		_, _ = io.Copy(field, strings.NewReader(strconv.Itoa(id)))
 		file, _ := w.CreateFormFile("photo", p.Name())
-		_, err = io.Copy(file, &p)
+		_, err = io.Copy(file, p)
 		if err != nil {
 			log.Fatalln(err)
 		}
