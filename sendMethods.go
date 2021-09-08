@@ -75,6 +75,8 @@ func sendPhotoLogic(b Bot, id int, photo interface{}) string {
 		q.Add("chat_id", strconv.Itoa(id))
 		q.Add("photo", p)
 		req.URL.RawQuery = q.Encode()
+	default:
+		return "sendPhotoLogic function accepts string and *os.File types"
 	}
 	res, err := client.Do(req)
 	resToString, _ := ioutil.ReadAll(res.Body)
