@@ -70,7 +70,7 @@ func sendPhotoLogic(b Bot, id int, photo interface{}) string {
 		if err != nil {
 			log.Fatalln(err)
 		}
-		req.Body = io.NopCloser(bytes.NewReader(body.Bytes()))
+		req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
 		req.Header.Add("Content-Type", w.FormDataContentType())
 	case string:
 		q := req.URL.Query()
