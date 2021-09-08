@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"mime/multipart"
 	"net/http"
@@ -52,48 +53,40 @@ func (c Chat) SendText(b Bot, text string) {
 	}
 }
 
-func sendPhotoLogic(b Bot, id int, photo os.File) {
-	body := &bytes.Buffer{}
-	w := multipart.NewWriter(body)
-	field, err := w.CreateFormField("chat_id")
-	if err != nil {
-		return
-	}
-	_, err = io.Copy(field, strings.NewReader(strconv.Itoa(id)))
-	if err != nil {
-		return
-	}
-
-	file, err := w.CreateFormFile("photo", photo.Name())
-	if err != nil {
-		return
-	}
-	_, err = io.Copy(file, &photo)
-	if err != nil {
-		return
-	}
+func sendPhotoLogic(b Bot, id int, photo interface{}) string {
+	// ++++
 	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto", b.Token),
-		bytes.NewReader(body.Bytes()))
-	if err != nil {
-		log.Println(err)
-	}
-	req.Header.Add("Content-Type", w.FormDataContentType())
-
-	//q := url.Values{}
-	//q.Add("chat_id", strconv.Itoa(id))
-	//q.Add("photo", photo)
-	//req.Header.Add("Content-Type", "multipart/form-data")
-	//q := req.URL.Query()
-
+		nil)
 	client := &http.Client{}
+	body := &bytes.Buffer{}
+	// ++++
+	switch p := photo.(type) {
+	case os.File:
+		w := multipart.NewWriter(body)
+		field, _ := w.CreateFormField("chat_id")
+		_, _ = io.Copy(field, strings.NewReader(strconv.Itoa(id)))
+		file, _ := w.CreateFormFile("photo", p.Name())
+		_, err = io.Copy(file, &p)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		req.Body = io.NopCloser(bytes.NewReader(body.Bytes()))
+		req.Header.Add("Content-Type", w.FormDataContentType())
+	case string:
+		q := req.URL.Query()
+		q.Add("chat_id", strconv.Itoa(id))
+		q.Add("photo", p)
+	}
 	res, err := client.Do(req)
+	resToString, _ := ioutil.ReadAll(res.Body)
 	if err != nil {
 		log.Fatalln(err)
 	}
 	log.Println(res)
+	return string(resToString)
 }
 
-func (u User) SendPhoto(b Bot, photo os.File) {
+func (u User) SendPhoto(b Bot, photo interface{}) {
 	if u.Id == 0 {
 		log.Println("User's Id field is empty")
 	} else {
@@ -101,7 +94,7 @@ func (u User) SendPhoto(b Bot, photo os.File) {
 	}
 }
 
-func (c Chat) SendPhoto(b Bot, photo os.File) {
+func (c Chat) SendPhoto(b Bot, photo interface{}) {
 	if c.Id == 0 {
 		log.Println("Chat's Id field is empty")
 	} else {
