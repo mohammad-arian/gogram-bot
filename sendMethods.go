@@ -88,18 +88,16 @@ func sendPhotoLogic(b Bot, id int, photo interface{}) (string, error) {
 	return string(resToString), nil
 }
 
-func (u User) SendPhoto(b Bot, photo interface{}) {
+func (u User) SendPhoto(b Bot, photo interface{}) (string, error) {
 	if u.Id == 0 {
-		log.Println("User's Id field is empty")
-	} else {
-		sendPhotoLogic(b, u.Id, photo)
+		return "", errors.New("user's Id field is empty")
 	}
+	return sendPhotoLogic(b, u.Id, photo)
 }
 
-func (c Chat) SendPhoto(b Bot, photo interface{}) {
+func (c Chat) SendPhoto(b Bot, photo interface{}) (string, error) {
 	if c.Id == 0 {
-		log.Println("Chat's Id field is empty")
-	} else {
-		sendPhotoLogic(b, c.Id, photo)
+		return "", errors.New("chat's Id field is empty")
 	}
+	return sendPhotoLogic(b, c.Id, photo)
 }
