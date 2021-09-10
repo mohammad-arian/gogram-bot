@@ -57,27 +57,20 @@ func (c Chat) SendText(b Bot, text string) {
 func sendPhotoLogic(b Bot, id int, photo interface{}) string {
 	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto", b.Token),
 		nil)
-	client := &http.Client{}
-	body := &bytes.Buffer{}
 	switch p := photo.(type) {
 	case *os.File:
-		log.Println("type is file")
+		var body = &bytes.Buffer{}
 		w := multipart.NewWriter(body)
-		field, err := w.CreateFormField("chat_id")
+		label, err := w.CreateFormField("chat_id")
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
 		}
-		_, err = io.Copy(field, strings.NewReader(strconv.Itoa(id)))
-		if err != nil {
-			log.Fatalln(err)
-		}
-		file, err := w.CreateFormFile("photo", p.Name())
-		_, err = io.Copy(file, p)
-		if err != nil {
-			log.Fatalln(err)
-		}
+		io.Copy(label, strings.NewReader(strconv.Itoa(id)))
+		photoField, err := w.CreateFormFile("photo", p.Name())
+		_, err = io.Copy(photoField, p)
+		w.Close()
+		req.Header.Set("Content-Type", w.FormDataContentType())
 		req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
-		req.Header.Add("Content-Type", w.FormDataContentType())
 	case string:
 		q := req.URL.Query()
 		q.Add("chat_id", strconv.Itoa(id))
@@ -85,8 +78,9 @@ func sendPhotoLogic(b Bot, id int, photo interface{}) string {
 		req.URL.RawQuery = q.Encode()
 	default:
 		log.Println(reflect.TypeOf(photo))
-		return "sendPhotoLogic function accepts string and *os.File types"
+		return "SendPhoto function accepts string and *os.File types"
 	}
+	client := &http.Client{}
 	res, err := client.Do(req)
 	resToString, _ := ioutil.ReadAll(res.Body)
 	if err != nil {
