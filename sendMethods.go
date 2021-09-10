@@ -2,6 +2,7 @@ package gogram
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -9,7 +10,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
-	"reflect"
 	"strconv"
 	"strings"
 )
@@ -54,20 +54,20 @@ func (c Chat) SendText(b Bot, text string) {
 	}
 }
 
-func sendPhotoLogic(b Bot, id int, photo interface{}) string {
+func sendPhotoLogic(b Bot, id int, photo interface{}) (string, error) {
 	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto", b.Token),
 		nil)
 	switch p := photo.(type) {
 	case *os.File:
 		var body = &bytes.Buffer{}
 		w := multipart.NewWriter(body)
-		label, err := w.CreateFormField("chat_id")
+		chatId, err := w.CreateFormField("chat_id")
 		if err != nil {
 			log.Println(err)
 		}
-		io.Copy(label, strings.NewReader(strconv.Itoa(id)))
+		io.Copy(chatId, strings.NewReader(strconv.Itoa(id)))
 		photoField, err := w.CreateFormFile("photo", p.Name())
-		_, err = io.Copy(photoField, p)
+		io.Copy(photoField, p)
 		w.Close()
 		req.Header.Set("Content-Type", w.FormDataContentType())
 		req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
@@ -77,17 +77,15 @@ func sendPhotoLogic(b Bot, id int, photo interface{}) string {
 		q.Add("photo", p)
 		req.URL.RawQuery = q.Encode()
 	default:
-		log.Println(reflect.TypeOf(photo))
-		return "SendPhoto function accepts string and *os.File types"
+		return "", errors.New("SendPhoto function accepts string and *os.File types")
 	}
 	client := &http.Client{}
 	res, err := client.Do(req)
 	resToString, _ := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Fatalln(err)
+		return "", err
 	}
-	log.Println(res)
-	return string(resToString)
+	return string(resToString), nil
 }
 
 func (u User) SendPhoto(b Bot, photo interface{}) {
