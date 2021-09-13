@@ -14,44 +14,44 @@ import (
 	"strings"
 )
 
-func sendTextLogic(b Bot, id int, text string) {
+func sendTextLogic(b Bot, id int, text string) (string, error) {
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", b.Token), nil)
 	if err != nil {
-		log.Fatalln(err)
+		return "", err
 	}
 	q := req.URL.Query()
 	q.Add("chat_id", strconv.Itoa(id))
 	q.Add("text", text)
 	req.URL.RawQuery = q.Encode()
 	client := &http.Client{}
-	_, err = client.Do(req)
+	res, err := client.Do(req)
 	if err != nil {
-		log.Fatalln(err)
+		return "", err
 	}
+	resToString, _ := ioutil.ReadAll(res.Body)
+	return string(resToString), nil
 }
 
 // SendText sends message to a User.
 // b Bot parameter indicated which bot to send
 // the message with. This way you can send messages
 // with different bots
-func (u User) SendText(b Bot, text string) {
+func (u User) SendText(b Bot, text string) (string, error) {
 	if u.Id == 0 {
-		log.Println("User's Id field is empty")
-	} else {
-		sendTextLogic(b, u.Id, text)
+		return "", errors.New("user's Id field is empty")
 	}
+	return sendTextLogic(b, u.Id, text)
 }
 
 // SendText sends message to a Chat.
 // b Bot parameter indicated which bot to send
 // the message with. This way you can send messages
 // with different bots
-func (c Chat) SendText(b Bot, text string) {
+func (c Chat) SendText(b Bot, text string) (string, error) {
 	if c.Id == 0 {
-		log.Println("User's Id field is empty")
-	} else {
-		sendTextLogic(b, c.Id, text)
+		return "", errors.New("chat's Id field is empty")
 	}
+	return sendTextLogic(b, c.Id, text)
 }
 
 func sendPhotoLogic(b Bot, id int, photo interface{}) (string, error) {
@@ -81,10 +81,10 @@ func sendPhotoLogic(b Bot, id int, photo interface{}) (string, error) {
 	}
 	client := &http.Client{}
 	res, err := client.Do(req)
-	resToString, _ := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return "", err
 	}
+	resToString, _ := ioutil.ReadAll(res.Body)
 	return string(resToString), nil
 }
 
