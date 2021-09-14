@@ -45,9 +45,11 @@ func sendTextLogic(b Bot, id int, text string, optionalParams *TextOptionalParam
 
 // SendText sends message to a User.
 // b Bot parameter indicated which bot to send
-// the message with. This way you can send messages
-// with different bots
-func (u User) SendText(b Bot, text string, optionalParams *TextOptionalParams) (string, error) {
+// the message with. This way you can send messages with different bots
+// text is the message that will be sent
+// pass nil or *TextOptionalParams struct to optionalParams. It adds some optional
+// parameters to request, like reply_markup, disable_notification and ...
+func (u User) SendText(b Bot, text string, optionalParams *TextOptionalParams) (response string, err error) {
 	if u.Id == 0 {
 		return "", errors.New("user's Id field is empty")
 	}
@@ -56,8 +58,10 @@ func (u User) SendText(b Bot, text string, optionalParams *TextOptionalParams) (
 
 // SendText sends message to a Chat.
 // b Bot parameter indicated which bot to send
-// the message with. This way you can send messages
-// with different bots
+// the message with. This way you can send messages with different bots
+// text is the message that will be sent
+// pass nil or *TextOptionalParams struct to optionalParams. It adds some optional
+// parameters to request, like reply_markup, disable_notification and ...
 func (c Chat) SendText(b Bot, text string, optionalParams *TextOptionalParams) (response string, err error) {
 	if c.Id == 0 {
 		return "", errors.New("chat's Id field is empty")
