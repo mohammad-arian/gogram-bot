@@ -4,24 +4,33 @@ package gogram
 // that SendText function can use.
 // All fields are optional.
 type TextOptionalParams struct {
-	parseMode                string
-	entities                 interface{}
-	disableWebPagePreview    bool
-	disableNotification      bool
-	replyToMessageId         int
-	allowSendingWithoutReply bool
-	replyMarkup              interface{}
+	ParseMode                string                   `json:"parse_mode"`
+	Entities                 []MessageEntity          `json:"entities"`
+	DisableWebPagePreview    bool                     `json:"disable_web_page_preview"`
+	DisableNotification      bool                     `json:"disable_notification"`
+	ReplyToMessageId         int                      `json:"reply_to_message_id"`
+	AllowSendingWithoutReply bool                     `json:"allow_sending_without_reply"`
+	InlineKeyboardMarkup     [][]InlineKeyboardButton `json:"inline_keyboard"`
 }
 
-//// TextOptionalParams represents optional parameters
-//// that SendText function can use.
-//// All fields are optional.
-//type PhotoOptionalParams struct {
-//	parseMode                string
-//	entities                 interface{}
-//	disableWebPagePreview    bool
-//	disableNotification      bool
-//	replyToMessageId         int
-//	allowSendingWithoutReply bool
-//	replyMarkup              interface{}
-//}
+type MessageEntity struct {
+	Type     string
+	offset   int
+	length   int
+	url      string
+	user     User
+	language string
+}
+
+// InlineKeyboardButton represents one button of an inline keyboard.
+// You must use exactly one of the optional fields.
+type InlineKeyboardButton struct {
+	// Label text on the button
+	Text string `json:"text"`
+	// Optional. HTTP or tg:// url to be opened
+	// when button is pressed
+	Url string `json:"url"`
+	// Optional. Data to be sent in a callback query
+	// to the bot when button is pressed
+	CallbackData string `json:"callback_data"`
+}

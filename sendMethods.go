@@ -2,6 +2,7 @@ package gogram
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -14,7 +15,7 @@ import (
 	"strings"
 )
 
-func sendTextLogic(b Bot, id int, text string, optionalParams TextOptionalParams) (response string, err error) {
+func sendTextLogic(b Bot, id int, text string, optionalParams *TextOptionalParams) (response string, err error) {
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", b.Token), nil)
 	if err != nil {
 		return "", err
@@ -22,6 +23,16 @@ func sendTextLogic(b Bot, id int, text string, optionalParams TextOptionalParams
 	q := req.URL.Query()
 	q.Set("chat_id", strconv.Itoa(id))
 	q.Set("text", text)
+	if optionalParams != nil {
+		replyMarkUp, _ := json.Marshal(&optionalParams)
+		q.Set("reply_markup", string(replyMarkUp))
+		q.Set("disable_notification", strconv.FormatBool(optionalParams.DisableNotification))
+		q.Set("parse_mode", optionalParams.ParseMode)
+		q.Set("disable_web_page_preview", strconv.FormatBool(optionalParams.DisableWebPagePreview))
+		q.Set("reply_to_message_id", strconv.Itoa(optionalParams.ReplyToMessageId))
+		q.Set("allow_sending_without_reply", strconv.FormatBool(optionalParams.AllowSendingWithoutReply))
+		//q.Set("entities", optionalParams.ParseMode)     // fix this part later
+	}
 	req.URL.RawQuery = q.Encode()
 	client := &http.Client{}
 	res, err := client.Do(req)
@@ -36,7 +47,7 @@ func sendTextLogic(b Bot, id int, text string, optionalParams TextOptionalParams
 // b Bot parameter indicated which bot to send
 // the message with. This way you can send messages
 // with different bots
-func (u User) SendText(b Bot, text string, optionalParams TextOptionalParams) (string, error) {
+func (u User) SendText(b Bot, text string, optionalParams *TextOptionalParams) (string, error) {
 	if u.Id == 0 {
 		return "", errors.New("user's Id field is empty")
 	}
@@ -47,7 +58,7 @@ func (u User) SendText(b Bot, text string, optionalParams TextOptionalParams) (s
 // b Bot parameter indicated which bot to send
 // the message with. This way you can send messages
 // with different bots
-func (c Chat) SendText(b Bot, text string, optionalParams TextOptionalParams) (response string, err error) {
+func (c Chat) SendText(b Bot, text string, optionalParams *TextOptionalParams) (response string, err error) {
 	if c.Id == 0 {
 		return "", errors.New("chat's Id field is empty")
 	}
@@ -65,10 +76,19 @@ func sendPhotoLogic(b Bot, id int, photo interface{}) (response string, err erro
 		if err != nil {
 			log.Println(err)
 		}
-		io.Copy(chatId, strings.NewReader(strconv.Itoa(id)))
+		_, err = io.Copy(chatId, strings.NewReader(strconv.Itoa(id)))
+		if err != nil {
+			return "", err
+		}
 		photoField, err := w.CreateFormFile("photo", p.Name())
-		io.Copy(photoField, p)
-		w.Close()
+		_, err = io.Copy(photoField, p)
+		if err != nil {
+			return "", err
+		}
+		err = w.Close()
+		if err != nil {
+			return "", err
+		}
 		req.Header.Set("Content-Type", w.FormDataContentType())
 		req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
 	case string:
@@ -113,10 +133,19 @@ func sendVideoLogic(b Bot, id int, video interface{}) (response string, err erro
 		if err != nil {
 			log.Println(err)
 		}
-		io.Copy(chatId, strings.NewReader(strconv.Itoa(id)))
+		_, err = io.Copy(chatId, strings.NewReader(strconv.Itoa(id)))
+		if err != nil {
+			return "", err
+		}
 		photoField, err := w.CreateFormFile("video", p.Name())
-		io.Copy(photoField, p)
-		w.Close()
+		_, err = io.Copy(photoField, p)
+		if err != nil {
+			return "", err
+		}
+		err = w.Close()
+		if err != nil {
+			return "", err
+		}
 		req.Header.Set("Content-Type", w.FormDataContentType())
 		req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
 	case string:

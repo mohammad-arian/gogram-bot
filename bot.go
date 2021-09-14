@@ -81,7 +81,8 @@ type User struct {
 	Username  string `json:"username"`
 	// SupportsInlineQueries shows if Bot supports inline queries
 	// This field is only for bots
-	SupportsInlineQueries bool `json:"supports_inline_queries"`
+	SupportsInlineQueries bool   `json:"supports_inline_queries"`
+	LanguageCode          string `json:"language_code"`
 }
 
 // Chat id is a unique identification number of a Telegram chat (personal or group chat).
