@@ -27,7 +27,7 @@ func sendTextLogic(b Bot, id int, text string, optionalParams *TextOptionalParam
 		if optionalParams.ReplyMarkup != nil {
 			replyMarkup, err := json.Marshal(&optionalParams.ReplyMarkup)
 			q.Set("reply_markup", string(replyMarkup))
-			log.Println("heyyyyyyyyyyyyyyyyyyyyy", replyMarkup)
+			log.Println("heyyyyyyyyyyyyyyyyyyyyy", string(replyMarkup))
 			return "", err
 		}
 		q.Set("disable_notification", strconv.FormatBool(optionalParams.DisableNotification))
