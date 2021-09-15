@@ -54,7 +54,7 @@ func NewBot(token string, handler func(message Update, bot Bot)) Bot {
 
 // Update from webhook
 type Update struct {
-	UpdateId      string        `json:"update_id"`
+	UpdateId      int           `json:"update_id"`
 	Message       Message       `json:"message"`
 	CallbackQuery CallbackQuery `json:"callback_query"`
 }
