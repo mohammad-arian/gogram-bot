@@ -19,7 +19,7 @@ type TextOptionalParams struct {
 
 func (t *TextOptionalParams) AddInlineKeyboardButton(i ...InlineKeyboardButton) {
 	if t.ReplyMarkup == nil {
-		t.ReplyMarkup = &InlineKeyboardMarkup{InlineKeyboard: [][]InlineKeyboardButton{{}}}
+		t.ReplyMarkup = &InlineKeyboardMarkup{}
 	}
 	for _, button := range i {
 		b := ButtonKinds{inlineKeyboardButton: button}

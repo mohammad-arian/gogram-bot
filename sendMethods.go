@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -26,9 +25,10 @@ func sendTextLogic(b Bot, id int, text string, optionalParams *TextOptionalParam
 	if optionalParams != nil {
 		if optionalParams.ReplyMarkup != nil {
 			replyMarkup, err := json.Marshal(&optionalParams.ReplyMarkup)
+			if err != nil {
+				return "", err
+			}
 			q.Set("reply_markup", string(replyMarkup))
-			log.Println("heyyyyyyyyyyyyyyyyyyyyy", string(replyMarkup))
-			return "", err
 		}
 		q.Set("disable_notification", strconv.FormatBool(optionalParams.DisableNotification))
 		q.Set("parse_mode", optionalParams.ParseMode)
