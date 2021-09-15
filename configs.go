@@ -28,6 +28,10 @@ type MessageEntity struct {
 	language string
 }
 
+type InlineKeyboardMarkup struct {
+	InlineKeyboardButtons [][]InlineKeyboardButton `json:"inline_keyboard"`
+}
+
 // InlineKeyboardButton represents one button of an inline keyboard.
 // You must use exactly one of the optional fields.
 type InlineKeyboardButton struct {

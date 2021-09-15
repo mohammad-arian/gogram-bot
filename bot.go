@@ -72,14 +72,14 @@ type Photo struct {
 }
 
 type Message struct {
-	MessageId   int                      `json:"message_id"`
-	User        User                     `json:"from"`
-	Chat        Chat                     `json:"chat"`
-	Text        string                   `json:"text"`
-	Animation   Animation                `json:"animation"`
-	Photo       []Photo                  `json:"photo"`
-	Date        int                      `json:"date"`
-	ReplyMarkup [][]InlineKeyboardButton `json:"reply_markup"`
+	MessageId   int                  `json:"message_id"`
+	User        User                 `json:"from"`
+	Chat        Chat                 `json:"chat"`
+	Text        string               `json:"text"`
+	Animation   Animation            `json:"animation"`
+	Photo       []Photo              `json:"photo"`
+	Date        int                  `json:"date"`
+	ReplyMarkup InlineKeyboardMarkup `json:"reply_markup"`
 }
 
 type User struct {
@@ -144,12 +144,12 @@ func (b Bot) Listener(port string) {
 
 func webhookHandler(w http.ResponseWriter, r *http.Request, bot Bot) {
 	res, _ := ioutil.ReadAll(r.Body)
+	log.Println(string(res))
 	update := Update{}
 	err := json.Unmarshal(res, &update)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	log.Println(string(res))
 	if bot.MessageHandler != nil {
 		bot.MessageHandler(update, bot)
 	} else {
