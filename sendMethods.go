@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -78,7 +77,7 @@ func sendPhotoLogic(b Bot, id int, photo interface{}) (response string, err erro
 		w := multipart.NewWriter(body)
 		chatId, err := w.CreateFormField("chat_id")
 		if err != nil {
-			log.Println(err)
+			return "", err
 		}
 		_, err = io.Copy(chatId, strings.NewReader(strconv.Itoa(id)))
 		if err != nil {
@@ -135,7 +134,7 @@ func sendVideoLogic(b Bot, id int, video interface{}) (response string, err erro
 		w := multipart.NewWriter(body)
 		chatId, err := w.CreateFormField("chat_id")
 		if err != nil {
-			log.Println(err)
+			return "", err
 		}
 		_, err = io.Copy(chatId, strings.NewReader(strconv.Itoa(id)))
 		if err != nil {

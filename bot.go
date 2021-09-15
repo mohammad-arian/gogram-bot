@@ -15,11 +15,10 @@ type Bot struct {
 	Token string
 	/*
 			MessageHandler invokes when webhook sends a new update.
-		    It must have two parameters, one of type Message
-		    the other of type Bot.
-
-			In the below example, we have a Bot variable called bot.
-			We passed a function of type func (message gogram.Message, bot gogram.Bot)
+			It must have two parameters, one of type Message
+			the other of type Bot.
+		    In the below example, we have a Bot variable called bot.
+		    We passed a function of type func (message gogram.Update, bot gogram.Bot)
 			to our bot called handle.
 			When telegram server sends something, handle function is invoked.
 			Then we can use bot parameter to send something back to user who sent bot message;
@@ -28,16 +27,16 @@ type Bot struct {
 			var bot = gogram.NewBot("<Token>", handle)
 			bot.Listener(<Port>)
 
-			func handle(message gogram.Message, bot gogram.Bot) {
+			func handle(message gogram.Update, bot gogram.Bot) {
 				message.User.SendText(bot, message.Text)
 			}
 	*/
-	MessageHandler func(message Message, bot Bot)
+	MessageHandler func(message Update, bot Bot)
 	Self           User `json:"result"`
 }
 
 // NewBot creates a Bot
-func NewBot(token string, handler func(message Message, bot Bot)) Bot {
+func NewBot(token string, handler func(message Update, bot Bot)) Bot {
 	res, err := http.Get(fmt.Sprintf("https://api.telegram.org/bot%s/getme", token))
 	if err != nil {
 		log.Fatalln(err)
@@ -55,7 +54,17 @@ func NewBot(token string, handler func(message Message, bot Bot)) Bot {
 
 // Update from webhook
 type Update struct {
-	Message Message `json:"message"`
+	UpdateId      string        `json:"update_id"`
+	Message       Message       `json:"message"`
+	CallbackQuery CallbackQuery `json:"callback_query"`
+}
+
+type CallbackQuery struct {
+	Id           string  `json:"id"`
+	Message      Message `json:"message"`
+	Chat         Chat    `json:"chat"`
+	ChatInstance string  `json:"chat_instance"`
+	Data         string  `json:"data"`
 }
 
 type Photo struct {
@@ -63,12 +72,14 @@ type Photo struct {
 }
 
 type Message struct {
-	MessageId int       `json:"message_id"`
-	User      User      `json:"from"`
-	Chat      Chat      `json:"chat"`
-	Text      string    `json:"text"`
-	Animation Animation `json:"animation"`
-	Photo     []Photo   `json:"photo"`
+	MessageId   int                      `json:"message_id"`
+	User        User                     `json:"from"`
+	Chat        Chat                     `json:"chat"`
+	Text        string                   `json:"text"`
+	Animation   Animation                `json:"animation"`
+	Photo       []Photo                  `json:"photo"`
+	Date        int                      `json:"date"`
+	ReplyMarkup [][]InlineKeyboardButton `json:"reply_markup"`
 }
 
 type User struct {
@@ -83,13 +94,17 @@ type User struct {
 	// This field is only for bots
 	SupportsInlineQueries bool   `json:"supports_inline_queries"`
 	LanguageCode          string `json:"language_code"`
+	IsBot                 bool   `json:"is_bot"`
 }
 
 // Chat id is a unique identification number of a Telegram chat (personal or group chat).
 // However, the Telegram User id is a unique identification number of a particular Telegram user.
 // Use Chat id for groups, and User id for a specific user
 type Chat struct {
-	Id int `json:"id"`
+	Id        int    `json:"id"`
+	FirstName string `json:"first_name"`
+	Username  string `json:"username"`
+	Type      string
 }
 
 type Animation struct {
@@ -132,12 +147,11 @@ func webhookHandler(w http.ResponseWriter, r *http.Request, bot Bot) {
 	update := Update{}
 	err := json.Unmarshal(res, &update)
 	if err != nil {
-		log.Println(err)
+		log.Fatalln(err)
 	}
-	log.Printf("%+v\n", update)
 	log.Println(string(res))
 	if bot.MessageHandler != nil {
-		bot.MessageHandler(update.Message, bot)
+		bot.MessageHandler(update, bot)
 	} else {
 		log.Println("Warning: webhook just received something, but you have not added any handler to bot")
 	}
