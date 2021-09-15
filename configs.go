@@ -10,7 +10,13 @@ type TextOptionalParams struct {
 	DisableNotification      bool                     `json:"disable_notification"`
 	ReplyToMessageId         int                      `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool                     `json:"allow_sending_without_reply"`
-	InlineKeyboardMarkup     [][]InlineKeyboardButton `json:"inline_keyboard"`
+	InlineKeyboardButtons    [][]InlineKeyboardButton `json:"inline_keyboard"`
+}
+
+func (t *TextOptionalParams) AddInlineKeyboardButton(i ...InlineKeyboardButton) {
+	for _, button := range i {
+		t.InlineKeyboardButtons = append(t.InlineKeyboardButtons, []InlineKeyboardButton{button})
+	}
 }
 
 type MessageEntity struct {
