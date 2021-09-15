@@ -14,7 +14,7 @@ import (
 	"strings"
 )
 
-func sendTextLogic(b Bot, id int, text string, optionalParams *TextOptionalParams) (response string, err error) {
+func sendTextLogic(b Bot, id int, text string, optionalParams *TextOptionalParams) (string, error) {
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", b.Token), nil)
 	if err != nil {
 		return "", err
@@ -23,8 +23,11 @@ func sendTextLogic(b Bot, id int, text string, optionalParams *TextOptionalParam
 	q.Set("chat_id", strconv.Itoa(id))
 	q.Set("text", text)
 	if optionalParams != nil {
-		replyMarkUp, _ := json.Marshal(&optionalParams.InlineKeyboardButtons)
-		q.Set("reply_markup", string(replyMarkUp))
+		if optionalParams.ReplyMarkup != nil {
+			replyMarkUp, err := json.Marshal(&optionalParams.ReplyMarkup)
+			q.Set("reply_markup", string(replyMarkUp))
+			return "", err
+		}
 		q.Set("disable_notification", strconv.FormatBool(optionalParams.DisableNotification))
 		q.Set("parse_mode", optionalParams.ParseMode)
 		q.Set("disable_web_page_preview", strconv.FormatBool(optionalParams.DisableWebPagePreview))
@@ -68,7 +71,7 @@ func (c Chat) SendText(b Bot, text string, optionalParams *TextOptionalParams) (
 	return sendTextLogic(b, c.Id, text, optionalParams)
 }
 
-func sendPhotoLogic(b Bot, id int, photo interface{}) (response string, err error) {
+func sendPhotoLogic(b Bot, id int, photo interface{}, optionalParams *TextOptionalParams) (string, error) {
 	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto", b.Token),
 		nil)
 	switch p := photo.(type) {
@@ -111,18 +114,18 @@ func sendPhotoLogic(b Bot, id int, photo interface{}) (response string, err erro
 	return string(resToString), nil
 }
 
-func (u User) SendPhoto(b Bot, photo interface{}) (response string, err error) {
+func (u User) SendPhoto(b Bot, photo interface{}, optionalParams *TextOptionalParams) (response string, err error) {
 	if u.Id == 0 {
 		return "", errors.New("user's Id field is empty")
 	}
-	return sendPhotoLogic(b, u.Id, photo)
+	return sendPhotoLogic(b, u.Id, photo, optionalParams)
 }
 
-func (c Chat) SendPhoto(b Bot, photo interface{}) (response string, err error) {
+func (c Chat) SendPhoto(b Bot, photo interface{}, optionalParams *TextOptionalParams) (response string, err error) {
 	if c.Id == 0 {
 		return "", errors.New("chat's Id field is empty")
 	}
-	return sendPhotoLogic(b, c.Id, photo)
+	return sendPhotoLogic(b, c.Id, photo, optionalParams)
 }
 
 func sendVideoLogic(b Bot, id int, video interface{}) (response string, err error) {
