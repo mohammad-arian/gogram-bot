@@ -4,18 +4,19 @@ package gogram
 // that SendText function can use.
 // All fields are optional.
 type TextOptionalParams struct {
-	ParseMode                string                   `json:"parse_mode"`
-	Entities                 []MessageEntity          `json:"entities"`
-	DisableWebPagePreview    bool                     `json:"disable_web_page_preview"`
-	DisableNotification      bool                     `json:"disable_notification"`
-	ReplyToMessageId         int                      `json:"reply_to_message_id"`
-	AllowSendingWithoutReply bool                     `json:"allow_sending_without_reply"`
-	InlineKeyboardButtons    [][]InlineKeyboardButton `json:"inline_keyboard"`
+	ParseMode                string               `json:"parse_mode"`
+	Entities                 []MessageEntity      `json:"entities"`
+	DisableWebPagePreview    bool                 `json:"disable_web_page_preview"`
+	DisableNotification      bool                 `json:"disable_notification"`
+	ReplyToMessageId         int                  `json:"reply_to_message_id"`
+	AllowSendingWithoutReply bool                 `json:"allow_sending_without_reply"`
+	InlineKeyboardButtons    InlineKeyboardMarkup `json:"reply_markup"`
 }
 
 func (t *TextOptionalParams) AddInlineKeyboardButton(i ...InlineKeyboardButton) {
 	for _, button := range i {
-		t.InlineKeyboardButtons = append(t.InlineKeyboardButtons, []InlineKeyboardButton{button})
+		t.InlineKeyboardButtons.InlineKeyboard = append(t.InlineKeyboardButtons.InlineKeyboard,
+			[]InlineKeyboardButton{button})
 	}
 }
 
@@ -29,7 +30,7 @@ type MessageEntity struct {
 }
 
 type InlineKeyboardMarkup struct {
-	InlineKeyboardButtons [][]InlineKeyboardButton `json:"inline_keyboard"`
+	InlineKeyboard [][]InlineKeyboardButton `json:"inline_keyboard"`
 }
 
 // InlineKeyboardButton represents one button of an inline keyboard.

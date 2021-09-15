@@ -23,7 +23,7 @@ func sendTextLogic(b Bot, id int, text string, optionalParams *TextOptionalParam
 	q.Set("chat_id", strconv.Itoa(id))
 	q.Set("text", text)
 	if optionalParams != nil {
-		replyMarkUp, _ := json.Marshal(&optionalParams)
+		replyMarkUp, _ := json.Marshal(&optionalParams.InlineKeyboardButtons)
 		q.Set("reply_markup", string(replyMarkUp))
 		q.Set("disable_notification", strconv.FormatBool(optionalParams.DisableNotification))
 		q.Set("parse_mode", optionalParams.ParseMode)
