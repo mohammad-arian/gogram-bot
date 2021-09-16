@@ -2,7 +2,6 @@ package gogram
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -24,11 +23,7 @@ func sendTextLogic(b Bot, id int, text string, optionalParams *TextOptionalParam
 	q.Set("text", text)
 	if optionalParams != nil {
 		if optionalParams.ReplyMarkup != nil {
-			replyMarkup, err := json.Marshal(&optionalParams.ReplyMarkup)
-			if err != nil {
-				return "", err
-			}
-			q.Set("reply_markup", string(replyMarkup))
+			q.Set("reply_markup", optionalParams.ReplyMarkup.toString())
 		}
 		q.Set("disable_notification", strconv.FormatBool(optionalParams.DisableNotification))
 		q.Set("parse_mode", optionalParams.ParseMode)

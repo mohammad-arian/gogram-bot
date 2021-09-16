@@ -1,7 +1,11 @@
 package gogram
 
+import (
+	"encoding/json"
+)
+
 type KeyboardMarkup interface {
-	Add(ButtonKinds)
+	toString() string
 }
 
 // TextOptionalParams represents optional parameters
@@ -17,23 +21,62 @@ type TextOptionalParams struct {
 	ReplyMarkup              KeyboardMarkup  `json:"reply_markup"`
 }
 
-func (t *TextOptionalParams) AddInlineKeyboardButton(i ...InlineKeyboardButton) {
-	if t.ReplyMarkup == nil {
-		t.ReplyMarkup = &InlineKeyboardMarkup{}
-	}
+func (t *TextOptionalParams) AddInlineKeyboardButtonColumn(i ...InlineKeyboardButton) {
+	var column [][]InlineKeyboardButton
 	for _, button := range i {
-		b := ButtonKinds{inlineKeyboardButton: button}
-		t.ReplyMarkup.Add(b)
+		column = append(column, []InlineKeyboardButton{button})
+	}
+	switch r := t.ReplyMarkup.(type) {
+	case nil:
+		t.ReplyMarkup = &InlineKeyboardMarkup{InlineKeyboard: column}
+	case *ReplyKeyboardMarkup:
+		t.ReplyMarkup = nil
+	case *InlineKeyboardMarkup:
+		r.InlineKeyboard = append(r.InlineKeyboard, column...)
+	}
+}
+func (t *TextOptionalParams) AddInlineKeyboardButtonRow(i ...InlineKeyboardButton) {
+	row := [][]InlineKeyboardButton{{}}
+	for _, button := range i {
+		row[0] = append(row[0], button)
+	}
+	switch r := t.ReplyMarkup.(type) {
+	case nil:
+		t.ReplyMarkup = &InlineKeyboardMarkup{InlineKeyboard: row}
+	case *ReplyKeyboardMarkup:
+		t.ReplyMarkup = nil
+	case *InlineKeyboardMarkup:
+		r.InlineKeyboard = append(r.InlineKeyboard, row...)
 	}
 }
 
-func (t *TextOptionalParams) AddReplyKeyboardButton(i ...KeyboardButton) {
-	if t.ReplyMarkup == nil {
-		t.ReplyMarkup = &ReplyKeyboardMarkup{}
-	}
+func (t *TextOptionalParams) AddReplyKeyboardButtonColumn(i ...KeyboardButton) {
+	var column [][]KeyboardButton
 	for _, button := range i {
-		b := ButtonKinds{keyboardButton: button}
-		t.ReplyMarkup.Add(b)
+		column = append(column, []KeyboardButton{button})
+	}
+	switch r := t.ReplyMarkup.(type) {
+	case nil:
+		t.ReplyMarkup = &ReplyKeyboardMarkup{Keyboard: column}
+	case *ReplyKeyboardMarkup:
+		r.Keyboard = append(r.Keyboard, column...)
+	case *InlineKeyboardMarkup:
+		t.ReplyMarkup = nil
+	}
+}
+
+func (t *TextOptionalParams) AddReplyKeyboardButtonRow(i ...KeyboardButton) {
+	row := [][]KeyboardButton{{}}
+	for _, button := range i {
+		row[0] = append(row[0], button)
+	}
+	switch r := t.ReplyMarkup.(type) {
+	case nil:
+		t.ReplyMarkup = &ReplyKeyboardMarkup{Keyboard: row}
+	case *ReplyKeyboardMarkup:
+		r.Keyboard = append(r.Keyboard, row...)
+	case *InlineKeyboardMarkup:
+		t.ReplyMarkup = nil
 	}
 }
 
@@ -47,29 +90,26 @@ type PhotoOptionalParams struct {
 	ReplyMarkup              KeyboardMarkup  `json:"reply_markup"`
 }
 
-type MessageEntity struct {
-	Type     string
-	offset   int
-	length   int
-	url      string
-	user     User
-	language string
-}
-
 type InlineKeyboardMarkup struct {
 	InlineKeyboard [][]InlineKeyboardButton `json:"inline_keyboard"`
 }
 
-func (i *InlineKeyboardMarkup) Add(b ButtonKinds) {
-	i.InlineKeyboard = append(i.InlineKeyboard, []InlineKeyboardButton{b.inlineKeyboardButton})
+func (i *InlineKeyboardMarkup) toString() string {
+	a, _ := json.Marshal(i)
+	return string(a)
 }
 
 type ReplyKeyboardMarkup struct {
 	Keyboard [][]KeyboardButton `json:"keyboard"`
 }
 
-func (r *ReplyKeyboardMarkup) Add(b ButtonKinds) {
-	r.Keyboard = append(r.Keyboard, []KeyboardButton{b.keyboardButton})
+func (i *ReplyKeyboardMarkup) toString() string {
+	a, _ := json.Marshal(i)
+	return string(a)
+}
+
+func (i InlineKeyboardMarkup) ReplyKeyboardRemove() {
+
 }
 
 // InlineKeyboardButton represents one button of an inline keyboard.
@@ -93,7 +133,11 @@ type KeyboardButton struct {
 	RequestContact bool `json:"request_contact"`
 }
 
-type ButtonKinds struct {
-	keyboardButton       KeyboardButton
-	inlineKeyboardButton InlineKeyboardButton
+type MessageEntity struct {
+	Type     string
+	offset   int
+	length   int
+	url      string
+	user     User
+	language string
 }
