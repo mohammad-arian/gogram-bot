@@ -27,12 +27,10 @@ func (t *TextOptionalParams) AddInlineKeyboardButtonColumn(i ...InlineKeyboardBu
 		column = append(column, []InlineKeyboardButton{button})
 	}
 	switch r := t.ReplyMarkup.(type) {
-	case nil:
-		t.ReplyMarkup = &InlineKeyboardMarkup{InlineKeyboard: column}
-	case *ReplyKeyboardMarkup:
-		t.ReplyMarkup = nil
 	case *InlineKeyboardMarkup:
 		r.InlineKeyboard = append(r.InlineKeyboard, column...)
+	default:
+		t.ReplyMarkup = &InlineKeyboardMarkup{InlineKeyboard: column}
 	}
 }
 func (t *TextOptionalParams) AddInlineKeyboardButtonRow(i ...InlineKeyboardButton) {
@@ -41,12 +39,10 @@ func (t *TextOptionalParams) AddInlineKeyboardButtonRow(i ...InlineKeyboardButto
 		row[0] = append(row[0], button)
 	}
 	switch r := t.ReplyMarkup.(type) {
-	case nil:
-		t.ReplyMarkup = &InlineKeyboardMarkup{InlineKeyboard: row}
-	case *ReplyKeyboardMarkup:
-		t.ReplyMarkup = nil
 	case *InlineKeyboardMarkup:
 		r.InlineKeyboard = append(r.InlineKeyboard, row...)
+	default:
+		t.ReplyMarkup = &InlineKeyboardMarkup{InlineKeyboard: row}
 	}
 }
 
@@ -56,12 +52,10 @@ func (t *TextOptionalParams) AddReplyKeyboardButtonColumn(i ...KeyboardButton) {
 		column = append(column, []KeyboardButton{button})
 	}
 	switch r := t.ReplyMarkup.(type) {
-	case nil:
-		t.ReplyMarkup = &ReplyKeyboardMarkup{Keyboard: column}
 	case *ReplyKeyboardMarkup:
 		r.Keyboard = append(r.Keyboard, column...)
-	case *InlineKeyboardMarkup:
-		t.ReplyMarkup = nil
+	default:
+		t.ReplyMarkup = &ReplyKeyboardMarkup{Keyboard: column}
 	}
 }
 
@@ -71,12 +65,10 @@ func (t *TextOptionalParams) AddReplyKeyboardButtonRow(i ...KeyboardButton) {
 		row[0] = append(row[0], button)
 	}
 	switch r := t.ReplyMarkup.(type) {
-	case nil:
-		t.ReplyMarkup = &ReplyKeyboardMarkup{Keyboard: row}
 	case *ReplyKeyboardMarkup:
 		r.Keyboard = append(r.Keyboard, row...)
-	case *InlineKeyboardMarkup:
-		t.ReplyMarkup = nil
+	default:
+		t.ReplyMarkup = &ReplyKeyboardMarkup{Keyboard: row}
 	}
 }
 
