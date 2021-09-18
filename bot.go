@@ -79,7 +79,7 @@ type Message struct {
 	Animation   Animation            `json:"animation"`
 	Photo       []Photo              `json:"photo"`
 	Date        int                  `json:"date"`
-	ReplyMarkup InlineKeyboardMarkup `json:"reply_markup"`
+	ReplyMarkup inlineKeyboardMarkup `json:"reply_markup"`
 }
 
 type User struct {

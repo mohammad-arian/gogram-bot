@@ -22,8 +22,8 @@ type TextOptionalParams struct {
 }
 
 // AddInlineKeyboardButtonColumn add a InlineKeyboard in vertical orientation.
-// if ReplyMarkup of TextOptionalParams is nil or of type ReplyKeyboardMarkup
-// it will be set to InlineKeyboardMarkup, else if ReplyMarkup of TextOptionalParams
+// if ReplyMarkup of TextOptionalParams is nil or of type replyKeyboardMarkup
+// it will be set to inlineKeyboardMarkup, else if ReplyMarkup of TextOptionalParams
 // is already of type InlineKeyboardButton, buttons will be added to it.
 func (t *TextOptionalParams) AddInlineKeyboardButtonColumn(i ...InlineKeyboardButton) {
 	var column [][]InlineKeyboardButton
@@ -31,61 +31,71 @@ func (t *TextOptionalParams) AddInlineKeyboardButtonColumn(i ...InlineKeyboardBu
 		column = append(column, []InlineKeyboardButton{button})
 	}
 	switch r := t.ReplyMarkup.(type) {
-	case *InlineKeyboardMarkup:
+	case *inlineKeyboardMarkup:
 		r.InlineKeyboard = append(r.InlineKeyboard, column...)
 	default:
-		t.ReplyMarkup = &InlineKeyboardMarkup{InlineKeyboard: column}
+		t.ReplyMarkup = &inlineKeyboardMarkup{InlineKeyboard: column}
 	}
 }
 
-// AddInlineKeyboardButtonRow add a InlineKeyboard in horizontal orientation.
-// if ReplyMarkup of TextOptionalParams is nil or of type ReplyKeyboardMarkup
-// it will be set to InlineKeyboardMarkup, else if ReplyMarkup of TextOptionalParams
-// is already of type InlineKeyboardButton, buttons will be added to it.
+// AddInlineKeyboardButtonRow is like AddInlineKeyboardButtonColumn but adds a
+// InlineKeyboard in horizontal orientation.
 func (t *TextOptionalParams) AddInlineKeyboardButtonRow(i ...InlineKeyboardButton) {
 	row := [][]InlineKeyboardButton{{}}
 	for _, button := range i {
 		row[0] = append(row[0], button)
 	}
 	switch r := t.ReplyMarkup.(type) {
-	case *InlineKeyboardMarkup:
+	case *inlineKeyboardMarkup:
 		r.InlineKeyboard = append(r.InlineKeyboard, row...)
 	default:
-		t.ReplyMarkup = &InlineKeyboardMarkup{InlineKeyboard: row}
+		t.ReplyMarkup = &inlineKeyboardMarkup{InlineKeyboard: row}
 	}
 }
 
 // AddReplyKeyboardButtonColumn add a InlineKeyboard in vertical orientation.
-// if ReplyMarkup of TextOptionalParams is nil or of type InlineKeyboardMarkup
-// it will be set to ReplyKeyboardMarkup, else if ReplyMarkup of TextOptionalParams
-// is already of type ReplyKeyboardMarkup, buttons will be added to it.
-func (t *TextOptionalParams) AddReplyKeyboardButtonColumn(i ...KeyboardButton) {
+// if ReplyMarkup of TextOptionalParams is nil or of type inlineKeyboardMarkup
+// it will be set to replyKeyboardMarkup, else if ReplyMarkup of TextOptionalParams
+// is already of type replyKeyboardMarkup, buttons will be added to it.
+// set oneTimeKeyboard to true to request clients to hide the keyboard as soon as it's been used.
+// The keyboard will still be available, but clients will automatically display the usual letter-keyboard in the chat -
+// the user can press a special button in the input field to see the custom keyboard again. otherwise, set to false.
+// set selective to true if you want to show the keyboard to specific users only. otherwise, set to false
+// Targets: 1) users that are @mentioned in the text of the Message object;
+//          2) if the bot's message is a reply (has reply_to_message_id), sender of the original message.
+// Example: A user requests to change the bot's language, bot replies to the request with a
+// keyboard to select the new language. Other users in the group don't see the keyboard.
+// inputFieldPlaceholder is the placeholder to be shown in the input field when the keyboard is active; pass
+// empty or any string
+func (t *TextOptionalParams) AddReplyKeyboardButtonColumn(oneTimeKeyboard bool,
+	resizeKeyboard bool, inputFieldPlaceholder string, selective bool, i ...KeyboardButton) {
 	var column [][]KeyboardButton
 	for _, button := range i {
 		column = append(column, []KeyboardButton{button})
 	}
 	switch r := t.ReplyMarkup.(type) {
-	case *ReplyKeyboardMarkup:
+	case *replyKeyboardMarkup:
 		r.Keyboard = append(r.Keyboard, column...)
 	default:
-		t.ReplyMarkup = &ReplyKeyboardMarkup{Keyboard: column}
+		t.ReplyMarkup = &replyKeyboardMarkup{Keyboard: column, ResizeKeyboard: resizeKeyboard,
+			OneTimeKeyboard: oneTimeKeyboard, InputFieldPlaceholder: inputFieldPlaceholder, Selective: selective}
 	}
 }
 
-// AddReplyKeyboardButtonRow add a InlineKeyboard in horizontal orientation.
-// if ReplyMarkup of TextOptionalParams is nil or of type InlineKeyboardMarkup
-// it will be set to ReplyKeyboardMarkup, else if ReplyMarkup of TextOptionalParams
-// is already of type ReplyKeyboardMarkup, buttons will be added to it.
-func (t *TextOptionalParams) AddReplyKeyboardButtonRow(i ...KeyboardButton) {
+// AddReplyKeyboardButtonRow is like AddReplyKeyboardButtonColumn but adds a
+// InlineKeyboard in horizontal orientation.
+func (t *TextOptionalParams) AddReplyKeyboardButtonRow(oneTimeKeyboard bool,
+	resizeKeyboard bool, inputFieldPlaceholder string, selective bool, i ...KeyboardButton) {
 	row := [][]KeyboardButton{{}}
 	for _, button := range i {
 		row[0] = append(row[0], button)
 	}
 	switch r := t.ReplyMarkup.(type) {
-	case *ReplyKeyboardMarkup:
+	case *replyKeyboardMarkup:
 		r.Keyboard = append(r.Keyboard, row...)
 	default:
-		t.ReplyMarkup = &ReplyKeyboardMarkup{Keyboard: row}
+		t.ReplyMarkup = &replyKeyboardMarkup{Keyboard: row, ResizeKeyboard: resizeKeyboard,
+			OneTimeKeyboard: oneTimeKeyboard, InputFieldPlaceholder: inputFieldPlaceholder, Selective: selective}
 	}
 }
 
@@ -97,7 +107,11 @@ func (t *TextOptionalParams) AddReplyKeyboardButtonRow(i ...KeyboardButton) {
 // to the vote and removes the keyboard for that user,
 // while still showing the keyboard with poll options to users who haven't voted yet.
 func (t *TextOptionalParams) RemoveReplyKeyboard(selective bool) {
-	t.ReplyMarkup = &ReplyKeyboardRemove{RemoveKeyboard: true, Selective: selective}
+	t.ReplyMarkup = &replyKeyboardRemove{RemoveKeyboard: true, Selective: selective}
+}
+
+func (t *TextOptionalParams) ForceReply(selective bool, inputFieldPlaceholder string) {
+	t.ReplyMarkup = &forceReply{ForceReply: true, Selective: selective, InputFieldPlaceholder: inputFieldPlaceholder}
 }
 
 type PhotoOptionalParams struct {
@@ -110,52 +124,48 @@ type PhotoOptionalParams struct {
 	ReplyMarkup              KeyboardMarkup  `json:"reply_markup"`
 }
 
-type InlineKeyboardMarkup struct {
+type inlineKeyboardMarkup struct {
 	InlineKeyboard [][]InlineKeyboardButton `json:"inline_keyboard"`
 }
 
-func (i *InlineKeyboardMarkup) toString() string {
+func (i *inlineKeyboardMarkup) toString() string {
 	a, _ := json.Marshal(i)
 	return string(a)
 }
 
-type ReplyKeyboardMarkup struct {
-	Keyboard [][]KeyboardButton `json:"keyboard"`
-	// Optional. Requests clients to hide the keyboard as soon as it's been used.
-	// The keyboard will still be available,
-	// but clients will automatically display the usual letter-keyboard in the chat
-	// the user can press a special button in the input field to see the custom keyboard again.
-	OneTimeKeyboard bool `json:"one_time_keyboard"`
-	// Optional. Requests clients to resize the keyboard vertically for optimal fit.
-	// Defaults to false, in which case the custom keyboard is always of the same height as the app's standard keyboard.
-	ResizeKeyboard bool `json:"resize_keyboard"`
+type replyKeyboardMarkup struct {
+	Keyboard              [][]KeyboardButton `json:"keyboard"`
+	OneTimeKeyboard       bool               `json:"one_time_keyboard"`
+	ResizeKeyboard        bool               `json:"resize_keyboard"`
+	InputFieldPlaceholder string             `json:"input_field_placeholder"`
+	Selective             bool               `json:"selective"`
 }
 
-func (i *ReplyKeyboardMarkup) toString() string {
+func (i *replyKeyboardMarkup) toString() string {
 	a, _ := json.Marshal(i)
 	return string(a)
 }
 
-// ReplyKeyboardRemove represents an object that if Telegram clients receive,
+// replyKeyboardRemove represents an object that if Telegram clients receive,
 // they will remove the current custom keyboard and display the default letter-keyboard.
 // By default, custom keyboards are displayed until a new keyboard is sent by a bot.
-type ReplyKeyboardRemove struct {
-	// Requests clients to remove the custom keyboard
-	// (user will not be able to summon this keyboard;
-	// if you want to hide the keyboard from sight but keep it accessible,
-	// use OneTimeKeyboard in ReplyKeyboardMarkup).
-	// Always set to true.
+type replyKeyboardRemove struct {
 	RemoveKeyboard bool `json:"remove_keyboard"`
-	// Set Selective to true if you want to remove the keyboard for specific users only.
-	// Targets: 1) users that are @mentioned in the text of the Message object;
-	//          2) if the bot's message is a reply (has reply_to_message_id), sender of the original message.
-	// Example: A user votes in a poll, bot returns confirmation message in reply
-	// to the vote and removes the keyboard for that user,
-	// while still showing the keyboard with poll options to users who haven't voted yet.
-	Selective bool `json:"selective"`
+	Selective      bool `json:"selective"`
 }
 
-func (i *ReplyKeyboardRemove) toString() string {
+func (i *replyKeyboardRemove) toString() string {
+	a, _ := json.Marshal(i)
+	return string(a)
+}
+
+type forceReply struct {
+	ForceReply            bool   `json:"force_reply"`
+	InputFieldPlaceholder string `json:"input_field_placeholder"`
+	Selective             bool   `json:"selective"`
+}
+
+func (i *forceReply) toString() string {
 	a, _ := json.Marshal(i)
 	return string(a)
 }
