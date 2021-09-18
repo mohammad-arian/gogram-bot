@@ -23,15 +23,7 @@ func sendTextLogic(b Bot, id int, text string, optionalParams *TextOptionalParam
 	q.Set("chat_id", strconv.Itoa(id))
 	q.Set("text", text)
 	if optionalParams != nil {
-		if optionalParams.ReplyMarkup != nil {
-			q.Set("reply_markup", optionalParams.ReplyMarkup.toString())
-		}
-		q.Set("disable_notification", strconv.FormatBool(optionalParams.DisableNotification))
-		q.Set("parse_mode", optionalParams.ParseMode)
-		q.Set("disable_web_page_preview", strconv.FormatBool(optionalParams.DisableWebPagePreview))
-		q.Set("reply_to_message_id", strconv.Itoa(optionalParams.ReplyToMessageId))
-		q.Set("allow_sending_without_reply", strconv.FormatBool(optionalParams.AllowSendingWithoutReply))
-		//q.Set("entities", optionalParams.ParseMode)     // fix this part later
+		parameterSetter(optionalParams, &q)
 	}
 	req.URL.RawQuery = q.Encode()
 	client := &http.Client{}

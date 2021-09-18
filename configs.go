@@ -110,6 +110,10 @@ func (t *TextOptionalParams) RemoveReplyKeyboard(selective bool) {
 	t.ReplyMarkup = &replyKeyboardRemove{RemoveKeyboard: true, Selective: selective}
 }
 
+// ForceReply sends a request to telegram clients to display
+// a reply interface to the user (act as if the user has selected the bot's message and tapped 'Reply').
+// This can be extremely useful if you want to create user-friendly
+// step-by-step interfaces without having to sacrifice privacy mode.
 func (t *TextOptionalParams) ForceReply(selective bool, inputFieldPlaceholder string) {
 	t.ReplyMarkup = &forceReply{ForceReply: true, Selective: selective, InputFieldPlaceholder: inputFieldPlaceholder}
 }
