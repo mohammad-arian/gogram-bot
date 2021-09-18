@@ -14,7 +14,8 @@ import (
 )
 
 func sendTextLogic(b Bot, id int, text string, optionalParams *TextOptionalParams) (string, error) {
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", b.Token), nil)
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", b.Token),
+		nil)
 	if err != nil {
 		return "", err
 	}
