@@ -14,6 +14,9 @@ import (
 )
 
 func sendTextLogic(b Bot, id int, text string, optionalParams *TextOptionalParams) (string, error) {
+	if id == 0 {
+		return "", errors.New("id field is empty")
+	}
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", b.Token),
 		nil)
 	if err != nil {
@@ -42,9 +45,6 @@ func sendTextLogic(b Bot, id int, text string, optionalParams *TextOptionalParam
 // pass nil or *TextOptionalParams struct to optionalParams. It adds some optional
 // parameters to request, like reply_markup, disable_notification and ...
 func (u User) SendText(b Bot, text string, optionalParams *TextOptionalParams) (response string, err error) {
-	if u.Id == 0 {
-		return "", errors.New("user's Id field is empty")
-	}
 	return sendTextLogic(b, u.Id, text, optionalParams)
 }
 
@@ -55,13 +55,13 @@ func (u User) SendText(b Bot, text string, optionalParams *TextOptionalParams) (
 // pass nil or *TextOptionalParams struct to optionalParams. It adds some optional
 // parameters to request, like reply_markup, disable_notification and ...
 func (c Chat) SendText(b Bot, text string, optionalParams *TextOptionalParams) (response string, err error) {
-	if c.Id == 0 {
-		return "", errors.New("chat's Id field is empty")
-	}
 	return sendTextLogic(b, c.Id, text, optionalParams)
 }
 
 func sendPhotoLogic(b Bot, id int, photo interface{}, optionalParams *PhotoOptionalParams) (string, error) {
+	if id == 0 {
+		return "", errors.New("id field is empty")
+	}
 	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto", b.Token),
 		nil)
 	if err != nil {
@@ -112,20 +112,17 @@ func sendPhotoLogic(b Bot, id int, photo interface{}, optionalParams *PhotoOptio
 }
 
 func (u User) SendPhoto(b Bot, photo interface{}, optionalParams *PhotoOptionalParams) (response string, err error) {
-	if u.Id == 0 {
-		return "", errors.New("user's Id field is empty")
-	}
 	return sendPhotoLogic(b, u.Id, photo, optionalParams)
 }
 
 func (c Chat) SendPhoto(b Bot, photo interface{}, optionalParams *PhotoOptionalParams) (response string, err error) {
-	if c.Id == 0 {
-		return "", errors.New("chat's Id field is empty")
-	}
 	return sendPhotoLogic(b, c.Id, photo, optionalParams)
 }
 
 func sendVideoLogic(b Bot, id int, video interface{}) (response string, err error) {
+	if id == 0 {
+		return "", errors.New("id field is empty")
+	}
 	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendVideo", b.Token),
 		nil)
 	if err != nil {
@@ -172,15 +169,9 @@ func sendVideoLogic(b Bot, id int, video interface{}) (response string, err erro
 }
 
 func (u User) SendVideo(b Bot, video interface{}) (response string, err error) {
-	if u.Id == 0 {
-		return "", errors.New("user's Id field is empty")
-	}
 	return sendVideoLogic(b, u.Id, video)
 }
 
 func (c Chat) SendVideo(b Bot, video interface{}) (response string, err error) {
-	if c.Id == 0 {
-		return "", errors.New("chat's Id field is empty")
-	}
 	return sendVideoLogic(b, c.Id, video)
 }

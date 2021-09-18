@@ -21,82 +21,22 @@ type TextOptionalParams struct {
 	ReplyMarkup              KeyboardMarkup  `json:"reply_markup"`
 }
 
-// AddInlineKeyboardButtonColumn add a InlineKeyboard in vertical orientation.
-// if ReplyMarkup of TextOptionalParams is nil or of type replyKeyboardMarkup
-// it will be set to inlineKeyboardMarkup, else if ReplyMarkup of TextOptionalParams
-// is already of type InlineKeyboardButton, buttons will be added to it.
 func (t *TextOptionalParams) AddInlineKeyboardButtonColumn(i ...InlineKeyboardButton) {
-	var column [][]InlineKeyboardButton
-	for _, button := range i {
-		column = append(column, []InlineKeyboardButton{button})
-	}
-	switch r := t.ReplyMarkup.(type) {
-	case *inlineKeyboardMarkup:
-		r.InlineKeyboard = append(r.InlineKeyboard, column...)
-	default:
-		t.ReplyMarkup = &inlineKeyboardMarkup{InlineKeyboard: column}
-	}
+	inlineKeyboardButtonColumnAdder(t, i...)
 }
 
-// AddInlineKeyboardButtonRow is like AddInlineKeyboardButtonColumn but adds a
-// InlineKeyboard in horizontal orientation.
-func (t *TextOptionalParams) AddInlineKeyboardButtonRow(i ...InlineKeyboardButton) {
-	row := [][]InlineKeyboardButton{{}}
-	for _, button := range i {
-		row[0] = append(row[0], button)
-	}
-	switch r := t.ReplyMarkup.(type) {
-	case *inlineKeyboardMarkup:
-		r.InlineKeyboard = append(r.InlineKeyboard, row...)
-	default:
-		t.ReplyMarkup = &inlineKeyboardMarkup{InlineKeyboard: row}
-	}
+func (t *TextOptionalParams) AddInlineKeyboardRowColumn(i ...InlineKeyboardButton) {
+	inlineKeyboardButtonRowAdder(t, i...)
 }
 
-// AddReplyKeyboardButtonColumn add a InlineKeyboard in vertical orientation.
-// if ReplyMarkup of TextOptionalParams is nil or of type inlineKeyboardMarkup
-// it will be set to replyKeyboardMarkup, else if ReplyMarkup of TextOptionalParams
-// is already of type replyKeyboardMarkup, buttons will be added to it.
-// set oneTimeKeyboard to true to request clients to hide the keyboard as soon as it's been used.
-// The keyboard will still be available, but clients will automatically display the usual letter-keyboard in the chat -
-// the user can press a special button in the input field to see the custom keyboard again. otherwise, set to false.
-// set selective to true if you want to show the keyboard to specific users only. otherwise, set to false
-// Targets: 1) users that are @mentioned in the text of the Message object;
-//          2) if the bot's message is a reply (has reply_to_message_id), sender of the original message.
-// Example: A user requests to change the bot's language, bot replies to the request with a
-// keyboard to select the new language. Other users in the group don't see the keyboard.
-// inputFieldPlaceholder is the placeholder to be shown in the input field when the keyboard is active; pass
-// empty or any string
-func (t *TextOptionalParams) AddReplyKeyboardButtonColumn(oneTimeKeyboard bool,
-	resizeKeyboard bool, inputFieldPlaceholder string, selective bool, i ...KeyboardButton) {
-	var column [][]KeyboardButton
-	for _, button := range i {
-		column = append(column, []KeyboardButton{button})
-	}
-	switch r := t.ReplyMarkup.(type) {
-	case *replyKeyboardMarkup:
-		r.Keyboard = append(r.Keyboard, column...)
-	default:
-		t.ReplyMarkup = &replyKeyboardMarkup{Keyboard: column, ResizeKeyboard: resizeKeyboard,
-			OneTimeKeyboard: oneTimeKeyboard, InputFieldPlaceholder: inputFieldPlaceholder, Selective: selective}
-	}
-}
-
-// AddReplyKeyboardButtonRow is like AddReplyKeyboardButtonColumn but adds a
-// InlineKeyboard in horizontal orientation.
 func (t *TextOptionalParams) AddReplyKeyboardButtonRow(oneTimeKeyboard bool,
 	resizeKeyboard bool, inputFieldPlaceholder string, selective bool, i ...KeyboardButton) {
-	row := [][]KeyboardButton{{}}
-	for _, button := range i {
-		row[0] = append(row[0], button)
-	}
-	switch r := t.ReplyMarkup.(type) {
-	case *replyKeyboardMarkup:
-		r.Keyboard = append(r.Keyboard, row...)
-	default:
-		t.ReplyMarkup = &replyKeyboardMarkup{Keyboard: row, ResizeKeyboard: resizeKeyboard,
-			OneTimeKeyboard: oneTimeKeyboard, InputFieldPlaceholder: inputFieldPlaceholder, Selective: selective}
-	}
+	replyKeyboardButtonRowAdder(t, oneTimeKeyboard, resizeKeyboard, inputFieldPlaceholder, selective, i...)
+}
+
+func (t *TextOptionalParams) AddReplyKeyboardButtonColumn(oneTimeKeyboard bool,
+	resizeKeyboard bool, inputFieldPlaceholder string, selective bool, i ...KeyboardButton) {
+	replyKeyboardButtonColumnAdder(t, oneTimeKeyboard, resizeKeyboard, inputFieldPlaceholder, selective, i...)
 }
 
 // RemoveReplyKeyboard Removes the reply keyboard.
@@ -185,6 +125,20 @@ type InlineKeyboardButton struct {
 	// Optional. Data to be sent in a callback query
 	// to the bot when button is pressed
 	CallbackData string `json:"callback_data"`
+	// Optional. If set, pressing the button will prompt the user to select one of their chats,
+	// open that chat and insert the bot's username and the specified inline query in the input field.
+	// Can be empty, in which case just the bot's username will be inserted.
+	// Note: This offers an easy way for users to start using your bot in inline mode
+	// when they are currently in a private chat with it.
+	// Especially useful when combined with switch_pm… actions – in this case the user will be
+	// automatically returned to the chat they switched from, skipping the chat selection screen.
+	SwitchInlineQuery string `json:"switch_inline_query"`
+	// Optional. If set, pressing the button will insert the bot's username and the specified
+	// inline query in the current chat's input field.
+	// Can be empty, in which case only the bot's username will be inserted.
+	// This offers a quick way for the user to open your bot in inline mode
+	// in the same chat – good for selecting something from multiple options.
+	SwitchInlineQueryCurrentChat string `json:"switch_inline_query_current_chat"`
 }
 
 // KeyboardButton represents one button of a reply keyboard.
@@ -207,4 +161,9 @@ type MessageEntity struct {
 	url      string
 	user     User
 	language string
+}
+
+func (i *MessageEntity) toString() string {
+	a, _ := json.Marshal(i)
+	return string(a)
 }
