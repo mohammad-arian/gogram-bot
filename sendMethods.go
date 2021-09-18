@@ -23,7 +23,7 @@ func sendTextLogic(b Bot, id int, text string, optionalParams *TextOptionalParam
 	q.Set("chat_id", strconv.Itoa(id))
 	q.Set("text", text)
 	if optionalParams != nil {
-		parameterSetter(*optionalParams, &q)
+		urlValueSetter(*optionalParams, &q)
 	}
 	req.URL.RawQuery = q.Encode()
 	client := &http.Client{}
@@ -61,9 +61,12 @@ func (c Chat) SendText(b Bot, text string, optionalParams *TextOptionalParams) (
 	return sendTextLogic(b, c.Id, text, optionalParams)
 }
 
-func sendPhotoLogic(b Bot, id int, photo interface{}, optionalParams *TextOptionalParams) (string, error) {
+func sendPhotoLogic(b Bot, id int, photo interface{}, optionalParams *PhotoOptionalParams) (string, error) {
 	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto", b.Token),
 		nil)
+	if err != nil {
+		return "", err
+	}
 	switch p := photo.(type) {
 	case *os.File:
 		var body = &bytes.Buffer{}
@@ -81,6 +84,7 @@ func sendPhotoLogic(b Bot, id int, photo interface{}, optionalParams *TextOption
 		if err != nil {
 			return "", err
 		}
+		formFieldSetter(optionalParams, w)
 		err = w.Close()
 		if err != nil {
 			return "", err
@@ -91,6 +95,9 @@ func sendPhotoLogic(b Bot, id int, photo interface{}, optionalParams *TextOption
 		q := req.URL.Query()
 		q.Set("chat_id", strconv.Itoa(id))
 		q.Set("photo", p)
+		if optionalParams != nil {
+			urlValueSetter(*optionalParams, &q)
+		}
 		req.URL.RawQuery = q.Encode()
 	default:
 		return "", errors.New("SendPhoto function accepts string and *os.File types")
@@ -104,14 +111,14 @@ func sendPhotoLogic(b Bot, id int, photo interface{}, optionalParams *TextOption
 	return string(resToString), nil
 }
 
-func (u User) SendPhoto(b Bot, photo interface{}, optionalParams *TextOptionalParams) (response string, err error) {
+func (u User) SendPhoto(b Bot, photo interface{}, optionalParams *PhotoOptionalParams) (response string, err error) {
 	if u.Id == 0 {
 		return "", errors.New("user's Id field is empty")
 	}
 	return sendPhotoLogic(b, u.Id, photo, optionalParams)
 }
 
-func (c Chat) SendPhoto(b Bot, photo interface{}, optionalParams *TextOptionalParams) (response string, err error) {
+func (c Chat) SendPhoto(b Bot, photo interface{}, optionalParams *PhotoOptionalParams) (response string, err error) {
 	if c.Id == 0 {
 		return "", errors.New("chat's Id field is empty")
 	}
@@ -121,6 +128,9 @@ func (c Chat) SendPhoto(b Bot, photo interface{}, optionalParams *TextOptionalPa
 func sendVideoLogic(b Bot, id int, video interface{}) (response string, err error) {
 	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendVideo", b.Token),
 		nil)
+	if err != nil {
+		return "", err
+	}
 	switch p := video.(type) {
 	case *os.File:
 		var body = &bytes.Buffer{}
