@@ -1,6 +1,7 @@
 package gogram
 
 import (
+	"encoding/json"
 	"io"
 	"mime/multipart"
 	"net/url"
@@ -23,7 +24,8 @@ func urlValueSetter(s interface{}, q *url.Values) {
 		case KeyboardMarkup:
 			q.Set(tag, j.toString())
 		case MessageEntity:
-			q.Set(tag, j.toString())
+			a, _ := json.Marshal(i)
+			q.Set(tag, string(a))
 		}
 	}
 }
@@ -47,7 +49,8 @@ func formFieldSetter(s interface{}, w *multipart.Writer) {
 			_, _ = io.Copy(field, strings.NewReader(j.toString()))
 		case MessageEntity:
 			field, _ := w.CreateFormField(tag)
-			_, _ = io.Copy(field, strings.NewReader(j.toString()))
+			a, _ := json.Marshal(i)
+			_, _ = io.Copy(field, strings.NewReader(string(a)))
 		}
 	}
 }

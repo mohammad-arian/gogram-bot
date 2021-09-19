@@ -82,29 +82,31 @@ type Message struct {
 	ReplyMarkup inlineKeyboardMarkup `json:"reply_markup"`
 }
 
-type User struct {
-	// User id is a unique identification number of a particular Telegram user.
-	// However, the Telegram Chat id is a unique identification
-	// number of a Telegram chat (personal or group chat).
-	// Use Chat id for groups, and User id for a specific user
+type ReplyAble struct {
 	Id        int    `json:"id"`
 	FirstName string `json:"first_name"`
 	Username  string `json:"username"`
+}
+
+// User id is a unique identification number of a particular Telegram user.
+// However, the Telegram Chat id is a unique identification
+// number of a Telegram chat (personal or group chat).
+// Use Chat id for groups, and User id for a specific user
+type User struct {
 	// SupportsInlineQueries shows if Bot supports inline queries
 	// This field is only for bots
 	SupportsInlineQueries bool   `json:"supports_inline_queries"`
 	LanguageCode          string `json:"language_code"`
 	IsBot                 bool   `json:"is_bot"`
+	ReplyAble
 }
 
 // Chat id is a unique identification number of a Telegram chat (personal or group chat).
 // However, the Telegram User id is a unique identification number of a particular Telegram user.
 // Use Chat id for groups, and User id for a specific user
 type Chat struct {
-	Id        int    `json:"id"`
-	FirstName string `json:"first_name"`
-	Username  string `json:"username"`
-	Type      string
+	Type string
+	ReplyAble
 }
 
 type Animation struct {

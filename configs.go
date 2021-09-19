@@ -21,22 +21,21 @@ type TextOptionalParams struct {
 	ReplyMarkup              KeyboardMarkup  `json:"reply_markup"`
 }
 
-func (t *TextOptionalParams) AddInlineKeyboardButtonColumn(i ...InlineKeyboardButton) {
-	inlineKeyboardButtonColumnAdder(t, i...)
+func (t *TextOptionalParams) AddInlineKeyboardButtonColumn(horizontal bool, i ...InlineKeyboardButton) {
+	if horizontal {
+		inlineKeyboardButtonRowAdder(t, i...)
+	} else {
+		inlineKeyboardButtonColumnAdder(t, i...)
+	}
 }
 
-func (t *TextOptionalParams) AddInlineKeyboardRowColumn(i ...InlineKeyboardButton) {
-	inlineKeyboardButtonRowAdder(t, i...)
-}
-
-func (t *TextOptionalParams) AddReplyKeyboardButtonRow(oneTimeKeyboard bool,
+func (t *TextOptionalParams) AddReplyKeyboardButtonRow(horizontal bool, oneTimeKeyboard bool,
 	resizeKeyboard bool, inputFieldPlaceholder string, selective bool, i ...KeyboardButton) {
-	replyKeyboardButtonRowAdder(t, oneTimeKeyboard, resizeKeyboard, inputFieldPlaceholder, selective, i...)
-}
-
-func (t *TextOptionalParams) AddReplyKeyboardButtonColumn(oneTimeKeyboard bool,
-	resizeKeyboard bool, inputFieldPlaceholder string, selective bool, i ...KeyboardButton) {
-	replyKeyboardButtonColumnAdder(t, oneTimeKeyboard, resizeKeyboard, inputFieldPlaceholder, selective, i...)
+	if horizontal {
+		replyKeyboardButtonRowAdder(t, oneTimeKeyboard, resizeKeyboard, inputFieldPlaceholder, selective, i...)
+	} else {
+		replyKeyboardButtonColumnAdder(t, oneTimeKeyboard, resizeKeyboard, inputFieldPlaceholder, selective, i...)
+	}
 }
 
 // RemoveReplyKeyboard Removes the reply keyboard.
@@ -161,9 +160,4 @@ type MessageEntity struct {
 	url      string
 	user     User
 	language string
-}
-
-func (i *MessageEntity) toString() string {
-	a, _ := json.Marshal(i)
-	return string(a)
 }

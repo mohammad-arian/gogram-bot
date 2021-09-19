@@ -13,7 +13,14 @@ import (
 	"strings"
 )
 
-func sendTextLogic(b Bot, id int, text string, optionalParams *TextOptionalParams) (string, error) {
+// SendText sends message to a User.
+// b Bot parameter indicated which bot to send
+// the message with. This way you can send messages with different bots
+// text is the message that will be sent
+// pass nil or *TextOptionalParams struct to optionalParams. It adds some optional
+// parameters to request, like reply_markup, disable_notification and ...
+func (r *ReplyAble) SendText(b Bot, text string, optionalParams *TextOptionalParams) (response string, err error) {
+	var id = r.Id
 	if id == 0 {
 		return "", errors.New("id field is empty")
 	}
@@ -38,27 +45,8 @@ func sendTextLogic(b Bot, id int, text string, optionalParams *TextOptionalParam
 	return string(resToString), nil
 }
 
-// SendText sends message to a User.
-// b Bot parameter indicated which bot to send
-// the message with. This way you can send messages with different bots
-// text is the message that will be sent
-// pass nil or *TextOptionalParams struct to optionalParams. It adds some optional
-// parameters to request, like reply_markup, disable_notification and ...
-func (u User) SendText(b Bot, text string, optionalParams *TextOptionalParams) (response string, err error) {
-	return sendTextLogic(b, u.Id, text, optionalParams)
-}
-
-// SendText sends message to a Chat.
-// b Bot parameter indicated which bot to send
-// the message with. This way you can send messages with different bots
-// text is the message that will be sent
-// pass nil or *TextOptionalParams struct to optionalParams. It adds some optional
-// parameters to request, like reply_markup, disable_notification and ...
-func (c Chat) SendText(b Bot, text string, optionalParams *TextOptionalParams) (response string, err error) {
-	return sendTextLogic(b, c.Id, text, optionalParams)
-}
-
-func sendPhotoLogic(b Bot, id int, photo interface{}, optionalParams *PhotoOptionalParams) (string, error) {
+func (r *ReplyAble) SendPhoto(b Bot, photo interface{}, optionalParams *PhotoOptionalParams) (response string, err error) {
+	var id = r.Id
 	if id == 0 {
 		return "", errors.New("id field is empty")
 	}
@@ -111,15 +99,8 @@ func sendPhotoLogic(b Bot, id int, photo interface{}, optionalParams *PhotoOptio
 	return string(resToString), nil
 }
 
-func (u User) SendPhoto(b Bot, photo interface{}, optionalParams *PhotoOptionalParams) (response string, err error) {
-	return sendPhotoLogic(b, u.Id, photo, optionalParams)
-}
-
-func (c Chat) SendPhoto(b Bot, photo interface{}, optionalParams *PhotoOptionalParams) (response string, err error) {
-	return sendPhotoLogic(b, c.Id, photo, optionalParams)
-}
-
-func sendVideoLogic(b Bot, id int, video interface{}) (response string, err error) {
+func (r *ReplyAble) SendVideo(b Bot, video interface{}) (response string, err error) {
+	var id = r.Id
 	if id == 0 {
 		return "", errors.New("id field is empty")
 	}
@@ -166,12 +147,4 @@ func sendVideoLogic(b Bot, id int, video interface{}) (response string, err erro
 	}
 	resToString, _ := ioutil.ReadAll(res.Body)
 	return string(resToString), nil
-}
-
-func (u User) SendVideo(b Bot, video interface{}) (response string, err error) {
-	return sendVideoLogic(b, u.Id, video)
-}
-
-func (c Chat) SendVideo(b Bot, video interface{}) (response string, err error) {
-	return sendVideoLogic(b, c.Id, video)
 }
