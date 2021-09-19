@@ -105,7 +105,7 @@ type User struct {
 // However, the Telegram User id is a unique identification number of a particular Telegram user.
 // Use Chat id for groups, and User id for a specific user
 type Chat struct {
-	Type string
+	Type string `json:"type"`
 	ReplyAble
 }
 
