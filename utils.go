@@ -31,8 +31,8 @@ func urlValueSetter(s interface{}, q *url.Values) {
 }
 
 func formFieldSetter(s interface{}, w *multipart.Writer) {
-	for i := 0; i < reflect.ValueOf(w).NumField(); i++ {
-		tag := reflect.TypeOf(w).Field(i).Tag.Get("json")
+	for i := 0; i < reflect.ValueOf(s).NumField(); i++ {
+		tag := reflect.TypeOf(s).Field(i).Tag.Get("json")
 		value := reflect.ValueOf(s).Field(i).Interface()
 		switch j := value.(type) {
 		case string:
