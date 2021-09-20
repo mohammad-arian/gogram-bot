@@ -37,7 +37,7 @@ func (i *InlineKeyboard) AddInlineKeyboardButton(horizontal bool, a ...InlineKey
 }
 
 func (r *ReplyKeyboard) AddReplyKeyboardButton(horizontal bool, oneTimeKeyboard bool,
-	resizeKeyboard bool, inputFieldPlaceholder string, selective bool, i ...KeyboardButton) {
+	resizeKeyboard bool, inputFieldPlaceholder string, selective bool, i ...ReplyKeyboardButton) {
 	if horizontal {
 		replyKeyboardButtonRowAdder(r, oneTimeKeyboard, resizeKeyboard, inputFieldPlaceholder, selective, i...)
 	} else {
@@ -87,11 +87,11 @@ type forceReply struct {
 }
 
 type replyKeyboardMarkup struct {
-	Keyboard              [][]KeyboardButton `json:"keyboard"`
-	OneTimeKeyboard       bool               `json:"one_time_keyboard"`
-	ResizeKeyboard        bool               `json:"resize_keyboard"`
-	InputFieldPlaceholder string             `json:"input_field_placeholder"`
-	Selective             bool               `json:"selective"`
+	Keyboard              [][]ReplyKeyboardButton `json:"keyboard"`
+	OneTimeKeyboard       bool                    `json:"one_time_keyboard"`
+	ResizeKeyboard        bool                    `json:"resize_keyboard"`
+	InputFieldPlaceholder string                  `json:"input_field_placeholder"`
+	Selective             bool                    `json:"selective"`
 }
 
 // replyKeyboardRemove represents an object that if Telegram clients receive,
@@ -127,10 +127,13 @@ type InlineKeyboardButton struct {
 	// This offers a quick way for the user to open your bot in inline mode
 	// in the same chat – good for selecting something from multiple options.
 	SwitchInlineQueryCurrentChat string `json:"switch_inline_query_current_chat"`
+	// Optional. Specify True, to send a Pay button.
+	// NOTE: This type of button must always be the first button in the first row.
+	Pay bool `json:"pay"`
 }
 
-// KeyboardButton represents one button of a reply keyboard.
-type KeyboardButton struct {
+// ReplyKeyboardButton represents one button of a reply keyboard.
+type ReplyKeyboardButton struct {
 	// Text of the button. If none of the optional fields are used,
 	// it will be sent as a message when the button is pressed
 	Text string `json:"text"`

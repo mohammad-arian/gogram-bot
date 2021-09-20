@@ -72,7 +72,9 @@ func (r *ReplyAble) SendPhoto(b Bot, photo interface{}, optionalParams *PhotoOpt
 		if err != nil {
 			return "", err
 		}
-		formFieldSetter(*optionalParams, w)
+		if optionalParams != nil {
+			formFieldSetter(*optionalParams, w)
+		}
 		err = w.Close()
 		if err != nil {
 			return "", err

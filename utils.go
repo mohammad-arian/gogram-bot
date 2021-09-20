@@ -128,10 +128,10 @@ func inlineKeyboardButtonRowAdder(t *InlineKeyboard, i ...InlineKeyboardButton) 
 // inputFieldPlaceholder is the placeholder to be shown in the input field when the keyboard is active; pass
 // empty or any string
 func replyKeyboardButtonColumnAdder(t *ReplyKeyboard, oneTimeKeyboard bool,
-	resizeKeyboard bool, inputFieldPlaceholder string, selective bool, i ...KeyboardButton) {
-	var column [][]KeyboardButton
+	resizeKeyboard bool, inputFieldPlaceholder string, selective bool, i ...ReplyKeyboardButton) {
+	var column [][]ReplyKeyboardButton
 	for _, button := range i {
-		column = append(column, []KeyboardButton{button})
+		column = append(column, []ReplyKeyboardButton{button})
 	}
 	if t.Keyboard == nil {
 		t.replyKeyboardMarkup = replyKeyboardMarkup{Keyboard: column, ResizeKeyboard: resizeKeyboard,
@@ -144,8 +144,8 @@ func replyKeyboardButtonColumnAdder(t *ReplyKeyboard, oneTimeKeyboard bool,
 // AddReplyKeyboardButtonRow is like AddReplyKeyboardButtonColumn but adds a
 // InlineKeyboard in horizontal orientation.
 func replyKeyboardButtonRowAdder(t *ReplyKeyboard, oneTimeKeyboard bool,
-	resizeKeyboard bool, inputFieldPlaceholder string, selective bool, i ...KeyboardButton) {
-	row := [][]KeyboardButton{{}}
+	resizeKeyboard bool, inputFieldPlaceholder string, selective bool, i ...ReplyKeyboardButton) {
+	row := [][]ReplyKeyboardButton{{}}
 	for _, button := range i {
 		row[0] = append(row[0], button)
 	}
