@@ -57,6 +57,10 @@ func (r *ReplyAble) SendPhoto(b Bot, photo interface{}, optionalParams *PhotoOpt
 	}
 	switch p := photo.(type) {
 	case *os.File:
+		all, err := ioutil.ReadAll(p)
+		if err != nil {
+			return "", err
+		}
 		var body = &bytes.Buffer{}
 		w := multipart.NewWriter(body)
 		chatId, err := w.CreateFormField("chat_id")
@@ -68,7 +72,10 @@ func (r *ReplyAble) SendPhoto(b Bot, photo interface{}, optionalParams *PhotoOpt
 			return "", err
 		}
 		photoField, err := w.CreateFormFile("photo", p.Name())
-		_, err = io.Copy(photoField, p)
+		_, err = photoField.Write(all)
+		if err != nil {
+			return "", err
+		}
 		if err != nil {
 			return "", err
 		}
