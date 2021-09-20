@@ -1,11 +1,16 @@
 package gogram
 
-import (
-	"encoding/json"
-)
+type InlineKeyboard struct {
+	inlineKeyboardMarkup
+}
 
-type KeyboardMarkup interface {
-	toString() string
+type ReplyKeyboard struct {
+	replyKeyboardMarkup
+	replyKeyboardRemove
+}
+
+type ForceReply struct {
+	forceReply
 }
 
 // TextOptionalParams represents optional parameters
@@ -18,23 +23,25 @@ type TextOptionalParams struct {
 	DisableNotification      bool            `json:"disable_notification"`
 	ReplyToMessageId         int             `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
-	ReplyMarkup              KeyboardMarkup  `json:"reply_markup"`
+	InlineKeyboard
+	ReplyKeyboard
+	ForceReply
 }
 
-func (t *TextOptionalParams) AddInlineKeyboardButtonColumn(horizontal bool, i ...InlineKeyboardButton) {
+func (i *InlineKeyboard) AddInlineKeyboardButton(horizontal bool, a ...InlineKeyboardButton) {
 	if horizontal {
-		inlineKeyboardButtonRowAdder(t, i...)
+		inlineKeyboardButtonRowAdder(i, a...)
 	} else {
-		inlineKeyboardButtonColumnAdder(t, i...)
+		inlineKeyboardButtonColumnAdder(i, a...)
 	}
 }
 
-func (t *TextOptionalParams) AddReplyKeyboardButtonRow(horizontal bool, oneTimeKeyboard bool,
+func (r *ReplyKeyboard) AddReplyKeyboardButton(horizontal bool, oneTimeKeyboard bool,
 	resizeKeyboard bool, inputFieldPlaceholder string, selective bool, i ...KeyboardButton) {
 	if horizontal {
-		replyKeyboardButtonRowAdder(t, oneTimeKeyboard, resizeKeyboard, inputFieldPlaceholder, selective, i...)
+		replyKeyboardButtonRowAdder(r, oneTimeKeyboard, resizeKeyboard, inputFieldPlaceholder, selective, i...)
 	} else {
-		replyKeyboardButtonColumnAdder(t, oneTimeKeyboard, resizeKeyboard, inputFieldPlaceholder, selective, i...)
+		replyKeyboardButtonColumnAdder(r, oneTimeKeyboard, resizeKeyboard, inputFieldPlaceholder, selective, i...)
 	}
 }
 
@@ -45,16 +52,16 @@ func (t *TextOptionalParams) AddReplyKeyboardButtonRow(horizontal bool, oneTimeK
 // Example: A user votes in a poll, bot returns confirmation message in reply
 // to the vote and removes the keyboard for that user,
 // while still showing the keyboard with poll options to users who haven't voted yet.
-func (t *TextOptionalParams) RemoveReplyKeyboard(selective bool) {
-	t.ReplyMarkup = &replyKeyboardRemove{RemoveKeyboard: true, Selective: selective}
+func (r *ReplyKeyboard) RemoveReplyKeyboard(selective bool) {
+	r.replyKeyboardRemove = replyKeyboardRemove{RemoveKeyboard: true, Selective: selective}
 }
 
 // ForceReply sends a request to telegram clients to display
 // a reply interface to the user (act as if the user has selected the bot's message and tapped 'Reply').
 // This can be extremely useful if you want to create user-friendly
 // step-by-step interfaces without having to sacrifice privacy mode.
-func (t *TextOptionalParams) ForceReply(selective bool, inputFieldPlaceholder string) {
-	t.ReplyMarkup = &forceReply{ForceReply: true, Selective: selective, InputFieldPlaceholder: inputFieldPlaceholder}
+func (t *ForceReply) ForceReply(selective bool, inputFieldPlaceholder string) {
+	t.forceReply = forceReply{ForceReply: true, Selective: selective, InputFieldPlaceholder: inputFieldPlaceholder}
 }
 
 type PhotoOptionalParams struct {
@@ -64,16 +71,19 @@ type PhotoOptionalParams struct {
 	DisableNotification      bool            `json:"disable_notification"`
 	ReplyToMessageId         int             `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
-	ReplyMarkup              KeyboardMarkup  `json:"reply_markup"`
+	InlineKeyboard
+	ReplyKeyboard
+	ForceReply
 }
 
 type inlineKeyboardMarkup struct {
-	InlineKeyboard [][]InlineKeyboardButton `json:"inline_keyboard"`
+	InlineKeyboardButtons [][]InlineKeyboardButton `json:"inline_keyboard"`
 }
 
-func (i *inlineKeyboardMarkup) toString() string {
-	a, _ := json.Marshal(i)
-	return string(a)
+type forceReply struct {
+	ForceReply            bool   `json:"force_reply"`
+	InputFieldPlaceholder string `json:"input_field_placeholder"`
+	Selective             bool   `json:"selective"`
 }
 
 type replyKeyboardMarkup struct {
@@ -84,33 +94,12 @@ type replyKeyboardMarkup struct {
 	Selective             bool               `json:"selective"`
 }
 
-func (i *replyKeyboardMarkup) toString() string {
-	a, _ := json.Marshal(i)
-	return string(a)
-}
-
 // replyKeyboardRemove represents an object that if Telegram clients receive,
 // they will remove the current custom keyboard and display the default letter-keyboard.
 // By default, custom keyboards are displayed until a new keyboard is sent by a bot.
 type replyKeyboardRemove struct {
 	RemoveKeyboard bool `json:"remove_keyboard"`
 	Selective      bool `json:"selective"`
-}
-
-func (i *replyKeyboardRemove) toString() string {
-	a, _ := json.Marshal(i)
-	return string(a)
-}
-
-type forceReply struct {
-	ForceReply            bool   `json:"force_reply"`
-	InputFieldPlaceholder string `json:"input_field_placeholder"`
-	Selective             bool   `json:"selective"`
-}
-
-func (i *forceReply) toString() string {
-	a, _ := json.Marshal(i)
-	return string(a)
 }
 
 // InlineKeyboardButton represents one button of an inline keyboard.

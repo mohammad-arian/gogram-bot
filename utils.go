@@ -21,11 +21,24 @@ func urlValueSetter(s interface{}, q *url.Values) {
 			q.Set(tag, strconv.Itoa(value.(int)))
 		case bool:
 			q.Set(tag, strconv.FormatBool(value.(bool)))
-		case KeyboardMarkup:
-			q.Set(tag, j.toString())
-		case MessageEntity:
-			a, _ := json.Marshal(i)
-			q.Set(tag, string(a))
+		case InlineKeyboard:
+			if j.inlineKeyboardMarkup.InlineKeyboardButtons != nil {
+				a, _ := json.Marshal(j.inlineKeyboardMarkup)
+				q.Set("reply_markup", string(a))
+			}
+		case ReplyKeyboard:
+			if j.replyKeyboardMarkup.Keyboard != nil {
+				a, _ := json.Marshal(j.replyKeyboardMarkup)
+				q.Set("reply_markup", string(a))
+			} else if j.replyKeyboardRemove != (replyKeyboardRemove{}) {
+				a, _ := json.Marshal(j.replyKeyboardRemove)
+				q.Set("reply_markup", string(a))
+			}
+		case ForceReply:
+			if j.forceReply != (forceReply{}) {
+				a, _ := json.Marshal(j.forceReply)
+				q.Set("reply_markup", string(a))
+			}
 		}
 	}
 }
@@ -44,13 +57,28 @@ func formFieldSetter(s interface{}, w *multipart.Writer) {
 		case bool:
 			field, _ := w.CreateFormField(tag)
 			_, _ = io.Copy(field, strings.NewReader(strconv.FormatBool(value.(bool))))
-		case KeyboardMarkup:
-			field, _ := w.CreateFormField(tag)
-			_, _ = io.Copy(field, strings.NewReader(j.toString()))
-		case MessageEntity:
-			field, _ := w.CreateFormField(tag)
-			a, _ := json.Marshal(i)
-			_, _ = io.Copy(field, strings.NewReader(string(a)))
+		case InlineKeyboard:
+			if j.inlineKeyboardMarkup.InlineKeyboardButtons != nil {
+				a, _ := json.Marshal(j.inlineKeyboardMarkup)
+				field, _ := w.CreateFormField("reply_markup")
+				_, _ = io.Copy(field, strings.NewReader(string(a)))
+			}
+		case ReplyKeyboard:
+			if j.replyKeyboardMarkup.Keyboard != nil {
+				a, _ := json.Marshal(j.replyKeyboardMarkup)
+				field, _ := w.CreateFormField("reply_markup")
+				_, _ = io.Copy(field, strings.NewReader(string(a)))
+			} else if j.replyKeyboardRemove != (replyKeyboardRemove{}) {
+				a, _ := json.Marshal(j.replyKeyboardRemove)
+				field, _ := w.CreateFormField("reply_markup")
+				_, _ = io.Copy(field, strings.NewReader(string(a)))
+			}
+		case ForceReply:
+			if j.forceReply != (forceReply{}) {
+				a, _ := json.Marshal(j.forceReply)
+				field, _ := w.CreateFormField("reply_markup")
+				_, _ = io.Copy(field, strings.NewReader(string(a)))
+			}
 		}
 	}
 }
@@ -59,31 +87,29 @@ func formFieldSetter(s interface{}, w *multipart.Writer) {
 // if ReplyMarkup of TextOptionalParams is nil or of type replyKeyboardMarkup
 // it will be set to inlineKeyboardMarkup, else if ReplyMarkup of TextOptionalParams
 // is already of type InlineKeyboardButton, buttons will be added to it.
-func inlineKeyboardButtonColumnAdder(t *TextOptionalParams, i ...InlineKeyboardButton) {
+func inlineKeyboardButtonColumnAdder(t *InlineKeyboard, i ...InlineKeyboardButton) {
 	var column [][]InlineKeyboardButton
 	for _, button := range i {
 		column = append(column, []InlineKeyboardButton{button})
 	}
-	switch r := t.ReplyMarkup.(type) {
-	case *inlineKeyboardMarkup:
-		r.InlineKeyboard = append(r.InlineKeyboard, column...)
-	default:
-		t.ReplyMarkup = &inlineKeyboardMarkup{InlineKeyboard: column}
+	if t.InlineKeyboardButtons == nil {
+		t.InlineKeyboardButtons = column
+	} else {
+		t.InlineKeyboardButtons = append(t.InlineKeyboardButtons, column...)
 	}
 }
 
-// AddInlineKeyboardButtonRow is like AddInlineKeyboardButtonColumn but adds a
-// InlineKeyboard in horizontal orientation.
-func inlineKeyboardButtonRowAdder(t *TextOptionalParams, i ...InlineKeyboardButton) {
+// inlineKeyboardButtonRowAdder is like inlineKeyboardButtonColumnAdder but adds a
+// inline keyboard in horizontal orientation.
+func inlineKeyboardButtonRowAdder(t *InlineKeyboard, i ...InlineKeyboardButton) {
 	row := [][]InlineKeyboardButton{{}}
 	for _, button := range i {
 		row[0] = append(row[0], button)
 	}
-	switch r := t.ReplyMarkup.(type) {
-	case *inlineKeyboardMarkup:
-		r.InlineKeyboard = append(r.InlineKeyboard, row...)
-	default:
-		t.ReplyMarkup = &inlineKeyboardMarkup{InlineKeyboard: row}
+	if t.InlineKeyboardButtons == nil {
+		t.InlineKeyboardButtons = row
+	} else {
+		t.InlineKeyboardButtons = append(t.InlineKeyboardButtons, row...)
 	}
 }
 
@@ -101,34 +127,32 @@ func inlineKeyboardButtonRowAdder(t *TextOptionalParams, i ...InlineKeyboardButt
 // keyboard to select the new language. Other users in the group don't see the keyboard.
 // inputFieldPlaceholder is the placeholder to be shown in the input field when the keyboard is active; pass
 // empty or any string
-func replyKeyboardButtonColumnAdder(t *TextOptionalParams, oneTimeKeyboard bool,
+func replyKeyboardButtonColumnAdder(t *ReplyKeyboard, oneTimeKeyboard bool,
 	resizeKeyboard bool, inputFieldPlaceholder string, selective bool, i ...KeyboardButton) {
 	var column [][]KeyboardButton
 	for _, button := range i {
 		column = append(column, []KeyboardButton{button})
 	}
-	switch r := t.ReplyMarkup.(type) {
-	case *replyKeyboardMarkup:
-		r.Keyboard = append(r.Keyboard, column...)
-	default:
-		t.ReplyMarkup = &replyKeyboardMarkup{Keyboard: column, ResizeKeyboard: resizeKeyboard,
+	if t.Keyboard == nil {
+		t.replyKeyboardMarkup = replyKeyboardMarkup{Keyboard: column, ResizeKeyboard: resizeKeyboard,
 			OneTimeKeyboard: oneTimeKeyboard, InputFieldPlaceholder: inputFieldPlaceholder, Selective: selective}
+	} else {
+		t.Keyboard = append(t.Keyboard, column...)
 	}
 }
 
 // AddReplyKeyboardButtonRow is like AddReplyKeyboardButtonColumn but adds a
 // InlineKeyboard in horizontal orientation.
-func replyKeyboardButtonRowAdder(t *TextOptionalParams, oneTimeKeyboard bool,
+func replyKeyboardButtonRowAdder(t *ReplyKeyboard, oneTimeKeyboard bool,
 	resizeKeyboard bool, inputFieldPlaceholder string, selective bool, i ...KeyboardButton) {
 	row := [][]KeyboardButton{{}}
 	for _, button := range i {
 		row[0] = append(row[0], button)
 	}
-	switch r := t.ReplyMarkup.(type) {
-	case *replyKeyboardMarkup:
-		r.Keyboard = append(r.Keyboard, row...)
-	default:
-		t.ReplyMarkup = &replyKeyboardMarkup{Keyboard: row, ResizeKeyboard: resizeKeyboard,
+	if t.Keyboard == nil {
+		t.replyKeyboardMarkup = replyKeyboardMarkup{Keyboard: row, ResizeKeyboard: resizeKeyboard,
 			OneTimeKeyboard: oneTimeKeyboard, InputFieldPlaceholder: inputFieldPlaceholder, Selective: selective}
+	} else {
+		t.Keyboard = append(t.Keyboard, row...)
 	}
 }
