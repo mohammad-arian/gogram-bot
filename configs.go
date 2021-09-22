@@ -76,6 +76,30 @@ type PhotoOptionalParams struct {
 	ForceReply
 }
 
+type VideoOptionalParams struct {
+	Duration int    `json:"duration"`
+	Width    int    `json:"width"`
+	Height   int    `json:"height"`
+	Caption  string `json:"caption"`
+	// Set to a file of type *os.File or string.
+	// Thumbnail of the file sent;
+	// can be ignored if thumbnail generation for the file is supported server-side.
+	// The thumbnail should be in JPEG format and less than 200 kB in size.
+	// A thumbnail's width and height should not exceed 320.
+	// Ignored if the file is not uploaded using multipart/form-data.
+	// Thumbnails can't be reused and can be only uploaded as a new file.
+	Thumb                    interface{}     `json:"thumb"`
+	ParseMode                string          `json:"parse_mode"`
+	CaptionEntities          []MessageEntity `json:"caption_entities"`
+	SupportsStreaming        bool            `json:"supports_streaming"`
+	DisableNotification      bool            `json:"disable_notification"`
+	ReplyToMessageId         int             `json:"reply_to_message_id"`
+	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
+	InlineKeyboard
+	ReplyKeyboard
+	ForceReply
+}
+
 type inlineKeyboardMarkup struct {
 	InlineKeyboardButtons [][]InlineKeyboardButton `json:"inline_keyboard"`
 }

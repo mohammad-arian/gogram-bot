@@ -109,7 +109,7 @@ func (r *ReplyAble) SendPhoto(b Bot, photo interface{}, optionalParams *PhotoOpt
 	return string(resToString), nil
 }
 
-func (r *ReplyAble) SendVideo(b Bot, video interface{}) (response string, err error) {
+func (r *ReplyAble) SendVideo(b Bot, video interface{}, optionalParams *VideoOptionalParams) (response string, err error) {
 	var id = r.Id
 	if id == 0 {
 		return "", errors.New("id field is empty")
@@ -144,6 +144,9 @@ func (r *ReplyAble) SendVideo(b Bot, video interface{}) (response string, err er
 		if err != nil {
 			return "", err
 		}
+		if optionalParams != nil {
+			formFieldSetter(*optionalParams, w)
+		}
 		err = w.Close()
 		if err != nil {
 			return "", err
@@ -154,6 +157,9 @@ func (r *ReplyAble) SendVideo(b Bot, video interface{}) (response string, err er
 		q := req.URL.Query()
 		q.Set("chat_id", strconv.Itoa(id))
 		q.Set("video", v)
+		if optionalParams != nil {
+			urlValueSetter(*optionalParams, &q)
+		}
 		req.URL.RawQuery = q.Encode()
 	default:
 		return "", errors.New("SendVideo function accepts only string and *os.File types")

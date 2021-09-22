@@ -3,8 +3,10 @@ package gogram
 import (
 	"encoding/json"
 	"io"
+	"io/ioutil"
 	"mime/multipart"
 	"net/url"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -79,6 +81,11 @@ func formFieldSetter(s interface{}, w *multipart.Writer) {
 				field, _ := w.CreateFormField("reply_markup")
 				_, _ = io.Copy(field, strings.NewReader(string(a)))
 			}
+		case *os.File:
+			field, _ := w.CreateFormField(tag)
+			all, _ := ioutil.ReadAll(j)
+			_, _ = j.Seek(0, io.SeekStart)
+			_, _ = io.Copy(field, strings.NewReader(string(all)))
 		}
 	}
 }
