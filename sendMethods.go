@@ -57,10 +57,6 @@ func (r *ReplyAble) SendPhoto(b Bot, photo interface{}, optionalParams *PhotoOpt
 	}
 	switch p := photo.(type) {
 	case *os.File:
-		all, err := ioutil.ReadAll(p)
-		if err != nil {
-			return "", err
-		}
 		var body = &bytes.Buffer{}
 		w := multipart.NewWriter(body)
 		chatId, err := w.CreateFormField("chat_id")
@@ -72,10 +68,15 @@ func (r *ReplyAble) SendPhoto(b Bot, photo interface{}, optionalParams *PhotoOpt
 			return "", err
 		}
 		photoField, err := w.CreateFormFile("photo", p.Name())
-		_, err = photoField.Write(all)
+		all, err := ioutil.ReadAll(p)
 		if err != nil {
 			return "", err
 		}
+		_, err = p.Seek(0, io.SeekStart)
+		if err != nil {
+			return "", err
+		}
+		_, err = io.Copy(photoField, strings.NewReader(string(all)))
 		if err != nil {
 			return "", err
 		}
@@ -97,7 +98,7 @@ func (r *ReplyAble) SendPhoto(b Bot, photo interface{}, optionalParams *PhotoOpt
 		}
 		req.URL.RawQuery = q.Encode()
 	default:
-		return "", errors.New("SendPhoto function accepts string and *os.File types")
+		return "", errors.New("SendPhoto function accepts only string and *os.File types")
 	}
 	client := &http.Client{}
 	res, err := client.Do(req)
@@ -118,7 +119,7 @@ func (r *ReplyAble) SendVideo(b Bot, video interface{}) (response string, err er
 	if err != nil {
 		return "", err
 	}
-	switch p := video.(type) {
+	switch v := video.(type) {
 	case *os.File:
 		var body = &bytes.Buffer{}
 		w := multipart.NewWriter(body)
@@ -130,8 +131,16 @@ func (r *ReplyAble) SendVideo(b Bot, video interface{}) (response string, err er
 		if err != nil {
 			return "", err
 		}
-		photoField, err := w.CreateFormFile("video", p.Name())
-		_, err = io.Copy(photoField, p)
+		videoField, err := w.CreateFormFile("video", v.Name())
+		all, err := ioutil.ReadAll(v)
+		if err != nil {
+			return "", err
+		}
+		_, err = v.Seek(0, io.SeekStart)
+		if err != nil {
+			return "", err
+		}
+		_, err = io.Copy(videoField, strings.NewReader(string(all)))
 		if err != nil {
 			return "", err
 		}
@@ -144,10 +153,10 @@ func (r *ReplyAble) SendVideo(b Bot, video interface{}) (response string, err er
 	case string:
 		q := req.URL.Query()
 		q.Set("chat_id", strconv.Itoa(id))
-		q.Set("video", p)
+		q.Set("video", v)
 		req.URL.RawQuery = q.Encode()
 	default:
-		return "", errors.New("SendVideo function accepts string and *os.File types")
+		return "", errors.New("SendVideo function accepts only string and *os.File types")
 	}
 	client := &http.Client{}
 	res, err := client.Do(req)
