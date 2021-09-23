@@ -37,10 +37,8 @@ func urlValueSetter(s interface{}, q *url.Values) {
 				q.Set("reply_markup", string(a))
 			}
 		case ForceReply:
-			if j.forceReply != (forceReply{}) {
-				a, _ := json.Marshal(j.forceReply)
-				q.Set("reply_markup", string(a))
-			}
+			a, _ := json.Marshal(j)
+			q.Set("reply_markup", string(a))
 		}
 	}
 }
@@ -76,16 +74,14 @@ func formFieldSetter(s interface{}, w *multipart.Writer) {
 				_, _ = io.Copy(field, strings.NewReader(string(a)))
 			}
 		case ForceReply:
-			if j.forceReply != (forceReply{}) {
-				a, _ := json.Marshal(j.forceReply)
-				field, _ := w.CreateFormField("reply_markup")
-				_, _ = io.Copy(field, strings.NewReader(string(a)))
-			}
+			a, _ := json.Marshal(j)
+			field, _ := w.CreateFormField("reply_markup")
+			_, _ = io.Copy(field, strings.NewReader(string(a)))
 		case *os.File:
-			field, _ := w.CreateFormFile(tag, j.Name())
+			file, _ := w.CreateFormFile(tag, j.Name())
 			all, _ := ioutil.ReadAll(j)
 			_, _ = j.Seek(0, io.SeekStart)
-			_, _ = io.Copy(field, strings.NewReader(string(all)))
+			_, _ = io.Copy(file, strings.NewReader(string(all)))
 		}
 	}
 }

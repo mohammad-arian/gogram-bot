@@ -10,7 +10,9 @@ type ReplyKeyboard struct {
 }
 
 type ForceReply struct {
-	forceReply
+	IsForceReply          bool   `json:"force_reply"`
+	InputFieldPlaceholder string `json:"input_field_placeholder"`
+	Selective             bool   `json:"selective"`
 }
 
 // TextOptionalParams represents optional parameters
@@ -61,7 +63,9 @@ func (r *ReplyKeyboard) RemoveReplyKeyboard(selective bool) {
 // This can be extremely useful if you want to create user-friendly
 // step-by-step interfaces without having to sacrifice privacy mode.
 func (t *ForceReply) ForceReply(selective bool, inputFieldPlaceholder string) {
-	t.forceReply = forceReply{ForceReply: true, Selective: selective, InputFieldPlaceholder: inputFieldPlaceholder}
+	t.IsForceReply = true
+	t.Selective = selective
+	t.InputFieldPlaceholder = inputFieldPlaceholder
 }
 
 type PhotoOptionalParams struct {
@@ -88,7 +92,6 @@ type VideoOptionalParams struct {
 	// A thumbnail's width and height should not exceed 320.
 	// Ignored if the file is not uploaded using multipart/form-data.
 	// Thumbnails can't be reused and can be only uploaded as a new file.
-	Thumb                    interface{}     `json:"thumb"`
 	ParseMode                string          `json:"parse_mode"`
 	CaptionEntities          []MessageEntity `json:"caption_entities"`
 	SupportsStreaming        bool            `json:"supports_streaming"`
@@ -102,12 +105,6 @@ type VideoOptionalParams struct {
 
 type inlineKeyboardMarkup struct {
 	InlineKeyboardButtons [][]InlineKeyboardButton `json:"inline_keyboard"`
-}
-
-type forceReply struct {
-	ForceReply            bool   `json:"force_reply"`
-	InputFieldPlaceholder string `json:"input_field_placeholder"`
-	Selective             bool   `json:"selective"`
 }
 
 type replyKeyboardMarkup struct {
