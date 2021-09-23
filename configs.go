@@ -58,11 +58,11 @@ func (r *ReplyKeyboard) RemoveReplyKeyboard(selective bool) {
 	r.replyKeyboardRemove = replyKeyboardRemove{RemoveKeyboard: true, Selective: selective}
 }
 
-// ForceReply sends a request to telegram clients to display
+// SetForceReply sends a request to telegram clients to display
 // a reply interface to the user (act as if the user has selected the bot's message and tapped 'Reply').
 // This can be extremely useful if you want to create user-friendly
 // step-by-step interfaces without having to sacrifice privacy mode.
-func (t *ForceReply) ForceReply(selective bool, inputFieldPlaceholder string) {
+func (t *ForceReply) SetForceReply(selective bool, inputFieldPlaceholder string) {
 	t.IsForceReply = true
 	t.Selective = selective
 	t.InputFieldPlaceholder = inputFieldPlaceholder
