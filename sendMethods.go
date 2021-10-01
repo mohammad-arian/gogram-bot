@@ -451,7 +451,7 @@ func (r *ReplyAble) SendPoll(b Bot, question string, options []string, optionalP
 	q := req.URL.Query()
 	q.Set("chat_id", strconv.Itoa(id))
 	q.Set("question", question)
-	urlValueSetter(options, &q)
+	urlValueSetter(options, &q, "options")
 	if optionalParams != nil {
 		urlValueSetter(*optionalParams, &q)
 	}

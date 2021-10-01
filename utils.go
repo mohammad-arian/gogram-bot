@@ -43,11 +43,11 @@ func urlValueSetter(s interface{}, q *url.Values, key ...string) {
 			}
 		}
 	} else if reflect.TypeOf(s).Kind() == reflect.Slice {
-		a, _ := json.Marshal(s)
-		q.Set(key[0], string(a))
-
+		if key != nil {
+			a, _ := json.Marshal(s)
+			q.Set(key[0], string(a))
+		}
 	}
-
 }
 
 func formFieldSetter(s interface{}, w *multipart.Writer) {
