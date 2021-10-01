@@ -443,7 +443,7 @@ func (r *ReplyAble) SendPoll(b Bot, question string, options []string, optionalP
 	if id == 0 {
 		return "", errors.New("id field is empty")
 	}
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", b.Token),
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://api.telegram.org/bot%s/sendPoll", b.Token),
 		nil)
 	if err != nil {
 		return "", err
