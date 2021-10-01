@@ -71,6 +71,31 @@ type Photo struct {
 	FileId string `json:"file_id"`
 }
 
+type Poll struct {
+	Id              string
+	Question        string
+	Options         []PollOption
+	totalVoterCount int
+	IsAnonymous     bool `json:"is_anonymous"`
+	CloseDate       int  `json:"close_date"`
+	// Pass True, if the poll needs to be immediately closed.
+	// This can be useful for poll preview.
+	IsClosed                 bool            `json:"is_closed"`
+	Type                     string          `json:"type"`
+	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
+	CorrectOptionId          int             `json:"correct_option_id"`
+	Explanation              string          `json:"explanation"`
+	ExplanationEntities      []MessageEntity `json:"explanation_entities"`
+	// Amount of time in seconds the poll will be active after
+	// creation, 5-600. Can't be used together with close_date.
+	OpenPeriod int `json:"open_period"`
+}
+
+type PollOption struct {
+	Text       string `json:"text"`
+	VoterCount int    `json:"voter_count"`
+}
+
 type Message struct {
 	MessageId   int                  `json:"message_id"`
 	User        User                 `json:"from"`
@@ -80,6 +105,7 @@ type Message struct {
 	Photo       []Photo              `json:"photo"`
 	Date        int                  `json:"date"`
 	ReplyMarkup inlineKeyboardMarkup `json:"reply_markup"`
+	Poll        Poll                 `json:"poll"`
 }
 
 type ReplyAble struct {
