@@ -72,23 +72,23 @@ type Photo struct {
 }
 
 type Poll struct {
-	Id              string
-	Question        string
-	Options         []PollOption
-	totalVoterCount int
-	IsAnonymous     bool `json:"is_anonymous"`
-	CloseDate       int  `json:"close_date"`
+	Id              string       `json:"id,omitempty"`
+	Question        string       `json:"question,omitempty"`
+	Options         []PollOption `json:"options,omitempty"`
+	TotalVoterCount int          `json:"total_voter_count,omitempty"`
+	IsAnonymous     bool         `json:"is_anonymous,omitempty"`
+	CloseDate       int          `json:"close_date,omitempty"`
 	// Pass True, if the poll needs to be immediately closed.
 	// This can be useful for poll preview.
-	IsClosed                 bool            `json:"is_closed"`
-	Type                     string          `json:"type"`
-	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
-	CorrectOptionId          int             `json:"correct_option_id"`
-	Explanation              string          `json:"explanation"`
-	ExplanationEntities      []MessageEntity `json:"explanation_entities"`
+	IsClosed                 bool            `json:"is_closed,omitempty"`
+	Type                     string          `json:"type,omitempty"`
+	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply,omitempty"`
+	CorrectOptionId          int             `json:"correct_option_id,omitempty"`
+	Explanation              string          `json:"explanation,omitempty"`
+	ExplanationEntities      []MessageEntity `json:"explanation_entities,omitempty"`
 	// Amount of time in seconds the poll will be active after
 	// creation, 5-600. Can't be used together with close_date.
-	OpenPeriod int `json:"open_period"`
+	OpenPeriod int `json:"open_period,omitempty"`
 }
 
 type PollOption struct {
@@ -172,7 +172,7 @@ func (b Bot) Listener(port string) {
 
 func webhookHandler(w http.ResponseWriter, r *http.Request, bot Bot) {
 	res, _ := ioutil.ReadAll(r.Body)
-	log.Println(string(res))
+	log.Println("res is:" + string(res))
 	update := Update{}
 	err := json.Unmarshal(res, &update)
 	if err != nil {
