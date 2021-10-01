@@ -464,3 +464,28 @@ func (r *ReplyAble) SendPoll(b Bot, question string, options []string, optionalP
 	resToString, _ := ioutil.ReadAll(res.Body)
 	return string(resToString), nil
 }
+
+func (r *ReplyAble) SendDice(b Bot, optionalParams *DiceOptionalParams) (response string, err error) {
+	var id = r.Id
+	if id == 0 {
+		return "", errors.New("id field is empty")
+	}
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://api.telegram.org/bot%s/sendDice", b.Token),
+		nil)
+	if err != nil {
+		return "", err
+	}
+	q := req.URL.Query()
+	q.Set("chat_id", strconv.Itoa(id))
+	if optionalParams != nil {
+		urlValueSetter(*optionalParams, &q)
+	}
+	req.URL.RawQuery = q.Encode()
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	resToString, _ := ioutil.ReadAll(res.Body)
+	return string(resToString), nil
+}

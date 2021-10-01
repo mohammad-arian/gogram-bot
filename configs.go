@@ -152,6 +152,16 @@ type PollOptionalParams struct {
 	ForceReply
 }
 
+type DiceOptionalParams struct {
+	Emoji                    string `json:"emoji"`
+	DisableNotification      bool   `json:"disable_notification"`
+	ReplyToMessageId         int    `json:"reply_to_message_id"`
+	AllowSendingWithoutReply bool   `json:"allow_sending_without_reply"`
+	InlineKeyboard
+	ReplyKeyboard
+	ForceReply
+}
+
 func (i *InlineKeyboard) AddInlineKeyboardButton(horizontal bool, a ...InlineKeyboardButton) {
 	if horizontal {
 		inlineKeyboardButtonRowAdder(i, a...)
