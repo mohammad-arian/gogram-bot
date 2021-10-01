@@ -12,35 +12,41 @@ import (
 	"strings"
 )
 
-func urlValueSetter(s interface{}, q *url.Values) {
-	for i := 0; i < reflect.ValueOf(s).NumField(); i++ {
-		tag := reflect.TypeOf(s).Field(i).Tag.Get("json")
-		value := reflect.ValueOf(s).Field(i).Interface()
-		switch j := value.(type) {
-		case string:
-			q.Set(tag, value.(string))
-		case int:
-			q.Set(tag, strconv.Itoa(value.(int)))
-		case bool:
-			q.Set(tag, strconv.FormatBool(value.(bool)))
-		case InlineKeyboard:
-			if j.inlineKeyboardMarkup.InlineKeyboardButtons != nil {
-				a, _ := json.Marshal(j.inlineKeyboardMarkup)
+func urlValueSetter(s interface{}, q *url.Values, key ...string) {
+	if reflect.TypeOf(s).Kind() == reflect.Struct {
+		for i := 0; i < reflect.ValueOf(s).NumField(); i++ {
+			tag := reflect.TypeOf(s).Field(i).Tag.Get("json")
+			value := reflect.ValueOf(s).Field(i).Interface()
+			switch j := value.(type) {
+			case string:
+				q.Set(tag, value.(string))
+			case int:
+				q.Set(tag, strconv.Itoa(value.(int)))
+			case bool:
+				q.Set(tag, strconv.FormatBool(value.(bool)))
+			case InlineKeyboard:
+				if j.inlineKeyboardMarkup.InlineKeyboardButtons != nil {
+					a, _ := json.Marshal(j.inlineKeyboardMarkup)
+					q.Set("reply_markup", string(a))
+				}
+			case ReplyKeyboard:
+				if j.replyKeyboardMarkup.Keyboard != nil {
+					a, _ := json.Marshal(j.replyKeyboardMarkup)
+					q.Set("reply_markup", string(a))
+				} else if j.replyKeyboardRemove != (replyKeyboardRemove{}) {
+					a, _ := json.Marshal(j.replyKeyboardRemove)
+					q.Set("reply_markup", string(a))
+				}
+			case ForceReply:
+				a, _ := json.Marshal(j)
 				q.Set("reply_markup", string(a))
 			}
-		case ReplyKeyboard:
-			if j.replyKeyboardMarkup.Keyboard != nil {
-				a, _ := json.Marshal(j.replyKeyboardMarkup)
-				q.Set("reply_markup", string(a))
-			} else if j.replyKeyboardRemove != (replyKeyboardRemove{}) {
-				a, _ := json.Marshal(j.replyKeyboardRemove)
-				q.Set("reply_markup", string(a))
-			}
-		case ForceReply:
-			a, _ := json.Marshal(j)
-			q.Set("reply_markup", string(a))
 		}
+	} else if reflect.TypeOf(s).Kind() == reflect.Slice {
+		a, _ := json.Marshal(s)
+		q.Set(key[0], string(a))
 	}
+
 }
 
 func formFieldSetter(s interface{}, w *multipart.Writer) {

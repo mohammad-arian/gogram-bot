@@ -30,6 +30,128 @@ type TextOptionalParams struct {
 	ForceReply
 }
 
+type PhotoOptionalParams struct {
+	ParseMode                string          `json:"parse_mode"`
+	Caption                  string          `json:"caption"`
+	CaptionEntities          []MessageEntity `json:"caption_entities"`
+	DisableNotification      bool            `json:"disable_notification"`
+	ReplyToMessageId         int             `json:"reply_to_message_id"`
+	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
+	InlineKeyboard
+	ReplyKeyboard
+	ForceReply
+}
+
+type VideoOptionalParams struct {
+	Duration                 int             `json:"duration"`
+	Width                    int             `json:"width"`
+	Height                   int             `json:"height"`
+	Caption                  string          `json:"caption"`
+	ParseMode                string          `json:"parse_mode"`
+	CaptionEntities          []MessageEntity `json:"caption_entities"`
+	SupportsStreaming        bool            `json:"supports_streaming"`
+	DisableNotification      bool            `json:"disable_notification"`
+	ReplyToMessageId         int             `json:"reply_to_message_id"`
+	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
+	InlineKeyboard
+	ReplyKeyboard
+	ForceReply
+}
+
+type AudioOptionalParams struct {
+	Performer                string          `json:"performer"`
+	Title                    string          `json:"title"`
+	Duration                 int             `json:"duration"`
+	Caption                  string          `json:"caption"`
+	ParseMode                string          `json:"parse_mode"`
+	CaptionEntities          []MessageEntity `json:"caption_entities"`
+	DisableNotification      bool            `json:"disable_notification"`
+	ReplyToMessageId         int             `json:"reply_to_message_id"`
+	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
+	InlineKeyboard
+	ReplyKeyboard
+	ForceReply
+}
+
+type DocumentOptionalParams struct {
+	Caption string `json:"caption"`
+	// Optional. Disables automatic server-side content type
+	// detection for files uploaded using multipart/form-data
+	DisableContentTypeDetection bool            `json:"disable_content_type_detection"`
+	ParseMode                   string          `json:"parse_mode"`
+	CaptionEntities             []MessageEntity `json:"caption_entities"`
+	DisableNotification         bool            `json:"disable_notification"`
+	ReplyToMessageId            int             `json:"reply_to_message_id"`
+	AllowSendingWithoutReply    bool            `json:"allow_sending_without_reply"`
+	InlineKeyboard
+	ReplyKeyboard
+	ForceReply
+}
+
+type VoiceOptionalParams struct {
+	Duration                 int             `json:"duration"`
+	Caption                  string          `json:"caption"`
+	ParseMode                string          `json:"parse_mode"`
+	CaptionEntities          []MessageEntity `json:"caption_entities"`
+	DisableNotification      bool            `json:"disable_notification"`
+	ReplyToMessageId         int             `json:"reply_to_message_id"`
+	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
+	InlineKeyboard
+	ReplyKeyboard
+	ForceReply
+}
+
+type AnimationOptionalParams struct {
+	Duration                 int             `json:"duration"`
+	Width                    int             `json:"width"`
+	Height                   int             `json:"height"`
+	Caption                  string          `json:"caption"`
+	ParseMode                string          `json:"parse_mode"`
+	CaptionEntities          []MessageEntity `json:"caption_entities"`
+	DisableNotification      bool            `json:"disable_notification"`
+	ReplyToMessageId         int             `json:"reply_to_message_id"`
+	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
+	InlineKeyboard
+	ReplyKeyboard
+	ForceReply
+}
+
+type PollOptionalParams struct {
+	IsAnonymous bool `json:"is_anonymous"`
+	// Poll type, “quiz” or “regular”, defaults to “regular”
+	Type string `json:"type"`
+	// True, if the poll allows multiple answers,
+	// ignored for polls in quiz mode, defaults to False
+	AllowsMultipleAnswers bool `json:"allows_multiple_answers"`
+	// 0-based identifier of the correct answer option,
+	// required for polls in quiz mode
+	CorrectOptionId int `json:"correct_option_id"`
+	// Text that is shown when a user chooses an
+	// incorrect answer or taps on the lamp icon in a
+	// quiz-style poll, 0-200 characters with at most 2 line
+	// feeds after entities parsing
+	Explanation          string          `json:"explanation"`
+	ExplanationParseMode string          `json:"explanation_parse_mode"`
+	ExplanationEntities  []MessageEntity `json:"explanation_entities"`
+	// Amount of time in seconds the poll will be active after
+	// creation, 5-600. Can't be used together with close_date.
+	OpenPeriod int `json:"open_period"`
+	// Point in time (Unix timestamp) when the poll will
+	// be automatically closed. Must be at least 5 and no more
+	// than 600 seconds in the future.
+	// Can't be used together with open_period.
+	CloseDate int `json:"close_date"`
+	// Pass True, if the poll needs to be immediately closed.
+	// This can be useful for poll preview.
+	IsClosed                 bool `json:"is_closed"`
+	DisableNotification      bool `json:"disable_notification"`
+	ReplyToMessageId         int  `json:"reply_to_message_id"`
+	AllowSendingWithoutReply bool `json:"allow_sending_without_reply"`
+	InlineKeyboard
+	ReplyKeyboard
+	ForceReply
+}
+
 func (i *InlineKeyboard) AddInlineKeyboardButton(horizontal bool, a ...InlineKeyboardButton) {
 	if horizontal {
 		inlineKeyboardButtonRowAdder(i, a...)
@@ -66,41 +188,6 @@ func (t *ForceReply) SetForceReply(selective bool, inputFieldPlaceholder string)
 	t.IsForceReply = true
 	t.Selective = selective
 	t.InputFieldPlaceholder = inputFieldPlaceholder
-}
-
-type PhotoOptionalParams struct {
-	ParseMode                string          `json:"parse_mode"`
-	Caption                  string          `json:"caption"`
-	CaptionEntities          []MessageEntity `json:"caption_entities"`
-	DisableNotification      bool            `json:"disable_notification"`
-	ReplyToMessageId         int             `json:"reply_to_message_id"`
-	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
-	InlineKeyboard
-	ReplyKeyboard
-	ForceReply
-}
-
-type VideoOptionalParams struct {
-	Duration int    `json:"duration"`
-	Width    int    `json:"width"`
-	Height   int    `json:"height"`
-	Caption  string `json:"caption"`
-	// Set to a file of type *os.File or string.
-	// Thumbnail of the file sent;
-	// can be ignored if thumbnail generation for the file is supported server-side.
-	// The thumbnail should be in JPEG format and less than 200 kB in size.
-	// A thumbnail's width and height should not exceed 320.
-	// Ignored if the file is not uploaded using multipart/form-data.
-	// Thumbnails can't be reused and can be only uploaded as a new file.
-	ParseMode                string          `json:"parse_mode"`
-	CaptionEntities          []MessageEntity `json:"caption_entities"`
-	SupportsStreaming        bool            `json:"supports_streaming"`
-	DisableNotification      bool            `json:"disable_notification"`
-	ReplyToMessageId         int             `json:"reply_to_message_id"`
-	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
-	InlineKeyboard
-	ReplyKeyboard
-	ForceReply
 }
 
 type inlineKeyboardMarkup struct {
