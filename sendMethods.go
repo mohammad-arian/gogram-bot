@@ -2,6 +2,7 @@ package gogram
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -59,11 +60,10 @@ func (r *ReplyAble) SendPhoto(b Bot, photo interface{}, optionalParams *PhotoOpt
 	case *os.File:
 		var body = &bytes.Buffer{}
 		w := multipart.NewWriter(body)
-		chatId, err := w.CreateFormField("chat_id")
+		err := w.WriteField("chat_id", strconv.Itoa(id))
 		if err != nil {
 			return "", err
 		}
-		_, err = io.Copy(chatId, strings.NewReader(strconv.Itoa(id)))
 		if err != nil {
 			return "", err
 		}
@@ -123,11 +123,7 @@ func (r *ReplyAble) SendVideo(b Bot, video interface{}, optionalParams *VideoOpt
 	case *os.File:
 		var body = &bytes.Buffer{}
 		w := multipart.NewWriter(body)
-		chatId, err := w.CreateFormField("chat_id")
-		if err != nil {
-			return "", err
-		}
-		_, err = io.Copy(chatId, strings.NewReader(strconv.Itoa(id)))
+		err := w.WriteField("chat_id", strconv.Itoa(id))
 		if err != nil {
 			return "", err
 		}
@@ -191,11 +187,7 @@ func (r *ReplyAble) SendAudio(b Bot, audio interface{}, optionalParams *AudioOpt
 	case *os.File:
 		var body = &bytes.Buffer{}
 		w := multipart.NewWriter(body)
-		chatId, err := w.CreateFormField("chat_id")
-		if err != nil {
-			return "", err
-		}
-		_, err = io.Copy(chatId, strings.NewReader(strconv.Itoa(id)))
+		err := w.WriteField("chat_id", strconv.Itoa(id))
 		if err != nil {
 			return "", err
 		}
@@ -255,11 +247,7 @@ func (r *ReplyAble) SendDocument(b Bot, document interface{}, optionalParams *Do
 	case *os.File:
 		var body = &bytes.Buffer{}
 		w := multipart.NewWriter(body)
-		chatId, err := w.CreateFormField("chat_id")
-		if err != nil {
-			return "", err
-		}
-		_, err = io.Copy(chatId, strings.NewReader(strconv.Itoa(id)))
+		err := w.WriteField("chat_id", strconv.Itoa(id))
 		if err != nil {
 			return "", err
 		}
@@ -324,11 +312,7 @@ func (r *ReplyAble) SendVoice(b Bot, voice interface{}, optionalParams *VoiceOpt
 	case *os.File:
 		var body = &bytes.Buffer{}
 		w := multipart.NewWriter(body)
-		chatId, err := w.CreateFormField("chat_id")
-		if err != nil {
-			return "", err
-		}
-		_, err = io.Copy(chatId, strings.NewReader(strconv.Itoa(id)))
+		err := w.WriteField("chat_id", strconv.Itoa(id))
 		if err != nil {
 			return "", err
 		}
@@ -388,11 +372,7 @@ func (r *ReplyAble) SendAnimation(b Bot, animation interface{}, optionalParams *
 	case *os.File:
 		var body = &bytes.Buffer{}
 		w := multipart.NewWriter(body)
-		chatId, err := w.CreateFormField("chat_id")
-		if err != nil {
-			return "", err
-		}
-		_, err = io.Copy(chatId, strings.NewReader(strconv.Itoa(id)))
+		err := w.WriteField("chat_id", strconv.Itoa(id))
 		if err != nil {
 			return "", err
 		}
@@ -481,6 +461,148 @@ func (r *ReplyAble) SendDice(b Bot, optionalParams *DiceOptionalParams) (respons
 		urlValueSetter(*optionalParams, &q)
 	}
 	req.URL.RawQuery = q.Encode()
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	resToString, _ := ioutil.ReadAll(res.Body)
+	return string(resToString), nil
+}
+
+func (r *ReplyAble) SendVideoNote(b Bot, videoNote interface{}, optionalParams *VideoNoteOptionalParams) (response string, err error) {
+	var id = r.Id
+	if id == 0 {
+		return "", errors.New("id field is empty")
+	}
+	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendVideoNote", b.Token),
+		nil)
+	if err != nil {
+		return "", err
+	}
+	switch v := videoNote.(type) {
+	case *os.File:
+		var body = &bytes.Buffer{}
+		w := multipart.NewWriter(body)
+		err := w.WriteField("chat_id", strconv.Itoa(id))
+		if err != nil {
+			return "", err
+		}
+		videoField, err := w.CreateFormFile("video_note", v.Name())
+		all, err := ioutil.ReadAll(v)
+		if err != nil {
+			return "", err
+		}
+		_, err = v.Seek(0, io.SeekStart)
+		if err != nil {
+			return "", err
+		}
+		_, err = io.Copy(videoField, strings.NewReader(string(all)))
+		if err != nil {
+			return "", err
+		}
+		if optionalParams != nil {
+			formFieldSetter(*optionalParams, w)
+		}
+		err = w.Close()
+		if err != nil {
+			return "", err
+		}
+		req.Header.Set("Content-Type", w.FormDataContentType())
+		req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
+	case string:
+		q := req.URL.Query()
+		q.Set("chat_id", strconv.Itoa(id))
+		q.Set("video_note", v)
+		if optionalParams != nil {
+			urlValueSetter(*optionalParams, &q)
+		}
+		req.URL.RawQuery = q.Encode()
+	default:
+		return "", errors.New("SendVideoNote function accepts only string and *os.File types")
+	}
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	resToString, _ := ioutil.ReadAll(res.Body)
+	return string(resToString), nil
+}
+
+// SendMediaGroup sends a group of photos, videos, documents or audios as an album.
+// Documents and audio files can be only grouped in an album with messages of the same type.
+// On success, an array of Messages that were sent is returned.
+// You can add file_ids as string to send a media that exists on the Telegram servers (recommended),
+// HTTP URLs as string for Telegram to get a media from the Internet, or a file of type *os.File to
+// photos, videos, documents and audios slices.
+func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOptionalParams, photos []interface{}, videos []interface{},
+	documents []interface{}, audios []interface{}) (response string, err error) {
+	var id = r.Id
+	if id == 0 {
+		return "", errors.New("id field is empty")
+	}
+	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendMediaGroup", b.Token),
+		nil)
+	if err != nil {
+		return "", err
+	}
+	var body = &bytes.Buffer{}
+	w := multipart.NewWriter(body)
+	w.WriteField("chat_id", strconv.Itoa(id))
+	var media []interface{}
+	for _, i := range photos {
+		switch v := i.(type) {
+		case *os.File:
+			file, _ := w.CreateFormFile(v.Name(), v.Name())
+			_, err = io.Copy(file, v)
+			_, err = v.Seek(0, io.SeekStart)
+			media = append(media, inputMediaPhoto{Media: "attach://" + v.Name(), Type: "photo"})
+		case string:
+			media = append(media, inputMediaPhoto{Media: v, Type: "photo"})
+		}
+	}
+	for _, i := range videos {
+		switch v := i.(type) {
+		case *os.File:
+			file, _ := w.CreateFormFile(v.Name(), v.Name())
+			_, err = io.Copy(file, v)
+			_, err = v.Seek(0, io.SeekStart)
+			media = append(media, inputMediaVideo{Media: "attach://" + v.Name(), Type: "video"})
+		case string:
+			media = append(media, inputMediaVideo{Media: v, Type: "video"})
+		}
+	}
+	for _, i := range documents {
+		switch v := i.(type) {
+		case *os.File:
+			file, _ := w.CreateFormFile(v.Name(), v.Name())
+			_, err = io.Copy(file, v)
+			_, err = v.Seek(0, io.SeekStart)
+			media = append(media, inputMediaDocument{Media: "attach://" + v.Name(), Type: "document"})
+		case string:
+			media = append(media, inputMediaDocument{Media: v, Type: "documents"})
+		}
+	}
+	for _, i := range audios {
+		switch v := i.(type) {
+		case *os.File:
+			file, _ := w.CreateFormFile(v.Name(), v.Name())
+			_, err = io.Copy(file, v)
+			_, err = v.Seek(0, io.SeekStart)
+			media = append(media, inputMediaAudio{Media: "attach://" + v.Name(), Type: "audio"})
+		case string:
+			media = append(media, inputMediaAudio{Media: v, Type: "audio"})
+		}
+	}
+	if media == nil {
+		return "", errors.New("you did not pass any file, file_id or URL")
+	}
+	mediaToJson, _ := json.Marshal(media)
+	w.WriteField("media", string(mediaToJson))
+	err = w.Close()
+	req.Header.Add("Content-Type", w.FormDataContentType())
+	req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {

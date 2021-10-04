@@ -153,6 +153,11 @@ type PollOptionalParams struct {
 }
 
 type DiceOptionalParams struct {
+	// Emoji on which the dice throw animation is based.
+	// Currently, must be one of “🎲”, “🎯”, “🏀”, “⚽”, “🎳”, or “🎰”.
+	// Dice can have values 1-6 for “🎲”, “🎯” and “🎳”,
+	// values 1-5 for “🏀” and “⚽”, and values 1-64 for “🎰”.
+	// Defaults to “🎲”
 	Emoji                    string `json:"emoji"`
 	DisableNotification      bool   `json:"disable_notification"`
 	ReplyToMessageId         int    `json:"reply_to_message_id"`
@@ -160,6 +165,24 @@ type DiceOptionalParams struct {
 	InlineKeyboard
 	ReplyKeyboard
 	ForceReply
+}
+
+type VideoNoteOptionalParams struct {
+	Duration                 int  `json:"duration"`
+	Length                   int  `json:"length"`
+	DisableNotification      bool `json:"disable_notification"`
+	ReplyToMessageId         int  `json:"reply_to_message_id"`
+	AllowSendingWithoutReply bool `json:"allow_sending_without_reply"`
+	InlineKeyboard
+	ReplyKeyboard
+	ForceReply
+}
+
+// MediaGroupOptionalParams represents an album.
+type MediaGroupOptionalParams struct {
+	DisableNotification      bool `json:"disable_notification"`
+	ReplyToMessageId         int  `json:"reply_to_message_id"`
+	AllowSendingWithoutReply bool `json:"allow_sending_without_reply"`
 }
 
 func (i *InlineKeyboard) AddInlineKeyboardButton(horizontal bool, a ...InlineKeyboardButton) {
