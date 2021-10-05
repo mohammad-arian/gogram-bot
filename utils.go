@@ -93,6 +93,12 @@ func formFieldSetter(s interface{}, w *multipart.Writer, key ...string) {
 				file, _ := w.CreateFormFile(tag, j.Name())
 				_, _ = io.Copy(file, j)
 				_, _ = j.Seek(0, io.SeekStart)
+			case []*os.File:
+				for _, f := range j {
+					file, _ := w.CreateFormFile(f.Name(), f.Name())
+					_, _ = io.Copy(file, f)
+					_, _ = f.Seek(0, io.SeekStart)
+				}
 			}
 		}
 	}

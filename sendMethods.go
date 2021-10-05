@@ -1,16 +1,9 @@
 package gogram
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
-	"io"
-	"io/ioutil"
-	"mime/multipart"
-	"net/http"
 	"os"
-	"strconv"
 )
 
 // SendText sends message to a User.
@@ -158,6 +151,9 @@ func (r *ReplyAble) SendVideoNote(b Bot, videoNote interface{}, optionalParams *
 }
 
 func (r *ReplyAble) SendPoll(b Bot, question string, options []string, optionalParams *PollOptionalParams) (response string, err error) {
+	if options == nil {
+		return "", errors.New("options slice is empty")
+	}
 	type data struct {
 		ChatId   int         `json:"chat_id"`
 		Question interface{} `json:"question"`
@@ -175,25 +171,17 @@ func (r *ReplyAble) SendPoll(b Bot, question string, options []string, optionalP
 // photos, videos, documents and audios slices.
 func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOptionalParams, photos []interface{}, videos []interface{},
 	documents []interface{}, audios []interface{}) (response string, err error) {
-	var id = r.Id
-	if id == 0 {
-		return "", errors.New("id field is empty")
+	type data struct {
+		ChatId int    `json:"chat_id"`
+		Media  string `json:"media"`
+		Files  []*os.File
 	}
-	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendMediaGroup", b.Token),
-		nil)
-	if err != nil {
-		return "", err
-	}
-	var body = &bytes.Buffer{}
-	w := multipart.NewWriter(body)
-	w.WriteField("chat_id", strconv.Itoa(id))
+	d := data{ChatId: r.Id}
 	var media []interface{}
 	for _, i := range photos {
 		switch v := i.(type) {
 		case *os.File:
-			file, _ := w.CreateFormFile(v.Name(), v.Name())
-			_, err = io.Copy(file, v)
-			_, err = v.Seek(0, io.SeekStart)
+			d.Files = append(d.Files, v)
 			media = append(media, inputMediaPhoto{Media: "attach://" + v.Name(), Type: "photo"})
 		case string:
 			media = append(media, inputMediaPhoto{Media: v, Type: "photo"})
@@ -202,9 +190,7 @@ func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOptionalPara
 	for _, i := range videos {
 		switch v := i.(type) {
 		case *os.File:
-			file, _ := w.CreateFormFile(v.Name(), v.Name())
-			_, err = io.Copy(file, v)
-			_, err = v.Seek(0, io.SeekStart)
+			d.Files = append(d.Files, v)
 			media = append(media, inputMediaVideo{Media: "attach://" + v.Name(), Type: "video"})
 		case string:
 			media = append(media, inputMediaVideo{Media: v, Type: "video"})
@@ -213,9 +199,7 @@ func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOptionalPara
 	for _, i := range documents {
 		switch v := i.(type) {
 		case *os.File:
-			file, _ := w.CreateFormFile(v.Name(), v.Name())
-			_, err = io.Copy(file, v)
-			_, err = v.Seek(0, io.SeekStart)
+			d.Files = append(d.Files, v)
 			media = append(media, inputMediaDocument{Media: "attach://" + v.Name(), Type: "document"})
 		case string:
 			media = append(media, inputMediaDocument{Media: v, Type: "documents"})
@@ -224,9 +208,7 @@ func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOptionalPara
 	for _, i := range audios {
 		switch v := i.(type) {
 		case *os.File:
-			file, _ := w.CreateFormFile(v.Name(), v.Name())
-			_, err = io.Copy(file, v)
-			_, err = v.Seek(0, io.SeekStart)
+			d.Files = append(d.Files, v)
 			media = append(media, inputMediaAudio{Media: "attach://" + v.Name(), Type: "audio"})
 		case string:
 			media = append(media, inputMediaAudio{Media: v, Type: "audio"})
@@ -236,15 +218,6 @@ func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOptionalPara
 		return "", errors.New("you did not pass any file, file_id or URL")
 	}
 	mediaToJson, _ := json.Marshal(media)
-	w.WriteField("media", string(mediaToJson))
-	err = w.Close()
-	req.Header.Add("Content-Type", w.FormDataContentType())
-	req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
-	client := &http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	resToString, _ := ioutil.ReadAll(res.Body)
-	return string(resToString), nil
+	d.Media = string(mediaToJson)
+	return request(r.Id, "MediaGroup", b.Token, true, d, optionalParams)
 }
