@@ -222,7 +222,7 @@ func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOptionalPara
 	return request(r.Id, "MediaGroup", b.Token, true, d, optionalParams)
 }
 
-func (r *ReplyAble) SendLocation(b Bot, latitude float64, longitude float64, optionalParams *DiceOptionalParams) (response string, err error) {
+func (r *ReplyAble) SendLocation(b Bot, latitude float64, longitude float64, optionalParams *LocationOptionalParams) (response string, err error) {
 	type data struct {
 		ChatId    int     `json:"chat_id"`
 		Latitude  float64 `json:"latitude"`
@@ -230,4 +230,30 @@ func (r *ReplyAble) SendLocation(b Bot, latitude float64, longitude float64, opt
 	}
 	d := data{ChatId: r.Id, Latitude: latitude, Longitude: longitude}
 	return request(r.Id, "Location", b.Token, false, d, optionalParams)
+}
+
+func (r *ReplyAble) SendContact(b Bot, phoneNumber string, firstName string, optionalParams *ContactOptionalParams) (response string, err error) {
+	type data struct {
+		ChatId      int    `json:"chat_id"`
+		PhoneNumber string `json:"phone_number"`
+		FirstName   string `json:"first_name"`
+	}
+	d := data{ChatId: r.Id, PhoneNumber: phoneNumber, FirstName: firstName}
+	return request(r.Id, "Contact", b.Token, false, d, optionalParams)
+}
+
+// SendChatAction tells the user that something is happening on the bot's side.
+// The status is set for 5 seconds or less (when a message arrives from your bot,
+// Telegram clients clear its typing status). Returns True on success.
+// action parameter is the type of the action. Choose one, depending on what the user is about to receive:
+// "typing" for text messages, "upload_photo" for photos, "record_video" or "upload_video" for videos,
+// "record_voice" or "upload_voice" for voice notes, "upload_document" for "general" files,
+// "find_location" for location data, "record_video_note" or "upload_video_note" for video notes.
+func (r *ReplyAble) SendChatAction(b Bot, action string) (response string, err error) {
+	type data struct {
+		ChatId int    `json:"chat_id"`
+		Action string `json:"action"`
+	}
+	d := data{ChatId: r.Id, Action: action}
+	return request(r.Id, "ChatAction", b.Token, false, d, nil)
 }

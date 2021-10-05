@@ -191,6 +191,18 @@ type LocationOptionalParams struct {
 	ForceReply
 }
 
+type ContactOptionalParams struct {
+	LastName string `json:"last_name"`
+	// Additional data about the contact in the form of a vCard
+	Vcard                    string `json:"vcard"`
+	DisableNotification      bool   `json:"disable_notification"`
+	ReplyToMessageId         int    `json:"reply_to_message_id"`
+	AllowSendingWithoutReply bool   `json:"allow_sending_without_reply"`
+	InlineKeyboard
+	ReplyKeyboard
+	ForceReply
+}
+
 // MediaGroupOptionalParams represents an album.
 type MediaGroupOptionalParams struct {
 	DisableNotification      bool `json:"disable_notification"`
