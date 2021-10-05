@@ -25,6 +25,8 @@ func urlValueSetter(s interface{}, q *url.Values, key ...string) {
 				q.Set(tag, value.(string))
 			case int:
 				q.Set(tag, strconv.Itoa(value.(int)))
+			case float64:
+				q.Set(tag, strconv.Itoa(value.(int)))
 			case bool:
 				q.Set(tag, strconv.FormatBool(value.(bool)))
 			case []string:
@@ -71,6 +73,8 @@ func formFieldSetter(s interface{}, w *multipart.Writer, key ...string) {
 				_ = w.WriteField(tag, value.(string))
 			case int:
 				_ = w.WriteField(tag, strconv.Itoa(value.(int)))
+			case float64:
+				_ = w.WriteField(tag, fmt.Sprintf("%v", value.(float64)))
 			case bool:
 				_ = w.WriteField(tag, strconv.FormatBool(value.(bool)))
 			case InlineKeyboard:

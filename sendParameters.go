@@ -178,6 +178,19 @@ type VideoNoteOptionalParams struct {
 	ForceReply
 }
 
+type LocationOptionalParams struct {
+	HorizontalAccuracy       float64 `json:"horizontal_accuracy"`
+	LivePeriod               int     `json:"live_period"`
+	Heading                  int     `json:"heading"`
+	ProximityAlertRadius     int     `json:"proximity_alert_radius"`
+	DisableNotification      bool    `json:"disable_notification"`
+	ReplyToMessageId         int     `json:"reply_to_message_id"`
+	AllowSendingWithoutReply bool    `json:"allow_sending_without_reply"`
+	InlineKeyboard
+	ReplyKeyboard
+	ForceReply
+}
+
 // MediaGroupOptionalParams represents an album.
 type MediaGroupOptionalParams struct {
 	DisableNotification      bool `json:"disable_notification"`

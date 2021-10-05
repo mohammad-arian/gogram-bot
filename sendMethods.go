@@ -221,3 +221,13 @@ func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOptionalPara
 	d.Media = string(mediaToJson)
 	return request(r.Id, "MediaGroup", b.Token, true, d, optionalParams)
 }
+
+func (r *ReplyAble) SendLocation(b Bot, latitude float64, longitude float64, optionalParams *DiceOptionalParams) (response string, err error) {
+	type data struct {
+		ChatId    int     `json:"chat_id"`
+		Latitude  float64 `json:"latitude"`
+		Longitude float64 `json:"longitude"`
+	}
+	d := data{ChatId: r.Id, Latitude: latitude, Longitude: longitude}
+	return request(r.Id, "Location", b.Token, false, d, optionalParams)
+}
