@@ -161,7 +161,7 @@ func (r *ReplyAble) SendPoll(b Bot, question string, options []string, optionalP
 	type data struct {
 		ChatId   int         `json:"chat_id"`
 		Question interface{} `json:"question"`
-		Options  []string
+		Options  []string    `json:"options"`
 	}
 	d := data{ChatId: r.Id, Question: question, Options: options}
 	return request(r.Id, "VideoPoll", b.Token, false, d, optionalParams)
