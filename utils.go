@@ -26,7 +26,7 @@ func urlValueSetter(s interface{}, q *url.Values, key ...string) {
 			case int:
 				q.Set(tag, strconv.Itoa(value.(int)))
 			case float64:
-				q.Set(tag, strconv.Itoa(value.(int)))
+				q.Set(tag, fmt.Sprintf("%v", value.(float64)))
 			case bool:
 				q.Set(tag, strconv.FormatBool(value.(bool)))
 			case []string:
