@@ -254,6 +254,14 @@ func (r *ReplyAble) SendChatAction(b Bot, action string) (response string, err e
 		ChatId int    `json:"chat_id"`
 		Action string `json:"action"`
 	}
-	d := data{ChatId: r.Id, Action: action}
-	return request(r.Id, "ChatAction", b.Token, false, d, nil)
+	var actions = []string{"typing", "upload_photo", "record_video", "upload_video", "general",
+		"upload_document", "upload_voice", "record_voice", "find_location", "record_video_note", "upload_video_note"}
+	for _, v := range actions {
+		if v == action {
+			d := data{ChatId: r.Id, Action: action}
+			return request(r.Id, "ChatAction", b.Token, false, d, nil)
+		}
+	}
+	return "", errors.New(action + " is an unknown action, read the document.")
+
 }
