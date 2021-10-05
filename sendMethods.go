@@ -164,7 +164,7 @@ func (r *ReplyAble) SendPoll(b Bot, question string, options []string, optionalP
 		Options  []string    `json:"options"`
 	}
 	d := data{ChatId: r.Id, Question: question, Options: options}
-	return request(r.Id, "VideoPoll", b.Token, false, d, optionalParams)
+	return request(r.Id, "Poll", b.Token, false, d, optionalParams)
 }
 
 // SendMediaGroup sends a group of photos, videos, documents or audios as an album.
