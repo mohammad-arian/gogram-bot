@@ -1,15 +1,18 @@
 package gogram
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
+	"net/http"
 	"net/url"
 	"os"
 	"reflect"
 	"strconv"
-	"strings"
 )
 
 func urlValueSetter(s interface{}, q *url.Values, key ...string) {
@@ -47,48 +50,47 @@ func urlValueSetter(s interface{}, q *url.Values, key ...string) {
 			a, _ := json.Marshal(s)
 			q.Set(key[0], string(a))
 		}
+	} else if reflect.TypeOf(s).Kind() == reflect.Map {
+		v := reflect.ValueOf(s)
+		for _, i := range v.MapKeys() {
+			q.Set(i.String(), v.MapIndex(i).String())
+		}
 	}
 }
 
-func formFieldSetter(s interface{}, w *multipart.Writer) {
-	for i := 0; i < reflect.ValueOf(s).NumField(); i++ {
-		tag := reflect.TypeOf(s).Field(i).Tag.Get("json")
-		value := reflect.ValueOf(s).Field(i).Interface()
-		switch j := value.(type) {
-		case string:
-			field, _ := w.CreateFormField(tag)
-			_, _ = io.Copy(field, strings.NewReader(value.(string)))
-		case int:
-			field, _ := w.CreateFormField(tag)
-			_, _ = io.Copy(field, strings.NewReader(strconv.Itoa(value.(int))))
-		case bool:
-			field, _ := w.CreateFormField(tag)
-			_, _ = io.Copy(field, strings.NewReader(strconv.FormatBool(value.(bool))))
-		case InlineKeyboard:
-			if j.inlineKeyboardMarkup.InlineKeyboardButtons != nil {
-				a, _ := json.Marshal(j.inlineKeyboardMarkup)
-				field, _ := w.CreateFormField("reply_markup")
-				_, _ = io.Copy(field, strings.NewReader(string(a)))
+func formFieldSetter(s interface{}, w *multipart.Writer, key ...string) {
+	if reflect.TypeOf(s).Kind() == reflect.Struct {
+		for i := 0; i < reflect.ValueOf(s).NumField(); i++ {
+			tag := reflect.TypeOf(s).Field(i).Tag.Get("json")
+			value := reflect.ValueOf(s).Field(i).Interface()
+			switch j := value.(type) {
+			case string:
+				_ = w.WriteField(tag, value.(string))
+			case int:
+				_ = w.WriteField(tag, strconv.Itoa(value.(int)))
+			case bool:
+				_ = w.WriteField(tag, strconv.FormatBool(value.(bool)))
+			case InlineKeyboard:
+				if j.inlineKeyboardMarkup.InlineKeyboardButtons != nil {
+					a, _ := json.Marshal(j.inlineKeyboardMarkup)
+					_ = w.WriteField("reply_markup", string(a))
+				}
+			case ReplyKeyboard:
+				if j.replyKeyboardMarkup.Keyboard != nil {
+					a, _ := json.Marshal(j.replyKeyboardMarkup)
+					_ = w.WriteField("reply_markup", string(a))
+				} else if j.replyKeyboardRemove != (replyKeyboardRemove{}) {
+					a, _ := json.Marshal(j.replyKeyboardRemove)
+					_ = w.WriteField("reply_markup", string(a))
+				}
+			case ForceReply:
+				a, _ := json.Marshal(j)
+				_ = w.WriteField("reply_markup", string(a))
+			case *os.File:
+				file, _ := w.CreateFormFile(tag, j.Name())
+				_, _ = io.Copy(file, j)
+				_, _ = j.Seek(0, io.SeekStart)
 			}
-		case ReplyKeyboard:
-			if j.replyKeyboardMarkup.Keyboard != nil {
-				a, _ := json.Marshal(j.replyKeyboardMarkup)
-				field, _ := w.CreateFormField("reply_markup")
-				_, _ = io.Copy(field, strings.NewReader(string(a)))
-			} else if j.replyKeyboardRemove != (replyKeyboardRemove{}) {
-				a, _ := json.Marshal(j.replyKeyboardRemove)
-				field, _ := w.CreateFormField("reply_markup")
-				_, _ = io.Copy(field, strings.NewReader(string(a)))
-			}
-		case ForceReply:
-			a, _ := json.Marshal(j)
-			field, _ := w.CreateFormField("reply_markup")
-			_, _ = io.Copy(field, strings.NewReader(string(a)))
-		case *os.File:
-			file, _ := w.CreateFormFile(tag, j.Name())
-			all, _ := ioutil.ReadAll(j)
-			_, _ = j.Seek(0, io.SeekStart)
-			_, _ = io.Copy(file, strings.NewReader(string(all)))
 		}
 	}
 }
@@ -165,4 +167,44 @@ func replyKeyboardButtonRowAdder(t *ReplyKeyboard, oneTimeKeyboard bool,
 	} else {
 		t.Keyboard = append(t.Keyboard, row...)
 	}
+}
+
+func request(id int, method string, token string, containsFile bool, data interface{},
+	optionalParams interface{}) (response string, error error) {
+	if id == 0 {
+		return "", errors.New("id field is empty")
+	}
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://api.telegram.org/bot%s/send%s", token, method),
+		nil)
+	if err != nil {
+		return "", err
+	}
+	if !containsFile {
+		q := req.URL.Query()
+		urlValueSetter(data, &q)
+		if optionalParams != nil {
+			urlValueSetter(optionalParams, &q)
+		}
+		req.URL.RawQuery = q.Encode()
+	} else {
+		var body = &bytes.Buffer{}
+		w := multipart.NewWriter(body)
+		formFieldSetter(data, w)
+		if optionalParams != nil {
+			formFieldSetter(optionalParams, w)
+		}
+		err = w.Close()
+		if err != nil {
+			return "", err
+		}
+		req.Header.Set("Content-Type", w.FormDataContentType())
+		req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
+	}
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	resToString, _ := ioutil.ReadAll(res.Body)
+	return string(resToString), nil
 }

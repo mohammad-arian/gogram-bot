@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 )
 
 // SendText sends message to a User.
@@ -21,152 +20,44 @@ import (
 // pass nil or *TextOptionalParams struct to optionalParams. It adds some optional
 // parameters to request, like reply_markup, disable_notification and ...
 func (r *ReplyAble) SendText(b Bot, text string, optionalParams *TextOptionalParams) (response string, err error) {
-	var id = r.Id
-	if id == 0 {
-		return "", errors.New("id field is empty")
+	type data struct {
+		ChatId  int    `json:"chat_id"`
+		Message string `json:"message"`
 	}
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", b.Token),
-		nil)
-	if err != nil {
-		return "", err
-	}
-	q := req.URL.Query()
-	q.Set("chat_id", strconv.Itoa(id))
-	q.Set("text", text)
-	if optionalParams != nil {
-		urlValueSetter(*optionalParams, &q)
-	}
-	req.URL.RawQuery = q.Encode()
-	client := &http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	resToString, _ := ioutil.ReadAll(res.Body)
-	return string(resToString), nil
+	d := data{ChatId: r.Id, Message: text}
+	return request(r.Id, "Message", b.Token, false, d, optionalParams)
 }
 
 func (r *ReplyAble) SendPhoto(b Bot, photo interface{}, optionalParams *PhotoOptionalParams) (response string, err error) {
-	var id = r.Id
-	if id == 0 {
-		return "", errors.New("id field is empty")
+	type data struct {
+		ChatId int         `json:"chat_id"`
+		Photo  interface{} `json:"photo"`
 	}
-	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto", b.Token),
-		nil)
-	if err != nil {
-		return "", err
-	}
-	switch p := photo.(type) {
+	d := data{ChatId: r.Id, Photo: photo}
+	switch photo.(type) {
 	case *os.File:
-		var body = &bytes.Buffer{}
-		w := multipart.NewWriter(body)
-		err := w.WriteField("chat_id", strconv.Itoa(id))
-		if err != nil {
-			return "", err
-		}
-		if err != nil {
-			return "", err
-		}
-		photoField, err := w.CreateFormFile("photo", p.Name())
-		all, err := ioutil.ReadAll(p)
-		if err != nil {
-			return "", err
-		}
-		_, err = p.Seek(0, io.SeekStart)
-		if err != nil {
-			return "", err
-		}
-		_, err = io.Copy(photoField, strings.NewReader(string(all)))
-		if err != nil {
-			return "", err
-		}
-		if optionalParams != nil {
-			formFieldSetter(*optionalParams, w)
-		}
-		err = w.Close()
-		if err != nil {
-			return "", err
-		}
-		req.Header.Set("Content-Type", w.FormDataContentType())
-		req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
+		return request(r.Id, "Photo", b.Token, true, d, optionalParams)
 	case string:
-		q := req.URL.Query()
-		q.Set("chat_id", strconv.Itoa(id))
-		q.Set("photo", p)
-		if optionalParams != nil {
-			urlValueSetter(*optionalParams, &q)
-		}
-		req.URL.RawQuery = q.Encode()
+		return request(r.Id, "Photo", b.Token, false, d, optionalParams)
 	default:
 		return "", errors.New("SendPhoto function accepts only string and *os.File types")
 	}
-	client := &http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	resToString, _ := ioutil.ReadAll(res.Body)
-	return string(resToString), nil
 }
 
 func (r *ReplyAble) SendVideo(b Bot, video interface{}, optionalParams *VideoOptionalParams) (response string, err error) {
-	var id = r.Id
-	if id == 0 {
-		return "", errors.New("id field is empty")
+	type data struct {
+		ChatId int         `json:"chat_id"`
+		Video  interface{} `json:"video"`
 	}
-	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendVideo", b.Token),
-		nil)
-	if err != nil {
-		return "", err
-	}
-	switch v := video.(type) {
+	d := data{ChatId: r.Id, Video: video}
+	switch video.(type) {
 	case *os.File:
-		var body = &bytes.Buffer{}
-		w := multipart.NewWriter(body)
-		err := w.WriteField("chat_id", strconv.Itoa(id))
-		if err != nil {
-			return "", err
-		}
-		videoField, err := w.CreateFormFile("video", v.Name())
-		all, err := ioutil.ReadAll(v)
-		if err != nil {
-			return "", err
-		}
-		_, err = v.Seek(0, io.SeekStart)
-		if err != nil {
-			return "", err
-		}
-		_, err = io.Copy(videoField, strings.NewReader(string(all)))
-		if err != nil {
-			return "", err
-		}
-		if optionalParams != nil {
-			formFieldSetter(*optionalParams, w)
-		}
-		err = w.Close()
-		if err != nil {
-			return "", err
-		}
-		req.Header.Set("Content-Type", w.FormDataContentType())
-		req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
+		return request(r.Id, "Video", b.Token, true, d, optionalParams)
 	case string:
-		q := req.URL.Query()
-		q.Set("chat_id", strconv.Itoa(id))
-		q.Set("video", v)
-		if optionalParams != nil {
-			urlValueSetter(*optionalParams, &q)
-		}
-		req.URL.RawQuery = q.Encode()
+		return request(r.Id, "Video", b.Token, false, d, optionalParams)
 	default:
 		return "", errors.New("SendVideo function accepts only string and *os.File types")
 	}
-	client := &http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	resToString, _ := ioutil.ReadAll(res.Body)
-	return string(resToString), nil
 }
 
 // SendAudio sends audio files, if you want Telegram clients to display them in the music player.
@@ -174,123 +65,35 @@ func (r *ReplyAble) SendVideo(b Bot, video interface{}, optionalParams *VideoOpt
 // On success, the sent Message is returned.
 // Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
 func (r *ReplyAble) SendAudio(b Bot, audio interface{}, optionalParams *AudioOptionalParams) (response string, err error) {
-	var id = r.Id
-	if id == 0 {
-		return "", errors.New("id field is empty")
+	type data struct {
+		ChatId int         `json:"chat_id"`
+		Audio  interface{} `json:"audio"`
 	}
-	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendAudio", b.Token),
-		nil)
-	if err != nil {
-		return "", err
-	}
-	switch v := audio.(type) {
+	d := data{ChatId: r.Id, Audio: audio}
+	switch audio.(type) {
 	case *os.File:
-		var body = &bytes.Buffer{}
-		w := multipart.NewWriter(body)
-		err := w.WriteField("chat_id", strconv.Itoa(id))
-		if err != nil {
-			return "", err
-		}
-		videoField, err := w.CreateFormFile("audio", v.Name())
-		all, err := ioutil.ReadAll(v)
-		if err != nil {
-			return "", err
-		}
-		_, err = v.Seek(0, io.SeekStart)
-		if err != nil {
-			return "", err
-		}
-		_, err = io.Copy(videoField, strings.NewReader(string(all)))
-		if err != nil {
-			return "", err
-		}
-		if optionalParams != nil {
-			formFieldSetter(*optionalParams, w)
-		}
-		err = w.Close()
-		if err != nil {
-			return "", err
-		}
-		req.Header.Set("Content-Type", w.FormDataContentType())
-		req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
+		return request(r.Id, "Audio", b.Token, true, d, optionalParams)
 	case string:
-		q := req.URL.Query()
-		q.Set("chat_id", strconv.Itoa(id))
-		q.Set("audio", v)
-		if optionalParams != nil {
-			urlValueSetter(*optionalParams, &q)
-		}
-		req.URL.RawQuery = q.Encode()
+		return request(r.Id, "Audio", b.Token, false, d, optionalParams)
 	default:
 		return "", errors.New("SendAudio function accepts only string and *os.File types")
 	}
-	client := &http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	resToString, _ := ioutil.ReadAll(res.Body)
-	return string(resToString), nil
 }
 
 func (r *ReplyAble) SendDocument(b Bot, document interface{}, optionalParams *DocumentOptionalParams) (response string, err error) {
-	var id = r.Id
-	if id == 0 {
-		return "", errors.New("id field is empty")
+	type data struct {
+		ChatId   int         `json:"chat_id"`
+		Document interface{} `json:"document"`
 	}
-	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendDocument", b.Token),
-		nil)
-	if err != nil {
-		return "", err
-	}
-	switch v := document.(type) {
+	d := data{ChatId: r.Id, Document: document}
+	switch document.(type) {
 	case *os.File:
-		var body = &bytes.Buffer{}
-		w := multipart.NewWriter(body)
-		err := w.WriteField("chat_id", strconv.Itoa(id))
-		if err != nil {
-			return "", err
-		}
-		videoField, err := w.CreateFormFile("document", v.Name())
-		all, err := ioutil.ReadAll(v)
-		if err != nil {
-			return "", err
-		}
-		_, err = v.Seek(0, io.SeekStart)
-		if err != nil {
-			return "", err
-		}
-		_, err = io.Copy(videoField, strings.NewReader(string(all)))
-		if err != nil {
-			return "", err
-		}
-		if optionalParams != nil {
-			formFieldSetter(*optionalParams, w)
-		}
-		err = w.Close()
-		if err != nil {
-			return "", err
-		}
-		req.Header.Set("Content-Type", w.FormDataContentType())
-		req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
+		return request(r.Id, "Document", b.Token, true, d, optionalParams)
 	case string:
-		q := req.URL.Query()
-		q.Set("chat_id", strconv.Itoa(id))
-		q.Set("document", v)
-		if optionalParams != nil {
-			urlValueSetter(*optionalParams, &q)
-		}
-		req.URL.RawQuery = q.Encode()
+		return request(r.Id, "Document", b.Token, false, d, optionalParams)
 	default:
 		return "", errors.New("SendDocument function accepts only string and *os.File types")
 	}
-	client := &http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	resToString, _ := ioutil.ReadAll(res.Body)
-	return string(resToString), nil
 }
 
 // SendVoice sends audio files, if you want Telegram clients to display the file as a playable voice message.
@@ -299,235 +102,59 @@ func (r *ReplyAble) SendDocument(b Bot, document interface{}, optionalParams *Do
 // On success, the sent Message is returned.
 // Bots can currently send voice messages of up to 50 MB in size, this limit may be changed in the future.
 func (r *ReplyAble) SendVoice(b Bot, voice interface{}, optionalParams *VoiceOptionalParams) (response string, err error) {
-	var id = r.Id
-	if id == 0 {
-		return "", errors.New("id field is empty")
+	type data struct {
+		ChatId int         `json:"chat_id"`
+		Voice  interface{} `json:"voice"`
 	}
-	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendVoice", b.Token),
-		nil)
-	if err != nil {
-		return "", err
-	}
-	switch v := voice.(type) {
+	d := data{ChatId: r.Id, Voice: voice}
+	switch voice.(type) {
 	case *os.File:
-		var body = &bytes.Buffer{}
-		w := multipart.NewWriter(body)
-		err := w.WriteField("chat_id", strconv.Itoa(id))
-		if err != nil {
-			return "", err
-		}
-		videoField, err := w.CreateFormFile("voice", v.Name())
-		all, err := ioutil.ReadAll(v)
-		if err != nil {
-			return "", err
-		}
-		_, err = v.Seek(0, io.SeekStart)
-		if err != nil {
-			return "", err
-		}
-		_, err = io.Copy(videoField, strings.NewReader(string(all)))
-		if err != nil {
-			return "", err
-		}
-		if optionalParams != nil {
-			formFieldSetter(*optionalParams, w)
-		}
-		err = w.Close()
-		if err != nil {
-			return "", err
-		}
-		req.Header.Set("Content-Type", w.FormDataContentType())
-		req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
+		return request(r.Id, "Voice", b.Token, true, d, optionalParams)
 	case string:
-		q := req.URL.Query()
-		q.Set("chat_id", strconv.Itoa(id))
-		q.Set("voice", v)
-		if optionalParams != nil {
-			urlValueSetter(*optionalParams, &q)
-		}
-		req.URL.RawQuery = q.Encode()
+		return request(r.Id, "Voice", b.Token, false, d, optionalParams)
 	default:
 		return "", errors.New("SendVoice function accepts only string and *os.File types")
 	}
-	client := &http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	resToString, _ := ioutil.ReadAll(res.Body)
-	return string(resToString), nil
 }
 
 func (r *ReplyAble) SendAnimation(b Bot, animation interface{}, optionalParams *AnimationOptionalParams) (response string, err error) {
-	var id = r.Id
-	if id == 0 {
-		return "", errors.New("id field is empty")
+	type data struct {
+		ChatId    int         `json:"chat_id"`
+		Animation interface{} `json:"animation"`
 	}
-	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendAnimation", b.Token),
-		nil)
-	if err != nil {
-		return "", err
-	}
-	switch v := animation.(type) {
+	d := data{ChatId: r.Id, Animation: animation}
+	switch animation.(type) {
 	case *os.File:
-		var body = &bytes.Buffer{}
-		w := multipart.NewWriter(body)
-		err := w.WriteField("chat_id", strconv.Itoa(id))
-		if err != nil {
-			return "", err
-		}
-		videoField, err := w.CreateFormFile("animation", v.Name())
-		all, err := ioutil.ReadAll(v)
-		if err != nil {
-			return "", err
-		}
-		_, err = v.Seek(0, io.SeekStart)
-		if err != nil {
-			return "", err
-		}
-		_, err = io.Copy(videoField, strings.NewReader(string(all)))
-		if err != nil {
-			return "", err
-		}
-		if optionalParams != nil {
-			formFieldSetter(*optionalParams, w)
-		}
-		err = w.Close()
-		if err != nil {
-			return "", err
-		}
-		req.Header.Set("Content-Type", w.FormDataContentType())
-		req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
+		return request(r.Id, "Animation", b.Token, true, d, optionalParams)
 	case string:
-		q := req.URL.Query()
-		q.Set("chat_id", strconv.Itoa(id))
-		q.Set("animation", v)
-		if optionalParams != nil {
-			urlValueSetter(*optionalParams, &q)
-		}
-		req.URL.RawQuery = q.Encode()
+		return request(r.Id, "Animation", b.Token, false, d, optionalParams)
 	default:
 		return "", errors.New("SendAnimation function accepts only string and *os.File types")
 	}
-	client := &http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	resToString, _ := ioutil.ReadAll(res.Body)
-	return string(resToString), nil
-}
-
-func (r *ReplyAble) SendPoll(b Bot, question string, options []string, optionalParams *PollOptionalParams) (response string, err error) {
-	var id = r.Id
-	if id == 0 {
-		return "", errors.New("id field is empty")
-	}
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://api.telegram.org/bot%s/sendPoll", b.Token),
-		nil)
-	if err != nil {
-		return "", err
-	}
-	q := req.URL.Query()
-	q.Set("chat_id", strconv.Itoa(id))
-	q.Set("question", question)
-	urlValueSetter(options, &q, "options")
-	if optionalParams != nil {
-		urlValueSetter(*optionalParams, &q)
-	}
-	req.URL.RawQuery = q.Encode()
-	client := &http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	resToString, _ := ioutil.ReadAll(res.Body)
-	return string(resToString), nil
 }
 
 func (r *ReplyAble) SendDice(b Bot, optionalParams *DiceOptionalParams) (response string, err error) {
-	var id = r.Id
-	if id == 0 {
-		return "", errors.New("id field is empty")
+	type data struct {
+		ChatId int `json:"chat_id"`
 	}
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://api.telegram.org/bot%s/sendDice", b.Token),
-		nil)
-	if err != nil {
-		return "", err
-	}
-	q := req.URL.Query()
-	q.Set("chat_id", strconv.Itoa(id))
-	if optionalParams != nil {
-		urlValueSetter(*optionalParams, &q)
-	}
-	req.URL.RawQuery = q.Encode()
-	client := &http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	resToString, _ := ioutil.ReadAll(res.Body)
-	return string(resToString), nil
+	d := data{ChatId: r.Id}
+	return request(r.Id, "Dice", b.Token, false, d, optionalParams)
 }
 
 func (r *ReplyAble) SendVideoNote(b Bot, videoNote interface{}, optionalParams *VideoNoteOptionalParams) (response string, err error) {
-	var id = r.Id
-	if id == 0 {
-		return "", errors.New("id field is empty")
+	type data struct {
+		ChatId    int         `json:"chat_id"`
+		VideoNote interface{} `json:"videoNote"`
 	}
-	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/sendVideoNote", b.Token),
-		nil)
-	if err != nil {
-		return "", err
-	}
-	switch v := videoNote.(type) {
+	d := data{ChatId: r.Id, VideoNote: videoNote}
+	switch videoNote.(type) {
 	case *os.File:
-		var body = &bytes.Buffer{}
-		w := multipart.NewWriter(body)
-		err := w.WriteField("chat_id", strconv.Itoa(id))
-		if err != nil {
-			return "", err
-		}
-		videoField, err := w.CreateFormFile("video_note", v.Name())
-		all, err := ioutil.ReadAll(v)
-		if err != nil {
-			return "", err
-		}
-		_, err = v.Seek(0, io.SeekStart)
-		if err != nil {
-			return "", err
-		}
-		_, err = io.Copy(videoField, strings.NewReader(string(all)))
-		if err != nil {
-			return "", err
-		}
-		if optionalParams != nil {
-			formFieldSetter(*optionalParams, w)
-		}
-		err = w.Close()
-		if err != nil {
-			return "", err
-		}
-		req.Header.Set("Content-Type", w.FormDataContentType())
-		req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
+		return request(r.Id, "VideoNote", b.Token, true, d, optionalParams)
 	case string:
-		q := req.URL.Query()
-		q.Set("chat_id", strconv.Itoa(id))
-		q.Set("video_note", v)
-		if optionalParams != nil {
-			urlValueSetter(*optionalParams, &q)
-		}
-		req.URL.RawQuery = q.Encode()
+		return request(r.Id, "VideoNote", b.Token, false, d, optionalParams)
 	default:
 		return "", errors.New("SendVideoNote function accepts only string and *os.File types")
 	}
-	client := &http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	resToString, _ := ioutil.ReadAll(res.Body)
-	return string(resToString), nil
 }
 
 // SendMediaGroup sends a group of photos, videos, documents or audios as an album.
