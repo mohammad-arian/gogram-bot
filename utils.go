@@ -27,6 +27,9 @@ func urlValueSetter(s interface{}, q *url.Values, key ...string) {
 				q.Set(tag, strconv.Itoa(value.(int)))
 			case bool:
 				q.Set(tag, strconv.FormatBool(value.(bool)))
+			case map[string]string:
+				a, _ := json.Marshal(j)
+				q.Set(tag, string(a))
 			case InlineKeyboard:
 				if j.inlineKeyboardMarkup.InlineKeyboardButtons != nil {
 					a, _ := json.Marshal(j.inlineKeyboardMarkup)

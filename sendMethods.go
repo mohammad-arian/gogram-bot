@@ -21,10 +21,10 @@ import (
 // parameters to request, like reply_markup, disable_notification and ...
 func (r *ReplyAble) SendText(b Bot, text string, optionalParams *TextOptionalParams) (response string, err error) {
 	type data struct {
-		ChatId  int    `json:"chat_id"`
-		Message string `json:"message"`
+		ChatId int    `json:"chat_id"`
+		Text   string `json:"text"`
 	}
-	d := data{ChatId: r.Id, Message: text}
+	d := data{ChatId: r.Id, Text: text}
 	return request(r.Id, "Message", b.Token, false, d, optionalParams)
 }
 
@@ -155,6 +155,16 @@ func (r *ReplyAble) SendVideoNote(b Bot, videoNote interface{}, optionalParams *
 	default:
 		return "", errors.New("SendVideoNote function accepts only string and *os.File types")
 	}
+}
+
+func (r *ReplyAble) SendPoll(b Bot, question string, options []string, optionalParams *PollOptionalParams) (response string, err error) {
+	type data struct {
+		ChatId   int         `json:"chat_id"`
+		Question interface{} `json:"question"`
+		Options  []string
+	}
+	d := data{ChatId: r.Id, Question: question, Options: options}
+	return request(r.Id, "VideoPoll", b.Token, false, d, optionalParams)
 }
 
 // SendMediaGroup sends a group of photos, videos, documents or audios as an album.
