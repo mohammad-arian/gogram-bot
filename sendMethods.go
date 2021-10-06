@@ -18,7 +18,7 @@ func (r *ReplyAble) SendText(b Bot, text string, optionalParams *TextOptionalPar
 		Text   string `json:"text"`
 	}
 	d := data{ChatId: r.Id, Text: text}
-	return request(r.Id, "Message", b.Token, false, d, optionalParams)
+	return request(r.Id, "sendMessage", b.Token, false, d, optionalParams)
 }
 
 func (r *ReplyAble) SendPhoto(b Bot, photo interface{}, optionalParams *PhotoOptionalParams) (response string, err error) {
@@ -29,9 +29,9 @@ func (r *ReplyAble) SendPhoto(b Bot, photo interface{}, optionalParams *PhotoOpt
 	d := data{ChatId: r.Id, Photo: photo}
 	switch photo.(type) {
 	case *os.File:
-		return request(r.Id, "Photo", b.Token, true, d, optionalParams)
+		return request(r.Id, "sendPhoto", b.Token, true, d, optionalParams)
 	case string:
-		return request(r.Id, "Photo", b.Token, false, d, optionalParams)
+		return request(r.Id, "sendPhoto", b.Token, false, d, optionalParams)
 	default:
 		return "", errors.New("SendPhoto function accepts only string and *os.File types")
 	}
@@ -45,9 +45,9 @@ func (r *ReplyAble) SendVideo(b Bot, video interface{}, optionalParams *VideoOpt
 	d := data{ChatId: r.Id, Video: video}
 	switch video.(type) {
 	case *os.File:
-		return request(r.Id, "Video", b.Token, true, d, optionalParams)
+		return request(r.Id, "sendVideo", b.Token, true, d, optionalParams)
 	case string:
-		return request(r.Id, "Video", b.Token, false, d, optionalParams)
+		return request(r.Id, "sendVideo", b.Token, false, d, optionalParams)
 	default:
 		return "", errors.New("SendVideo function accepts only string and *os.File types")
 	}
@@ -65,9 +65,9 @@ func (r *ReplyAble) SendAudio(b Bot, audio interface{}, optionalParams *AudioOpt
 	d := data{ChatId: r.Id, Audio: audio}
 	switch audio.(type) {
 	case *os.File:
-		return request(r.Id, "Audio", b.Token, true, d, optionalParams)
+		return request(r.Id, "sendAudio", b.Token, true, d, optionalParams)
 	case string:
-		return request(r.Id, "Audio", b.Token, false, d, optionalParams)
+		return request(r.Id, "sendAudio", b.Token, false, d, optionalParams)
 	default:
 		return "", errors.New("SendAudio function accepts only string and *os.File types")
 	}
@@ -81,9 +81,9 @@ func (r *ReplyAble) SendDocument(b Bot, document interface{}, optionalParams *Do
 	d := data{ChatId: r.Id, Document: document}
 	switch document.(type) {
 	case *os.File:
-		return request(r.Id, "Document", b.Token, true, d, optionalParams)
+		return request(r.Id, "sendDocument", b.Token, true, d, optionalParams)
 	case string:
-		return request(r.Id, "Document", b.Token, false, d, optionalParams)
+		return request(r.Id, "sendDocument", b.Token, false, d, optionalParams)
 	default:
 		return "", errors.New("SendDocument function accepts only string and *os.File types")
 	}
@@ -102,9 +102,9 @@ func (r *ReplyAble) SendVoice(b Bot, voice interface{}, optionalParams *VoiceOpt
 	d := data{ChatId: r.Id, Voice: voice}
 	switch voice.(type) {
 	case *os.File:
-		return request(r.Id, "Voice", b.Token, true, d, optionalParams)
+		return request(r.Id, "sendVoice", b.Token, true, d, optionalParams)
 	case string:
-		return request(r.Id, "Voice", b.Token, false, d, optionalParams)
+		return request(r.Id, "sendVoice", b.Token, false, d, optionalParams)
 	default:
 		return "", errors.New("SendVoice function accepts only string and *os.File types")
 	}
@@ -118,9 +118,9 @@ func (r *ReplyAble) SendAnimation(b Bot, animation interface{}, optionalParams *
 	d := data{ChatId: r.Id, Animation: animation}
 	switch animation.(type) {
 	case *os.File:
-		return request(r.Id, "Animation", b.Token, true, d, optionalParams)
+		return request(r.Id, "sendAnimation", b.Token, true, d, optionalParams)
 	case string:
-		return request(r.Id, "Animation", b.Token, false, d, optionalParams)
+		return request(r.Id, "sendAnimation", b.Token, false, d, optionalParams)
 	default:
 		return "", errors.New("SendAnimation function accepts only string and *os.File types")
 	}
@@ -131,7 +131,7 @@ func (r *ReplyAble) SendDice(b Bot, optionalParams *DiceOptionalParams) (respons
 		ChatId int `json:"chat_id"`
 	}
 	d := data{ChatId: r.Id}
-	return request(r.Id, "Dice", b.Token, false, d, optionalParams)
+	return request(r.Id, "sendDice", b.Token, false, d, optionalParams)
 }
 
 func (r *ReplyAble) SendVideoNote(b Bot, videoNote interface{}, optionalParams *VideoNoteOptionalParams) (response string, err error) {
@@ -142,9 +142,9 @@ func (r *ReplyAble) SendVideoNote(b Bot, videoNote interface{}, optionalParams *
 	d := data{ChatId: r.Id, VideoNote: videoNote}
 	switch videoNote.(type) {
 	case *os.File:
-		return request(r.Id, "VideoNote", b.Token, true, d, optionalParams)
+		return request(r.Id, "sendVideoNote", b.Token, true, d, optionalParams)
 	case string:
-		return request(r.Id, "VideoNote", b.Token, false, d, optionalParams)
+		return request(r.Id, "sendVideoNote", b.Token, false, d, optionalParams)
 	default:
 		return "", errors.New("SendVideoNote function accepts only string and *os.File types")
 	}
@@ -160,7 +160,7 @@ func (r *ReplyAble) SendPoll(b Bot, question string, options []string, optionalP
 		Options  []string    `json:"options"`
 	}
 	d := data{ChatId: r.Id, Question: question, Options: options}
-	return request(r.Id, "Poll", b.Token, false, d, optionalParams)
+	return request(r.Id, "sendPoll", b.Token, false, d, optionalParams)
 }
 
 // SendMediaGroup sends a group of photos, videos, documents or audios as an album.
@@ -219,7 +219,7 @@ func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOptionalPara
 	}
 	mediaToJson, _ := json.Marshal(media)
 	d.Media = string(mediaToJson)
-	return request(r.Id, "MediaGroup", b.Token, true, d, optionalParams)
+	return request(r.Id, "sendMediaGroup", b.Token, true, d, optionalParams)
 }
 
 func (r *ReplyAble) SendLocation(b Bot, latitude float64, longitude float64, optionalParams *LocationOptionalParams) (response string, err error) {
@@ -229,7 +229,7 @@ func (r *ReplyAble) SendLocation(b Bot, latitude float64, longitude float64, opt
 		Longitude float64 `json:"longitude"`
 	}
 	d := data{ChatId: r.Id, Latitude: latitude, Longitude: longitude}
-	return request(r.Id, "Location", b.Token, false, d, optionalParams)
+	return request(r.Id, "sendLocation", b.Token, false, d, optionalParams)
 }
 
 func (r *ReplyAble) SendContact(b Bot, phoneNumber string, firstName string, optionalParams *ContactOptionalParams) (response string, err error) {
@@ -239,7 +239,7 @@ func (r *ReplyAble) SendContact(b Bot, phoneNumber string, firstName string, opt
 		FirstName   string `json:"first_name"`
 	}
 	d := data{ChatId: r.Id, PhoneNumber: phoneNumber, FirstName: firstName}
-	return request(r.Id, "Contact", b.Token, false, d, optionalParams)
+	return request(r.Id, "sendContact", b.Token, false, d, optionalParams)
 }
 
 // SendChatAction tells the user that something is happening on the bot's side.
@@ -259,9 +259,18 @@ func (r *ReplyAble) SendChatAction(b Bot, action string) (response string, err e
 	for _, v := range actions {
 		if v == action {
 			d := data{ChatId: r.Id, Action: action}
-			return request(r.Id, "ChatAction", b.Token, false, d, nil)
+			return request(r.Id, "sendChatAction", b.Token, false, d, nil)
 		}
 	}
 	return "", errors.New(action + " is an unknown action, read the document.")
+}
+
+func (r *ReplyAble) ForwardMessage(b Bot, targetChatId int) (response string, err error) {
+	type data struct {
+		ChatId     int `json:"chat_id"`
+		FromChatId int `json:"from_chat_id"`
+	}
+	d := data{ChatId: targetChatId, FromChatId: r.Id}
+	return request(r.Id, "forwardMessage", b.Token, false, d, nil)
 
 }

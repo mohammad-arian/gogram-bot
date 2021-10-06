@@ -187,7 +187,7 @@ func request(id int, method string, token string, containsFile bool, data interf
 	if id == 0 {
 		return "", errors.New("id field is empty")
 	}
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://api.telegram.org/bot%s/send%s", token, method),
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://api.telegram.org/bot%s/%s", token, method),
 		nil)
 	if err != nil {
 		return "", err
