@@ -10,8 +10,8 @@ import (
 // b Bot parameter indicated which bot to send
 // the message with. This way you can send messages with different bots
 // text is the message that will be sent
-// pass nil or *TextOptionalParams struct to optionalParams. It adds some optional
-// parameters to request, like reply_markup, disable_notification and ...
+// pass nil or *TextOptionalParams struct to optionalParams to add optional
+// parameters to request
 func (r *ReplyAble) SendText(b Bot, text string, optionalParams *TextOptionalParams) (response string, err error) {
 	type data struct {
 		ChatId int    `json:"chat_id"`
@@ -22,7 +22,7 @@ func (r *ReplyAble) SendText(b Bot, text string, optionalParams *TextOptionalPar
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "sendMessage", b.Token, false, d, op)
+	return request(r.Id, "sendMessage", b.Token, d, op)
 }
 
 func (r *ReplyAble) SendPhoto(b Bot, photo interface{}, optionalParams *PhotoOptionalParams) (response string, err error) {
@@ -35,14 +35,7 @@ func (r *ReplyAble) SendPhoto(b Bot, photo interface{}, optionalParams *PhotoOpt
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	switch photo.(type) {
-	case *os.File:
-		return request(r.Id, "sendPhoto", b.Token, true, d, op)
-	case string:
-		return request(r.Id, "sendPhoto", b.Token, false, d, op)
-	default:
-		return "", errors.New("SendPhoto function accepts only string and *os.File types")
-	}
+	return request(r.Id, "sendPhoto", b.Token, d, op)
 }
 
 func (r *ReplyAble) SendVideo(b Bot, video interface{}, optionalParams *VideoOptionalParams) (response string, err error) {
@@ -55,14 +48,7 @@ func (r *ReplyAble) SendVideo(b Bot, video interface{}, optionalParams *VideoOpt
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	switch video.(type) {
-	case *os.File:
-		return request(r.Id, "sendVideo", b.Token, true, d, op)
-	case string:
-		return request(r.Id, "sendVideo", b.Token, false, d, op)
-	default:
-		return "", errors.New("SendVideo function accepts only string and *os.File types")
-	}
+	return request(r.Id, "sendVideo", b.Token, d, op)
 }
 
 // SendAudio sends audio files, if you want Telegram clients to display them in the music player.
@@ -79,14 +65,7 @@ func (r *ReplyAble) SendAudio(b Bot, audio interface{}, optionalParams *AudioOpt
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	switch audio.(type) {
-	case *os.File:
-		return request(r.Id, "sendAudio", b.Token, true, d, op)
-	case string:
-		return request(r.Id, "sendAudio", b.Token, false, d, op)
-	default:
-		return "", errors.New("SendAudio function accepts only string and *os.File types")
-	}
+	return request(r.Id, "sendAudio", b.Token, d, op)
 }
 
 func (r *ReplyAble) SendDocument(b Bot, document interface{}, optionalParams *DocumentOptionalParams) (response string, err error) {
@@ -99,14 +78,7 @@ func (r *ReplyAble) SendDocument(b Bot, document interface{}, optionalParams *Do
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	switch document.(type) {
-	case *os.File:
-		return request(r.Id, "sendDocument", b.Token, true, d, op)
-	case string:
-		return request(r.Id, "sendDocument", b.Token, false, d, op)
-	default:
-		return "", errors.New("SendDocument function accepts only string and *os.File types")
-	}
+	return request(r.Id, "sendDocument", b.Token, d, op)
 }
 
 // SendVoice sends audio files, if you want Telegram clients to display the file as a playable voice message.
@@ -124,14 +96,7 @@ func (r *ReplyAble) SendVoice(b Bot, voice interface{}, optionalParams *VoiceOpt
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	switch voice.(type) {
-	case *os.File:
-		return request(r.Id, "sendVoice", b.Token, true, d, op)
-	case string:
-		return request(r.Id, "sendVoice", b.Token, false, d, op)
-	default:
-		return "", errors.New("SendVoice function accepts only string and *os.File types")
-	}
+	return request(r.Id, "sendVoice", b.Token, d, op)
 }
 
 func (r *ReplyAble) SendAnimation(b Bot, animation interface{}, optionalParams *AnimationOptionalParams) (response string, err error) {
@@ -144,14 +109,7 @@ func (r *ReplyAble) SendAnimation(b Bot, animation interface{}, optionalParams *
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	switch animation.(type) {
-	case *os.File:
-		return request(r.Id, "sendAnimation", b.Token, true, d, op)
-	case string:
-		return request(r.Id, "sendAnimation", b.Token, false, d, op)
-	default:
-		return "", errors.New("SendAnimation function accepts only string and *os.File types")
-	}
+	return request(r.Id, "sendAnimation", b.Token, d, op)
 }
 
 func (r *ReplyAble) SendDice(b Bot, optionalParams *DiceOptionalParams) (response string, err error) {
@@ -163,7 +121,7 @@ func (r *ReplyAble) SendDice(b Bot, optionalParams *DiceOptionalParams) (respons
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "sendDice", b.Token, false, d, op)
+	return request(r.Id, "sendDice", b.Token, d, op)
 }
 
 func (r *ReplyAble) SendVideoNote(b Bot, videoNote interface{}, optionalParams *VideoNoteOptionalParams) (response string, err error) {
@@ -176,14 +134,7 @@ func (r *ReplyAble) SendVideoNote(b Bot, videoNote interface{}, optionalParams *
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	switch videoNote.(type) {
-	case *os.File:
-		return request(r.Id, "sendVideoNote", b.Token, true, d, op)
-	case string:
-		return request(r.Id, "sendVideoNote", b.Token, false, d, op)
-	default:
-		return "", errors.New("SendVideoNote function accepts only string and *os.File types")
-	}
+	return request(r.Id, "sendVideoNote", b.Token, d, op)
 }
 
 func (r *ReplyAble) SendPoll(b Bot, question string, options []string, optionalParams *PollOptionalParams) (response string, err error) {
@@ -200,7 +151,7 @@ func (r *ReplyAble) SendPoll(b Bot, question string, options []string, optionalP
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "sendPoll", b.Token, false, d, op)
+	return request(r.Id, "sendPoll", b.Token, d, op)
 }
 
 // SendMediaGroup sends a group of photos, videos, documents or audios as an album.
@@ -263,7 +214,7 @@ func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOptionalPara
 	}
 	mediaToJson, _ := json.Marshal(media)
 	d.Media = string(mediaToJson)
-	return request(r.Id, "sendMediaGroup", b.Token, true, d, op)
+	return request(r.Id, "sendMediaGroup", b.Token, d, op)
 }
 
 func (r *ReplyAble) SendLocation(b Bot, latitude float64, longitude float64, optionalParams *LocationOptionalParams) (response string, err error) {
@@ -277,7 +228,7 @@ func (r *ReplyAble) SendLocation(b Bot, latitude float64, longitude float64, opt
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "sendLocation", b.Token, false, d, op)
+	return request(r.Id, "sendLocation", b.Token, d, op)
 }
 
 func (r *ReplyAble) SendContact(b Bot, phoneNumber string, firstName string, optionalParams *ContactOptionalParams) (response string, err error) {
@@ -291,7 +242,7 @@ func (r *ReplyAble) SendContact(b Bot, phoneNumber string, firstName string, opt
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "sendContact", b.Token, false, d, op)
+	return request(r.Id, "sendContact", b.Token, d, op)
 }
 
 // SendChatAction tells the user that something is happening on the bot's side.
@@ -311,7 +262,7 @@ func (r *ReplyAble) SendChatAction(b Bot, action string) (response string, err e
 	for _, v := range actions {
 		if v == action {
 			d := data{ChatId: r.Id, Action: action}
-			return request(r.Id, "sendChatAction", b.Token, false, d, nil)
+			return request(r.Id, "sendChatAction", b.Token, d, nil)
 		}
 	}
 	return "", errors.New(action + " is an unknown action, read the document.")
@@ -329,6 +280,5 @@ func (r *ReplyAble) ForwardMessage(b Bot, targetChatId int, messageId int,
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "forwardMessage", b.Token, false, d, op)
-
+	return request(r.Id, "forwardMessage", b.Token, d, op)
 }

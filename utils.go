@@ -133,7 +133,7 @@ func replyKeyboardButtonRowAdder(t *ReplyKeyboard, oneTimeKeyboard bool,
 	}
 }
 
-func request(id int, method string, token string, f bool, data interface{},
+func request(id int, method string, token string, data interface{},
 	optionalParams interface{}) (response string, error error) {
 	if id == 0 {
 		return "", errors.New("id field is empty")
