@@ -18,7 +18,7 @@ func (r *ReplyAble) SendText(b Bot, text string, optionalParams *TextOptionalPar
 		Text   string `json:"text"`
 	}
 	d := data{ChatId: r.Id, Text: text}
-	return request(r.Id, "sendMessage", b.Token, false, d, optionalParams)
+	return request(r.Id, "sendMessage", b.Token, false, d, *optionalParams)
 }
 
 func (r *ReplyAble) SendPhoto(b Bot, photo interface{}, optionalParams *PhotoOptionalParams) (response string, err error) {
