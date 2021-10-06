@@ -9,61 +9,12 @@ import (
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
-	"net/url"
 	"os"
 	"reflect"
 	"strconv"
 )
 
-func urlValueSetter(s interface{}, q *url.Values, key ...string) {
-	if reflect.TypeOf(s).Kind() == reflect.Struct {
-		for i := 0; i < reflect.ValueOf(s).NumField(); i++ {
-			tag := reflect.TypeOf(s).Field(i).Tag.Get("json")
-			value := reflect.ValueOf(s).Field(i).Interface()
-			switch j := value.(type) {
-			case string:
-				q.Set(tag, value.(string))
-			case int:
-				q.Set(tag, strconv.Itoa(value.(int)))
-			case float64:
-				q.Set(tag, fmt.Sprintf("%v", value.(float64)))
-			case bool:
-				q.Set(tag, strconv.FormatBool(value.(bool)))
-			case []string:
-				a, _ := json.Marshal(j)
-				q.Set(tag, string(a))
-			case InlineKeyboard:
-				if j.inlineKeyboardMarkup.InlineKeyboardButtons != nil {
-					a, _ := json.Marshal(j.inlineKeyboardMarkup)
-					q.Set("reply_markup", string(a))
-				}
-			case ReplyKeyboard:
-				if j.replyKeyboardMarkup.Keyboard != nil {
-					a, _ := json.Marshal(j.replyKeyboardMarkup)
-					q.Set("reply_markup", string(a))
-				} else if j.replyKeyboardRemove != (replyKeyboardRemove{}) {
-					a, _ := json.Marshal(j.replyKeyboardRemove)
-					q.Set("reply_markup", string(a))
-				}
-			case ForceReply:
-				a, _ := json.Marshal(j)
-				q.Set("reply_markup", string(a))
-			}
-		}
-	} else if reflect.TypeOf(s).Kind() == reflect.Slice {
-		if key != nil {
-			a, _ := json.Marshal(s)
-			q.Set(key[0], string(a))
-		}
-	} else if reflect.TypeOf(s).Kind() == reflect.Map {
-		v := reflect.ValueOf(s)
-		for _, i := range v.MapKeys() {
-			q.Set(i.String(), v.MapIndex(i).String())
-		}
-	}
-}
-
-func formFieldSetter(s interface{}, w *multipart.Writer, key ...string) {
+func formFieldSetter(s interface{}, w *multipart.Writer) {
 	if reflect.TypeOf(s).Kind() == reflect.Struct {
 		for i := 0; i < reflect.ValueOf(s).NumField(); i++ {
 			tag := reflect.TypeOf(s).Field(i).Tag.Get("json")
@@ -182,7 +133,7 @@ func replyKeyboardButtonRowAdder(t *ReplyKeyboard, oneTimeKeyboard bool,
 	}
 }
 
-func request(id int, method string, token string, containsFile bool, data interface{},
+func request(id int, method string, token string, f bool, data interface{},
 	optionalParams interface{}) (response string, error error) {
 	if id == 0 {
 		return "", errors.New("id field is empty")
@@ -192,27 +143,18 @@ func request(id int, method string, token string, containsFile bool, data interf
 	if err != nil {
 		return "", err
 	}
-	if !containsFile {
-		q := req.URL.Query()
-		urlValueSetter(data, &q)
-		if optionalParams != nil {
-			urlValueSetter(optionalParams, &q)
-		}
-		req.URL.RawQuery = q.Encode()
-	} else {
-		var body = &bytes.Buffer{}
-		w := multipart.NewWriter(body)
-		formFieldSetter(data, w)
-		if optionalParams != nil {
-			formFieldSetter(optionalParams, w)
-		}
-		err = w.Close()
-		if err != nil {
-			return "", err
-		}
-		req.Header.Set("Content-Type", w.FormDataContentType())
-		req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
+	var body = &bytes.Buffer{}
+	w := multipart.NewWriter(body)
+	formFieldSetter(data, w)
+	if optionalParams != nil {
+		formFieldSetter(optionalParams, w)
 	}
+	err = w.Close()
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Content-Type", w.FormDataContentType())
+	req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
