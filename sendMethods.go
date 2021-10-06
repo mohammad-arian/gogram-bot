@@ -265,12 +265,14 @@ func (r *ReplyAble) SendChatAction(b Bot, action string) (response string, err e
 	return "", errors.New(action + " is an unknown action, read the document.")
 }
 
-func (r *ReplyAble) ForwardMessage(b Bot, targetChatId int) (response string, err error) {
+func (r *ReplyAble) ForwardMessage(b Bot, targetChatId int, messageId int,
+	optionalParams *ForwardMessageOptionalParams) (response string, err error) {
 	type data struct {
 		ChatId     int `json:"chat_id"`
 		FromChatId int `json:"from_chat_id"`
+		MessageId  int `json:"message_id"`
 	}
-	d := data{ChatId: targetChatId, FromChatId: r.Id}
-	return request(r.Id, "forwardMessage", b.Token, false, d, nil)
+	d := data{ChatId: targetChatId, FromChatId: r.Id, MessageId: messageId}
+	return request(r.Id, "forwardMessage", b.Token, false, d, optionalParams)
 
 }
