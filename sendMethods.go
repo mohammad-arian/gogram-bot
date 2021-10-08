@@ -3,6 +3,7 @@ package gogram
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 )
 
@@ -318,6 +319,7 @@ func (r *ReplyAble) GetUserProfilePhotos(b Bot,
 		u := UserProfilePhotos{}
 		err := json.Unmarshal([]byte(res), &u)
 		if err != nil {
+			fmt.Println("test: ", res, u)
 			return u, err
 		}
 	}

@@ -173,6 +173,6 @@ type inputMediaAudio struct {
 
 type UserProfilePhotos struct {
 	// Total number of profile pictures the target user has
-	TotalCount int `json:"total_count"`
-	photos     [][]PhotoSize
+	TotalCount int           `json:"total_count"`
+	Photos     [][]PhotoSize `json:"photos"`
 }
