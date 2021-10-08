@@ -282,3 +282,44 @@ func (r *ReplyAble) ForwardMessage(b Bot, targetChatId int, messageId int,
 	}
 	return request(r.Id, "forwardMessage", b.Token, d, op)
 }
+
+// CopyMessage copies messages of any kind.
+// Service messages and invoice messages can't be copied.
+// The method is analogous to the method forwardMessage,
+// but the copied message doesn't have a link to the original
+// message. Returns the MessageId of the sent message on success.
+func (r *ReplyAble) CopyMessage(b Bot, targetChatId int, messageId int,
+	optionalParams *CopyMessageOptionalParams) (response string, err error) {
+	type data struct {
+		ChatId     int `json:"chat_id"`
+		FromChatId int `json:"from_chat_id"`
+		MessageId  int `json:"message_id"`
+	}
+	d := data{ChatId: targetChatId, FromChatId: r.Id, MessageId: messageId}
+	var op interface{}
+	if optionalParams != nil {
+		op = *optionalParams
+	}
+	return request(r.Id, "forwardMessage", b.Token, d, op)
+}
+
+func (r *ReplyAble) GetUserProfilePhotos(b Bot,
+	optionalParams *GetUserProfilePhotosOptionalParams) (response UserProfilePhotos, err error) {
+	type data struct {
+		UserId int `json:"user_id"`
+	}
+	d := data{UserId: r.Id}
+	var op interface{}
+	if optionalParams != nil {
+		op = *optionalParams
+	}
+	res, err := request(r.Id, "forwardMessage", b.Token, d, op)
+	if err != nil {
+		u := UserProfilePhotos{}
+		err := json.Unmarshal([]byte(res), &u)
+		if err != nil {
+			return u, err
+		}
+	}
+	return UserProfilePhotos{}, err
+}

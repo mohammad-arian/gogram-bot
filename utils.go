@@ -15,45 +15,43 @@ import (
 )
 
 func formFieldSetter(s interface{}, w *multipart.Writer) {
-	if reflect.TypeOf(s).Kind() == reflect.Struct {
-		for i := 0; i < reflect.ValueOf(s).NumField(); i++ {
-			tag := reflect.TypeOf(s).Field(i).Tag.Get("json")
-			value := reflect.ValueOf(s).Field(i).Interface()
-			switch j := value.(type) {
-			case string:
-				_ = w.WriteField(tag, value.(string))
-			case int:
-				_ = w.WriteField(tag, strconv.Itoa(value.(int)))
-			case float64:
-				_ = w.WriteField(tag, fmt.Sprintf("%v", value.(float64)))
-			case bool:
-				_ = w.WriteField(tag, strconv.FormatBool(value.(bool)))
-			case InlineKeyboard:
-				if j.inlineKeyboardMarkup.InlineKeyboardButtons != nil {
-					a, _ := json.Marshal(j.inlineKeyboardMarkup)
-					_ = w.WriteField("reply_markup", string(a))
-				}
-			case ReplyKeyboard:
-				if j.replyKeyboardMarkup.Keyboard != nil {
-					a, _ := json.Marshal(j.replyKeyboardMarkup)
-					_ = w.WriteField("reply_markup", string(a))
-				} else if j.replyKeyboardRemove != (replyKeyboardRemove{}) {
-					a, _ := json.Marshal(j.replyKeyboardRemove)
-					_ = w.WriteField("reply_markup", string(a))
-				}
-			case ForceReply:
-				a, _ := json.Marshal(j)
+	for i := 0; i < reflect.ValueOf(s).NumField(); i++ {
+		tag := reflect.TypeOf(s).Field(i).Tag.Get("json")
+		value := reflect.ValueOf(s).Field(i).Interface()
+		switch j := value.(type) {
+		case string:
+			_ = w.WriteField(tag, value.(string))
+		case int:
+			_ = w.WriteField(tag, strconv.Itoa(value.(int)))
+		case float64:
+			_ = w.WriteField(tag, fmt.Sprintf("%v", value.(float64)))
+		case bool:
+			_ = w.WriteField(tag, strconv.FormatBool(value.(bool)))
+		case InlineKeyboard:
+			if j.inlineKeyboardMarkup.InlineKeyboardButtons != nil {
+				a, _ := json.Marshal(j.inlineKeyboardMarkup)
 				_ = w.WriteField("reply_markup", string(a))
-			case *os.File:
-				file, _ := w.CreateFormFile(tag, j.Name())
-				_, _ = io.Copy(file, j)
-				_, _ = j.Seek(0, io.SeekStart)
-			case []*os.File:
-				for _, f := range j {
-					file, _ := w.CreateFormFile(f.Name(), f.Name())
-					_, _ = io.Copy(file, f)
-					_, _ = f.Seek(0, io.SeekStart)
-				}
+			}
+		case ReplyKeyboard:
+			if j.replyKeyboardMarkup.Keyboard != nil {
+				a, _ := json.Marshal(j.replyKeyboardMarkup)
+				_ = w.WriteField("reply_markup", string(a))
+			} else if j.replyKeyboardRemove != (replyKeyboardRemove{}) {
+				a, _ := json.Marshal(j.replyKeyboardRemove)
+				_ = w.WriteField("reply_markup", string(a))
+			}
+		case ForceReply:
+			a, _ := json.Marshal(j)
+			_ = w.WriteField("reply_markup", string(a))
+		case *os.File:
+			file, _ := w.CreateFormFile(tag, j.Name())
+			_, _ = io.Copy(file, j)
+			_, _ = j.Seek(0, io.SeekStart)
+		case []*os.File:
+			for _, f := range j {
+				file, _ := w.CreateFormFile(f.Name(), f.Name())
+				_, _ = io.Copy(file, f)
+				_, _ = f.Seek(0, io.SeekStart)
 			}
 		}
 	}

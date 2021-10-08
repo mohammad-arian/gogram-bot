@@ -16,10 +16,6 @@ type CallbackQuery struct {
 	Data         string  `json:"data"`
 }
 
-type Photo struct {
-	FileId string `json:"file_id"`
-}
-
 type Poll struct {
 	Id              string       `json:"id,omitempty"`
 	Question        string       `json:"question,omitempty"`
@@ -45,13 +41,21 @@ type PollOption struct {
 	VoterCount int    `json:"voter_count"`
 }
 
+type PhotoSize struct {
+	fileId       string
+	fileUniqueId string
+	width        int
+	height       int
+	fileSize     int
+}
+
 type Message struct {
 	MessageId   int                  `json:"message_id"`
 	User        User                 `json:"from"`
 	Chat        Chat                 `json:"chat"`
 	Text        string               `json:"text"`
 	Animation   Animation            `json:"animation"`
-	Photo       []Photo              `json:"photo"`
+	Photo       []PhotoSize          `json:"photo"`
 	Date        int                  `json:"date"`
 	ReplyMarkup inlineKeyboardMarkup `json:"reply_markup"`
 	Poll        Poll                 `json:"poll"`
@@ -165,4 +169,10 @@ type inputMediaAudio struct {
 	Duration        int             `json:"duration"`
 	Performer       string          `json:"performer"`
 	Tile            string          `json:"tile"`
+}
+
+type UserProfilePhotos struct {
+	// Total number of profile pictures the target user has
+	TotalCount int `json:"total_count"`
+	photos     [][]PhotoSize
 }

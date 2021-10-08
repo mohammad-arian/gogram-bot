@@ -213,6 +213,27 @@ type ForwardMessageOptionalParams struct {
 	DisableNotification bool `json:"disable_notification"`
 }
 
+type CopyMessageOptionalParams struct {
+	Caption                  string          `json:"caption"`
+	ParseMode                string          `json:"parse_mode"`
+	CaptionEntities          []MessageEntity `json:"caption_entities"`
+	DisableNotification      bool            `json:"disable_notification"`
+	ReplyToMessageId         int             `json:"reply_to_message_id"`
+	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
+	InlineKeyboard
+	ReplyKeyboard
+	ForceReply
+}
+
+type GetUserProfilePhotosOptionalParams struct {
+	// Sequential number of the first photo to be returned.
+	// By default, all photos are returned.
+	Offset int `json:"offset"`
+	// Limits the number of photos to be retrieved.
+	// Values between 1-100 are accepted. Defaults to 100.
+	Limit int `json:"limit"`
+}
+
 func (i *InlineKeyboard) AddInlineKeyboardButton(horizontal bool, a ...InlineKeyboardButton) {
 	if horizontal {
 		inlineKeyboardButtonRowAdder(i, a...)
