@@ -352,8 +352,7 @@ func (r *User) BanChatMember(b Bot, chatId int,
 // This method guarantees that after the call the user is not a member of the chat,
 // but will be able to join it. So if the user is a member of the chat they will also be removed
 // from the chat. If you don't want this, set onlyIfBanned to true, otherwise set to false.
-func (r *User) UnbanChatMember(b Bot, chatId int, onlyIfBanned bool,
-	optionalParams *BanChatMemberOptionalParams) (response string, err error) {
+func (r *User) UnbanChatMember(b Bot, chatId int, onlyIfBanned bool) (response string, err error) {
 	type data struct {
 		ChatId       int  `json:"chat_id"`
 		UserId       int  `json:"user_id"`
@@ -361,8 +360,20 @@ func (r *User) UnbanChatMember(b Bot, chatId int, onlyIfBanned bool,
 	}
 	d := data{ChatId: chatId, UserId: r.Id, OnlyIfBanned: onlyIfBanned}
 	var op interface{}
+	return request(r.Id, "unbanChatMember", b.Token, d, op)
+}
+
+func (r *User) RestrictChatMember(b Bot, chatId int, permissions ChatPermissions,
+	optionalParams *RestrictChatMemberOptionalParams) (response string, err error) {
+	type data struct {
+		ChatId      int             `json:"chat_id"`
+		UserId      int             `json:"user_id"`
+		Permissions ChatPermissions `json:"permissions"`
+	}
+	d := data{ChatId: chatId, UserId: r.Id, Permissions: permissions}
+	var op interface{}
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "unbanChatMember", b.Token, d, op)
+	return request(r.Id, "restrictChatMember", b.Token, d, op)
 }

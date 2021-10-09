@@ -246,6 +246,10 @@ type BanChatMemberOptionalParams struct {
 	RevokeMessages bool `json:"revoke_messages"`
 }
 
+type RestrictChatMemberOptionalParams struct {
+	UntilDate int `json:"until_date"`
+}
+
 func (i *InlineKeyboard) AddInlineKeyboardButton(horizontal bool, a ...InlineKeyboardButton) {
 	if horizontal {
 		inlineKeyboardButtonRowAdder(i, a...)
