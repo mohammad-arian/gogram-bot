@@ -324,3 +324,23 @@ func (r *ReplyAble) GetUserProfilePhotos(b Bot,
 	}
 	return UserProfileResponse{}, err
 }
+
+// BanChatMember bans a user in a group, a supergroup or a channel.
+// In the case of supergroups and channels, the user will not be able
+// to return to the chat on their own using invite links, etc.,
+// unless unbanned first.
+// The bot must be an administrator in the chat for this to work and must
+// have the appropriate admin rights.
+func (r *User) BanChatMember(b Bot, chatId int,
+	optionalParams *BanChatMemberOptionalParams) (response string, err error) {
+	type data struct {
+		ChatId int `json:"chat_id"`
+		UserId int `json:"user_id"`
+	}
+	d := data{ChatId: chatId, UserId: r.Id}
+	var op interface{}
+	if optionalParams != nil {
+		op = *optionalParams
+	}
+	return request(r.Id, "banChatMember", b.Token, d, op)
+}
