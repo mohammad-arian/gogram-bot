@@ -42,11 +42,11 @@ type PollOption struct {
 }
 
 type PhotoSize struct {
-	fileId       string
-	fileUniqueId string
-	width        int
-	height       int
-	fileSize     int
+	FileId       string `json:"file_id"`
+	FileUniqueId string `json:"file_unique_id"`
+	Width        int    `json:"width"`
+	Height       int    `json:"height"`
+	FileSize     int    `json:"file_size"`
 }
 
 type Message struct {
@@ -175,4 +175,9 @@ type UserProfilePhotos struct {
 	// Total number of profile pictures the target user has
 	TotalCount int           `json:"total_count"`
 	Photos     [][]PhotoSize `json:"photos"`
+}
+
+type UserProfileResponse struct {
+	Ok     bool              `json:"ok"`
+	Result UserProfilePhotos `json:"result"`
 }

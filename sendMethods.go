@@ -304,7 +304,7 @@ func (r *ReplyAble) CopyMessage(b Bot, targetChatId int, messageId int,
 }
 
 func (r *ReplyAble) GetUserProfilePhotos(b Bot,
-	optionalParams *GetUserProfilePhotosOptionalParams) (response UserProfilePhotos, err error) {
+	optionalParams *GetUserProfilePhotosOptionalParams) (response UserProfileResponse, err error) {
 	type data struct {
 		UserId int `json:"user_id"`
 	}
@@ -315,12 +315,12 @@ func (r *ReplyAble) GetUserProfilePhotos(b Bot,
 	}
 	res, err := request(r.Id, "getUserProfilePhotos", b.Token, d, op)
 	if err == nil {
-		u := UserProfilePhotos{}
+		u := UserProfileResponse{}
 		err := json.Unmarshal([]byte(res), &u)
 		if err != nil {
 			return u, err
 		}
 		return u, nil
 	}
-	return UserProfilePhotos{}, err
+	return UserProfileResponse{}, err
 }
