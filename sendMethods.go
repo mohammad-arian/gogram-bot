@@ -344,3 +344,25 @@ func (r *User) BanChatMember(b Bot, chatId int,
 	}
 	return request(r.Id, "banChatMember", b.Token, d, op)
 }
+
+// UnbanChatMember unbans a previously banned user in a supergroup or channel.
+// The user will not return to the group or channel automatically,
+// but will be able to join via link, etc.
+// The bot must be an administrator for this to work.
+// This method guarantees that after the call the user is not a member of the chat,
+// but will be able to join it. So if the user is a member of the chat they will also be removed
+// from the chat. If you don't want this, set onlyIfBanned to true, otherwise set to false.
+func (r *User) UnbanChatMember(b Bot, chatId int, onlyIfBanned bool,
+	optionalParams *BanChatMemberOptionalParams) (response string, err error) {
+	type data struct {
+		ChatId       int  `json:"chat_id"`
+		UserId       int  `json:"user_id"`
+		OnlyIfBanned bool `json:"only_if_banned"`
+	}
+	d := data{ChatId: chatId, UserId: r.Id, OnlyIfBanned: onlyIfBanned}
+	var op interface{}
+	if optionalParams != nil {
+		op = *optionalParams
+	}
+	return request(r.Id, "unbanChatMember", b.Token, d, op)
+}
