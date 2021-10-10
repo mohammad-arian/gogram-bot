@@ -183,13 +183,17 @@ type UserProfileResponse struct {
 }
 
 type BooleanResponse struct {
-	Ok     bool `json:"ok"`
-	Result bool `json:"result"`
+	Ok          bool   `json:"ok"`
+	Result      bool   `json:"result"`
+	ErrorCode   int    `json:"error_code"`
+	Description string `json:"description"`
 }
 
 type MessageResponse struct {
-	Ok     bool    `json:"ok"`
-	Result Message `json:"result"`
+	Ok          bool    `json:"ok"`
+	Result      Message `json:"result"`
+	ErrorCode   int     `json:"error_code"`
+	Description string  `json:"description"`
 }
 
 type ChatPermissions struct {
