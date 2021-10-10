@@ -182,6 +182,16 @@ type UserProfileResponse struct {
 	Result UserProfilePhotos `json:"result"`
 }
 
+type BooleanResponse struct {
+	Ok     bool `json:"ok"`
+	Result bool `json:"result"`
+}
+
+type MessageResponse struct {
+	Ok     bool    `json:"ok"`
+	Result Message `json:"result"`
+}
+
 type ChatPermissions struct {
 	CanSendMessages       bool `json:"can_send_messages"`
 	CanSendMediaMessages  bool `json:"can_send_media_messages"`

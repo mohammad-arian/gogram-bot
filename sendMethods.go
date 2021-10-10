@@ -12,73 +12,86 @@ import (
 // text is the message that will be sent
 // pass nil or *TextOptionalParams struct to optionalParams to add optional
 // parameters to request
-func (r *ReplyAble) SendText(b Bot, text string, optionalParams *TextOptionalParams) (response string, err error) {
+func (r *ReplyAble) SendText(b Bot, text string, optionalParams *TextOptionalParams) (response MessageResponse, err error) {
 	type data struct {
 		ChatId int    `json:"chat_id"`
 		Text   string `json:"text"`
 	}
 	d := data{ChatId: r.Id, Text: text}
+	messageRes := MessageResponse{}
 	var op interface{}
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "sendMessage", b.Token, d, op)
+	res, err := request(r.Id, "sendMessage", b.Token, d, op, &messageRes)
+	return res.(MessageResponse), err
 }
 
-func (r *ReplyAble) SendPhoto(b Bot, photo interface{}, optionalParams *PhotoOptionalParams) (response string, err error) {
+func (r *ReplyAble) SendPhoto(b Bot, photo interface{},
+	optionalParams *PhotoOptionalParams) (response MessageResponse, err error) {
 	type data struct {
 		ChatId int         `json:"chat_id"`
 		Photo  interface{} `json:"photo"`
 	}
 	d := data{ChatId: r.Id, Photo: photo}
+	messageRes := MessageResponse{}
 	var op interface{}
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "sendPhoto", b.Token, d, op)
+	res, err := request(r.Id, "sendPhoto", b.Token, d, op, &messageRes)
+	return res.(MessageResponse), err
 }
 
-func (r *ReplyAble) SendVideo(b Bot, video interface{}, optionalParams *VideoOptionalParams) (response string, err error) {
+func (r *ReplyAble) SendVideo(b Bot, video interface{},
+	optionalParams *VideoOptionalParams) (response MessageResponse, err error) {
 	type data struct {
 		ChatId int         `json:"chat_id"`
 		Video  interface{} `json:"video"`
 	}
 	d := data{ChatId: r.Id, Video: video}
+	messageRes := MessageResponse{}
 	var op interface{}
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "sendVideo", b.Token, d, op)
+	res, err := request(r.Id, "sendVideo", b.Token, d, op, &messageRes)
+	return res.(MessageResponse), err
 }
 
 // SendAudio sends audio files, if you want Telegram clients to display them in the music player.
 // Your audio must be in the .MP3 or .M4A format.
 // On success, the sent Message is returned.
 // Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
-func (r *ReplyAble) SendAudio(b Bot, audio interface{}, optionalParams *AudioOptionalParams) (response string, err error) {
+func (r *ReplyAble) SendAudio(b Bot, audio interface{}, optionalParams *AudioOptionalParams) (response MessageResponse, err error) {
 	type data struct {
 		ChatId int         `json:"chat_id"`
 		Audio  interface{} `json:"audio"`
 	}
 	d := data{ChatId: r.Id, Audio: audio}
+	messageRes := MessageResponse{}
 	var op interface{}
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "sendAudio", b.Token, d, op)
+	res, err := request(r.Id, "sendAudio", b.Token, d, op, &messageRes)
+	return res.(MessageResponse), err
 }
 
-func (r *ReplyAble) SendDocument(b Bot, document interface{}, optionalParams *DocumentOptionalParams) (response string, err error) {
+func (r *ReplyAble) SendDocument(b Bot, document interface{},
+	optionalParams *DocumentOptionalParams) (response MessageResponse, err error) {
 	type data struct {
 		ChatId   int         `json:"chat_id"`
 		Document interface{} `json:"document"`
 	}
 	d := data{ChatId: r.Id, Document: document}
+	messageRes := MessageResponse{}
 	var op interface{}
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "sendDocument", b.Token, d, op)
+	res, err := request(r.Id, "sendDocument", b.Token, d, op, &messageRes)
+	return res.(MessageResponse), err
 }
 
 // SendVoice sends audio files, if you want Telegram clients to display the file as a playable voice message.
@@ -86,60 +99,73 @@ func (r *ReplyAble) SendDocument(b Bot, document interface{}, optionalParams *Do
 // OPUS (other formats may be sent as Audio or Document).
 // On success, the sent Message is returned.
 // Bots can currently send voice messages of up to 50 MB in size, this limit may be changed in the future.
-func (r *ReplyAble) SendVoice(b Bot, voice interface{}, optionalParams *VoiceOptionalParams) (response string, err error) {
+func (r *ReplyAble) SendVoice(b Bot, voice interface{},
+	optionalParams *VoiceOptionalParams) (response MessageResponse, err error) {
 	type data struct {
 		ChatId int         `json:"chat_id"`
 		Voice  interface{} `json:"voice"`
 	}
+	messageRes := MessageResponse{}
 	d := data{ChatId: r.Id, Voice: voice}
 	var op interface{}
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "sendVoice", b.Token, d, op)
+	res, err := request(r.Id, "sendVoice", b.Token, d, op, &messageRes)
+	return res.(MessageResponse), err
 }
 
-func (r *ReplyAble) SendAnimation(b Bot, animation interface{}, optionalParams *AnimationOptionalParams) (response string, err error) {
+func (r *ReplyAble) SendAnimation(b Bot, animation interface{},
+	optionalParams *AnimationOptionalParams) (response MessageResponse, err error) {
 	type data struct {
 		ChatId    int         `json:"chat_id"`
 		Animation interface{} `json:"animation"`
 	}
 	d := data{ChatId: r.Id, Animation: animation}
+	messageRes := MessageResponse{}
 	var op interface{}
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "sendAnimation", b.Token, d, op)
+	res, err := request(r.Id, "sendAnimation", b.Token, d, op, &messageRes)
+	return res.(MessageResponse), err
 }
 
-func (r *ReplyAble) SendDice(b Bot, optionalParams *DiceOptionalParams) (response string, err error) {
+func (r *ReplyAble) SendDice(b Bot, optionalParams *DiceOptionalParams) (response MessageResponse, err error) {
 	type data struct {
 		ChatId int `json:"chat_id"`
 	}
 	d := data{ChatId: r.Id}
+	messageRes := MessageResponse{}
 	var op interface{}
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "sendDice", b.Token, d, op)
+	res, err := request(r.Id, "sendDice", b.Token, d, op, &messageRes)
+	return res.(MessageResponse), err
 }
 
-func (r *ReplyAble) SendVideoNote(b Bot, videoNote interface{}, optionalParams *VideoNoteOptionalParams) (response string, err error) {
+func (r *ReplyAble) SendVideoNote(b Bot, videoNote interface{},
+	optionalParams *VideoNoteOptionalParams) (response MessageResponse, err error) {
 	type data struct {
 		ChatId    int         `json:"chat_id"`
 		VideoNote interface{} `json:"videoNote"`
 	}
 	d := data{ChatId: r.Id, VideoNote: videoNote}
+	messageRes := MessageResponse{}
 	var op interface{}
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "sendVideoNote", b.Token, d, op)
+	res, err := request(r.Id, "sendVideoNote", b.Token, d, op, &messageRes)
+	return res.(MessageResponse), err
 }
 
-func (r *ReplyAble) SendPoll(b Bot, question string, options []string, optionalParams *PollOptionalParams) (response string, err error) {
+func (r *ReplyAble) SendPoll(b Bot, question string, options []string,
+	optionalParams *PollOptionalParams) (response MessageResponse, err error) {
+	messageRes := MessageResponse{}
 	if options == nil {
-		return "", errors.New("options slice is empty")
+		return messageRes, errors.New("options slice is empty")
 	}
 	type data struct {
 		ChatId   int         `json:"chat_id"`
@@ -151,7 +177,8 @@ func (r *ReplyAble) SendPoll(b Bot, question string, options []string, optionalP
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "sendPoll", b.Token, d, op)
+	res, err := request(r.Id, "sendPoll", b.Token, d, op, &messageRes)
+	return res.(MessageResponse), err
 }
 
 // SendMediaGroup sends a group of photos, videos, documents or audios as an album.
@@ -160,8 +187,8 @@ func (r *ReplyAble) SendPoll(b Bot, question string, options []string, optionalP
 // You can add file_ids as string to send a media that exists on the Telegram servers (recommended),
 // HTTP URLs as string for Telegram to get a media from the Internet, or a file of type *os.File to
 // photos, videos, documents and audios slices.
-func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOptionalParams, photos []interface{}, videos []interface{},
-	documents []interface{}, audios []interface{}) (response string, err error) {
+func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOptionalParams, photos []interface{},
+	videos []interface{}, documents []interface{}, audios []interface{}) (response []MessageResponse, err error) {
 	type data struct {
 		ChatId int    `json:"chat_id"`
 		Media  string `json:"media"`
@@ -209,15 +236,18 @@ func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOptionalPara
 			media = append(media, inputMediaAudio{Media: v, Type: "audio"})
 		}
 	}
+	var messageRes []MessageResponse
 	if media == nil {
-		return "", errors.New("you did not pass any file, file_id or URL")
+		return messageRes, errors.New("you did not pass any file, file_id or URL")
 	}
 	mediaToJson, _ := json.Marshal(media)
 	d.Media = string(mediaToJson)
-	return request(r.Id, "sendMediaGroup", b.Token, d, op)
+	res, err := request(r.Id, "sendMediaGroup", b.Token, d, op, messageRes)
+	return res.([]MessageResponse), err
 }
 
-func (r *ReplyAble) SendLocation(b Bot, latitude float64, longitude float64, optionalParams *LocationOptionalParams) (response string, err error) {
+func (r *ReplyAble) SendLocation(b Bot, latitude float64, longitude float64,
+	optionalParams *LocationOptionalParams) (response MessageResponse, err error) {
 	type data struct {
 		ChatId    int     `json:"chat_id"`
 		Latitude  float64 `json:"latitude"`
@@ -228,21 +258,26 @@ func (r *ReplyAble) SendLocation(b Bot, latitude float64, longitude float64, opt
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "sendLocation", b.Token, d, op)
+	messageRes := MessageResponse{}
+	res, err := request(r.Id, "sendLocation", b.Token, d, op, &messageRes)
+	return res.(MessageResponse), err
 }
 
-func (r *ReplyAble) SendContact(b Bot, phoneNumber string, firstName string, optionalParams *ContactOptionalParams) (response string, err error) {
+func (r *ReplyAble) SendContact(b Bot, phoneNumber string, firstName string,
+	optionalParams *ContactOptionalParams) (response MessageResponse, err error) {
 	type data struct {
 		ChatId      int    `json:"chat_id"`
 		PhoneNumber string `json:"phone_number"`
 		FirstName   string `json:"first_name"`
 	}
 	d := data{ChatId: r.Id, PhoneNumber: phoneNumber, FirstName: firstName}
+	messageRes := MessageResponse{}
 	var op interface{}
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "sendContact", b.Token, d, op)
+	res, err := request(r.Id, "sendContact", b.Token, d, op, &messageRes)
+	return res.(MessageResponse), err
 }
 
 // SendChatAction tells the user that something is happening on the bot's side.
@@ -252,24 +287,26 @@ func (r *ReplyAble) SendContact(b Bot, phoneNumber string, firstName string, opt
 // "typing" for text messages, "upload_photo" for photos, "record_video" or "upload_video" for videos,
 // "record_voice" or "upload_voice" for voice notes, "upload_document" for "general" files,
 // "find_location" for location data, "record_video_note" or "upload_video_note" for video notes.
-func (r *ReplyAble) SendChatAction(b Bot, action string) (response string, err error) {
+func (r *ReplyAble) SendChatAction(b Bot, action string) (response BooleanResponse, err error) {
 	type data struct {
 		ChatId int    `json:"chat_id"`
 		Action string `json:"action"`
 	}
 	var actions = []string{"typing", "upload_photo", "record_video", "upload_video", "general",
 		"upload_document", "upload_voice", "record_voice", "find_location", "record_video_note", "upload_video_note"}
+	boolRes := BooleanResponse{}
 	for _, v := range actions {
 		if v == action {
 			d := data{ChatId: r.Id, Action: action}
-			return request(r.Id, "sendChatAction", b.Token, d, nil)
+			res, err := request(r.Id, "sendChatAction", b.Token, d, nil, &boolRes)
+			return res.(BooleanResponse), err
 		}
 	}
-	return "", errors.New(action + " is an unknown action, read the document.")
+	return boolRes, errors.New(action + " is an unknown action, read the document.")
 }
 
 func (r *ReplyAble) ForwardMessage(b Bot, targetChatId int, messageId int,
-	optionalParams *ForwardMessageOptionalParams) (response string, err error) {
+	optionalParams *ForwardMessageOptionalParams) (response MessageResponse, err error) {
 	type data struct {
 		ChatId     int `json:"chat_id"`
 		FromChatId int `json:"from_chat_id"`
@@ -280,7 +317,9 @@ func (r *ReplyAble) ForwardMessage(b Bot, targetChatId int, messageId int,
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "forwardMessage", b.Token, d, op)
+	m := MessageResponse{}
+	res, err := request(r.Id, "forwardMessage", b.Token, d, op, &m)
+	return res.(MessageResponse), err
 }
 
 // CopyMessage copies messages of any kind.
@@ -289,18 +328,20 @@ func (r *ReplyAble) ForwardMessage(b Bot, targetChatId int, messageId int,
 // but the copied message doesn't have a link to the original
 // message. Returns the MessageId of the sent message on success.
 func (r *ReplyAble) CopyMessage(b Bot, targetChatId int, messageId int,
-	optionalParams *CopyMessageOptionalParams) (response string, err error) {
+	optionalParams *CopyMessageOptionalParams) (response MessageResponse, err error) {
 	type data struct {
 		ChatId     int `json:"chat_id"`
 		FromChatId int `json:"from_chat_id"`
 		MessageId  int `json:"message_id"`
 	}
 	d := data{ChatId: targetChatId, FromChatId: r.Id, MessageId: messageId}
+	messageRes := MessageResponse{}
 	var op interface{}
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "forwardMessage", b.Token, d, op)
+	res, err := request(r.Id, "forwardMessage", b.Token, d, op, &messageRes)
+	return res.(MessageResponse), err
 }
 
 func (r *ReplyAble) GetUserProfilePhotos(b Bot,
@@ -313,16 +354,9 @@ func (r *ReplyAble) GetUserProfilePhotos(b Bot,
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	res, err := request(r.Id, "getUserProfilePhotos", b.Token, d, op)
-	if err == nil {
-		u := UserProfileResponse{}
-		err := json.Unmarshal([]byte(res), &u)
-		if err != nil {
-			return u, err
-		}
-		return u, nil
-	}
-	return UserProfileResponse{}, err
+	u := UserProfileResponse{}
+	res, err := request(r.Id, "getUserProfilePhotos", b.Token, d, op, &u)
+	return res.(UserProfileResponse), err
 }
 
 // BanChatMember bans a user in a group, a supergroup or a channel.
@@ -332,7 +366,7 @@ func (r *ReplyAble) GetUserProfilePhotos(b Bot,
 // The bot must be an administrator in the chat for this to work and must
 // have the appropriate admin rights.
 func (r *User) BanChatMember(b Bot, chatId int,
-	optionalParams *BanChatMemberOptionalParams) (response string, err error) {
+	optionalParams *BanChatMemberOptionalParams) (response BooleanResponse, err error) {
 	type data struct {
 		ChatId int `json:"chat_id"`
 		UserId int `json:"user_id"`
@@ -342,7 +376,9 @@ func (r *User) BanChatMember(b Bot, chatId int,
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "banChatMember", b.Token, d, op)
+	u := BooleanResponse{}
+	res, err := request(r.Id, "banChatMember", b.Token, d, op, &u)
+	return res.(BooleanResponse), err
 }
 
 // UnbanChatMember unbans a previously banned user in a supergroup or channel.
@@ -352,19 +388,20 @@ func (r *User) BanChatMember(b Bot, chatId int,
 // This method guarantees that after the call the user is not a member of the chat,
 // but will be able to join it. So if the user is a member of the chat they will also be removed
 // from the chat. If you don't want this, set onlyIfBanned to true, otherwise set to false.
-func (r *User) UnbanChatMember(b Bot, chatId int, onlyIfBanned bool) (response string, err error) {
+func (r *User) UnbanChatMember(b Bot, chatId int, onlyIfBanned bool) (response BooleanResponse, err error) {
 	type data struct {
 		ChatId       int  `json:"chat_id"`
 		UserId       int  `json:"user_id"`
 		OnlyIfBanned bool `json:"only_if_banned"`
 	}
 	d := data{ChatId: chatId, UserId: r.Id, OnlyIfBanned: onlyIfBanned}
-	var op interface{}
-	return request(r.Id, "unbanChatMember", b.Token, d, op)
+	u := BooleanResponse{}
+	res, err := request(r.Id, "unbanChatMember", b.Token, d, nil, &u)
+	return res.(BooleanResponse), err
 }
 
 func (r *User) RestrictChatMember(b Bot, chatId int, permissions ChatPermissions,
-	optionalParams *RestrictChatMemberOptionalParams) (response string, err error) {
+	optionalParams *RestrictChatMemberOptionalParams) (response BooleanResponse, err error) {
 	type data struct {
 		ChatId      int             `json:"chat_id"`
 		UserId      int             `json:"user_id"`
@@ -375,5 +412,7 @@ func (r *User) RestrictChatMember(b Bot, chatId int, permissions ChatPermissions
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	return request(r.Id, "restrictChatMember", b.Token, d, op)
+	u := BooleanResponse{}
+	res, err := request(r.Id, "restrictChatMember", b.Token, d, op, &u)
+	return res.(BooleanResponse), err
 }

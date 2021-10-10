@@ -132,7 +132,7 @@ func replyKeyboardButtonRowAdder(t *ReplyKeyboard, oneTimeKeyboard bool,
 }
 
 func request(id int, method string, token string, data interface{},
-	optionalParams interface{}) (response string, error error) {
+	optionalParams interface{}, responseType interface{}) (response interface{}, error error) {
 	if id == 0 {
 		return "", errors.New("id field is empty")
 	}
@@ -158,6 +158,10 @@ func request(id int, method string, token string, data interface{},
 	if err != nil {
 		return "", err
 	}
-	resToString, _ := ioutil.ReadAll(res.Body)
-	return string(resToString), nil
+	readRes, _ := ioutil.ReadAll(res.Body)
+	err = json.Unmarshal(readRes, responseType)
+	if err != nil {
+		return responseType, err
+	}
+	return responseType, nil
 }
