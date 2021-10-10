@@ -243,7 +243,7 @@ func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOptionalPara
 	}
 	mediaToJson, _ := json.Marshal(media)
 	d.Media = string(mediaToJson)
-	res, err := request(r.Id, "sendMediaGroup", b.Token, d, op, messageRes)
+	res, err := request(r.Id, "sendMediaGroup", b.Token, d, op, &messageRes)
 	return res.(*[]MessageResponse), err
 }
 
