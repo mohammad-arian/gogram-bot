@@ -417,3 +417,19 @@ func (r *User) RestrictChatMember(b Bot, chatId int, permissions ChatPermissions
 	res, err := request(r.Id, "restrictChatMember", b.Token, d, op, &u)
 	return res.(*BooleanResponse), err
 }
+
+func (r *User) PromoteChatMember(b Bot, chatId int,
+	optionalParams *PromoteChatMemberOptionalParams) (response *BooleanResponse, err error) {
+	type data struct {
+		ChatId int `json:"chat_id"`
+		UserId int `json:"user_id"`
+	}
+	d := data{ChatId: chatId, UserId: r.Id}
+	var op interface{}
+	if optionalParams != nil {
+		op = *optionalParams
+	}
+	u := BooleanResponse{}
+	res, err := request(r.Id, "promoteChatMember", b.Token, d, op, &u)
+	return res.(*BooleanResponse), err
+}

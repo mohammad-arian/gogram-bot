@@ -250,6 +250,20 @@ type RestrictChatMemberOptionalParams struct {
 	UntilDate int `json:"until_date"`
 }
 
+type PromoteChatMemberOptionalParams struct {
+	IsAnonymous         bool `json:"is_anonymous"`
+	CanManageChat       bool `json:"can_manage_chat"`
+	CanPostMessages     bool `json:"can_post_messages"`
+	CanEditMessages     bool `json:"can_edit_messages"`
+	CanDeleteMessages   bool `json:"can_delete_messages"`
+	CanManageVoiceChats bool `json:"can_manage_voice_chats"`
+	CanRestrictMembers  bool `json:"can_restrict_members"`
+	CanPromoteMembers   bool `json:"can_promote_members"`
+	CanChangeInfo       bool `json:"can_change_info"`
+	CanInviteUsers      bool `json:"can_invite_users"`
+	CanPinMessages      bool `json:"can_pin_messages"`
+}
+
 func (i *InlineKeyboard) AddInlineKeyboardButton(horizontal bool, a ...InlineKeyboardButton) {
 	if horizontal {
 		inlineKeyboardButtonRowAdder(i, a...)
