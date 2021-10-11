@@ -171,6 +171,15 @@ type inputMediaAudio struct {
 	Tile            string          `json:"tile"`
 }
 
+type ChatInviteLink struct {
+	InviteLink  string `json:"invite_link"`
+	Creator     User   `json:"creator"`
+	IsPrimary   bool   `json:"is_primary"`
+	IsRevoked   bool   `json:"is_revoked"`
+	ExpireDate  int    `json:"expire_date"`
+	MemberLimit int    `json:"member_limit"`
+}
+
 type UserProfilePhotos struct {
 	// Total number of profile pictures the target user has
 	TotalCount int           `json:"total_count"`
@@ -182,25 +191,28 @@ type UserProfileResponse struct {
 	Result UserProfilePhotos `json:"result"`
 }
 
-type BooleanResponse struct {
+type Response struct {
 	Ok          bool   `json:"ok"`
-	Result      bool   `json:"result"`
 	ErrorCode   int    `json:"error_code"`
 	Description string `json:"description"`
+}
+
+type BooleanResponse struct {
+	Result bool `json:"result"`
+	Response
 }
 
 type StringResponse struct {
-	Ok          bool   `json:"ok"`
-	Result      string `json:"result"`
-	ErrorCode   int    `json:"error_code"`
-	Description string `json:"description"`
+	Result string `json:"result"`
+	Response
 }
 
 type MessageResponse struct {
-	Ok          bool    `json:"ok"`
-	Result      Message `json:"result"`
-	ErrorCode   int     `json:"error_code"`
-	Description string  `json:"description"`
+	Result Message `json:"result"`
+}
+
+type InviteLinkResponse struct {
+	Result ChatInviteLink `json:"result"`
 }
 
 type ChatPermissions struct {

@@ -279,6 +279,11 @@ type PromoteChatMemberOptionalParams struct {
 	CanPinMessages bool `json:"can_pin_messages"`
 }
 
+type CreateChatInviteLinkOptionalParams struct {
+	ExpireDate  int `json:"expire_date"`
+	MemberLimit int `json:"member_limit"`
+}
+
 func (i *InlineKeyboard) AddInlineKeyboardButton(horizontal bool, a ...InlineKeyboardButton) {
 	if horizontal {
 		inlineKeyboardButtonRowAdder(i, a...)

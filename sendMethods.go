@@ -447,19 +447,18 @@ func (r *User) SetChatAdministratorCustomTitle(b Bot, chatId int, customTitle st
 	return res.(*BooleanResponse), err
 }
 
-func (r *User) SetChatPermissions(b Bot, chatId int, permissions ChatPermissions) (response *BooleanResponse, err error) {
+func (r *User) SetChatPermissions(b Bot, permissions ChatPermissions) (response *BooleanResponse, err error) {
 	type data struct {
 		ChatId      int             `json:"chat_id"`
-		UserId      int             `json:"user_id"`
 		Permissions ChatPermissions `json:"permissions"`
 	}
-	d := data{ChatId: chatId, UserId: r.Id, Permissions: permissions}
+	d := data{ChatId: r.Id, Permissions: permissions}
 	u := BooleanResponse{}
 	res, err := request(r.Id, "setChatPermissions", b.Token, d, nil, &u)
 	return res.(*BooleanResponse), err
 }
 
-func (r *Chat) SetChatPermissions(b Bot) (response *StringResponse, err error) {
+func (r *Chat) ExportChatInviteLink(b Bot) (response *StringResponse, err error) {
 	type data struct {
 		ChatId int `json:"chat_id"`
 	}
@@ -467,4 +466,19 @@ func (r *Chat) SetChatPermissions(b Bot) (response *StringResponse, err error) {
 	u := StringResponse{}
 	res, err := request(r.Id, "exportChatInviteLink", b.Token, d, nil, &u)
 	return res.(*StringResponse), err
+}
+
+func (r *Chat) CreateChatInviteLink(b Bot,
+	optionalParams *CreateChatInviteLinkOptionalParams) (response *InviteLinkResponse, err error) {
+	type data struct {
+		ChatId int `json:"chat_id"`
+	}
+	d := data{ChatId: r.Id}
+	var op interface{}
+	if optionalParams != nil {
+		op = *optionalParams
+	}
+	u := InviteLinkResponse{}
+	res, err := request(r.Id, "createChatInviteLink", b.Token, d, op, &u)
+	return res.(*InviteLinkResponse), err
 }
