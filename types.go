@@ -189,6 +189,13 @@ type BooleanResponse struct {
 	Description string `json:"description"`
 }
 
+type StringResponse struct {
+	Ok          bool   `json:"ok"`
+	Result      string `json:"result"`
+	ErrorCode   int    `json:"error_code"`
+	Description string `json:"description"`
+}
+
 type MessageResponse struct {
 	Ok          bool    `json:"ok"`
 	Result      Message `json:"result"`

@@ -433,3 +433,38 @@ func (r *User) PromoteChatMember(b Bot, chatId int,
 	res, err := request(r.Id, "promoteChatMember", b.Token, d, op, &u)
 	return res.(*BooleanResponse), err
 }
+
+// SetChatAdministratorCustomTitle sets a custom title for an administrator in a supergroup promoted by the bot.
+func (r *User) SetChatAdministratorCustomTitle(b Bot, chatId int, customTitle string) (response *BooleanResponse, err error) {
+	type data struct {
+		ChatId      int    `json:"chat_id"`
+		UserId      int    `json:"user_id"`
+		CustomTitle string `json:"custom_title"`
+	}
+	d := data{ChatId: chatId, UserId: r.Id, CustomTitle: customTitle}
+	u := BooleanResponse{}
+	res, err := request(r.Id, "setChatAdministratorCustomTitle", b.Token, d, nil, &u)
+	return res.(*BooleanResponse), err
+}
+
+func (r *User) SetChatPermissions(b Bot, chatId int, permissions ChatPermissions) (response *BooleanResponse, err error) {
+	type data struct {
+		ChatId      int             `json:"chat_id"`
+		UserId      int             `json:"user_id"`
+		Permissions ChatPermissions `json:"permissions"`
+	}
+	d := data{ChatId: chatId, UserId: r.Id, Permissions: permissions}
+	u := BooleanResponse{}
+	res, err := request(r.Id, "setChatPermissions", b.Token, d, nil, &u)
+	return res.(*BooleanResponse), err
+}
+
+func (r *Chat) SetChatPermissions(b Bot) (response *StringResponse, err error) {
+	type data struct {
+		ChatId int `json:"chat_id"`
+	}
+	d := data{ChatId: r.Id}
+	u := StringResponse{}
+	res, err := request(r.Id, "exportChatInviteLink", b.Token, d, nil, &u)
+	return res.(*StringResponse), err
+}
