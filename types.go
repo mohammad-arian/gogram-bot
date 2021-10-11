@@ -209,10 +209,12 @@ type StringResponse struct {
 
 type MessageResponse struct {
 	Result Message `json:"result"`
+	Response
 }
 
 type InviteLinkResponse struct {
 	Result ChatInviteLink `json:"result"`
+	Response
 }
 
 type ChatPermissions struct {
