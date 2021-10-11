@@ -284,6 +284,19 @@ type CreateChatInviteLinkOptionalParams struct {
 	MemberLimit int `json:"member_limit"`
 }
 
+type EditChatInviteLinkOptionalParams struct {
+	ExpireDate  int `json:"expire_date"`
+	MemberLimit int `json:"member_limit"`
+}
+
+type PinChatMessageOptionalParams struct {
+	DisableNotification bool `json:"disable_notification"`
+}
+
+type UnpinChatMessageOptionalParams struct {
+	MessageId int `json:"message_id"`
+}
+
 func (i *InlineKeyboard) AddInlineKeyboardButton(horizontal bool, a ...InlineKeyboardButton) {
 	if horizontal {
 		inlineKeyboardButtonRowAdder(i, a...)
@@ -383,13 +396,4 @@ type ReplyKeyboardButton struct {
 	// Optional. If True, the user's current location will be sent when the button is pressed.
 	// Available in private chats only
 	RequestLocation bool `json:"request_location"`
-}
-
-type MessageEntity struct {
-	Type     string
-	offset   int
-	length   int
-	url      string
-	user     User
-	language string
 }

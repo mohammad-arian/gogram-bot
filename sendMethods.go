@@ -482,3 +482,136 @@ func (r *Chat) CreateChatInviteLink(b Bot,
 	res, err := request(r.Id, "createChatInviteLink", b.Token, d, op, &u)
 	return res.(*InviteLinkResponse), err
 }
+
+func (r *Chat) EditChatInviteLink(b Bot, inviteLink string,
+	optionalParams *EditChatInviteLinkOptionalParams) (response *InviteLinkResponse, err error) {
+	type data struct {
+		ChatId     int    `json:"chat_id"`
+		InviteLink string `json:"invite_link"`
+	}
+	d := data{ChatId: r.Id, InviteLink: inviteLink}
+	var op interface{}
+	if optionalParams != nil {
+		op = *optionalParams
+	}
+	u := InviteLinkResponse{}
+	res, err := request(r.Id, "editChatInviteLink", b.Token, d, op, &u)
+	return res.(*InviteLinkResponse), err
+}
+
+func (r *Chat) RevokeChatInviteLink(b Bot, inviteLink string) (response *InviteLinkResponse, err error) {
+	type data struct {
+		ChatId     int    `json:"chat_id"`
+		InviteLink string `json:"invite_link"`
+	}
+	d := data{ChatId: r.Id, InviteLink: inviteLink}
+	u := InviteLinkResponse{}
+	res, err := request(r.Id, "revokeChatInviteLink", b.Token, d, nil, &u)
+	return res.(*InviteLinkResponse), err
+}
+
+func (r *Chat) SetChatPhoto(b Bot, photo *os.File) (response *BooleanResponse, err error) {
+	type data struct {
+		ChatId int      `json:"chat_id"`
+		Photo  *os.File `json:"photo"`
+	}
+	d := data{ChatId: r.Id, Photo: photo}
+	u := BooleanResponse{}
+	res, err := request(r.Id, "setChatPhoto", b.Token, d, nil, &u)
+	return res.(*BooleanResponse), err
+}
+
+func (r *Chat) DeleteChatPhoto(b Bot) (response *BooleanResponse, err error) {
+	type data struct {
+		ChatId int `json:"chat_id"`
+	}
+	d := data{ChatId: r.Id}
+	u := BooleanResponse{}
+	res, err := request(r.Id, "deleteChatPhoto", b.Token, d, nil, &u)
+	return res.(*BooleanResponse), err
+}
+
+func (r *Chat) SetChatTitle(b Bot, title string) (response *BooleanResponse, err error) {
+	type data struct {
+		ChatId int    `json:"chat_id"`
+		Title  string `json:"title"`
+	}
+	d := data{ChatId: r.Id, Title: title}
+	u := BooleanResponse{}
+	res, err := request(r.Id, "setChatTitle", b.Token, d, nil, &u)
+	return res.(*BooleanResponse), err
+}
+
+func (r *Chat) SetChatDescription(b Bot, description string) (response *BooleanResponse, err error) {
+	type data struct {
+		ChatId      int    `json:"chat_id"`
+		Description string `json:"description"`
+	}
+	d := data{ChatId: r.Id, Description: description}
+	u := BooleanResponse{}
+	res, err := request(r.Id, "setChatDescription", b.Token, d, nil, &u)
+	return res.(*BooleanResponse), err
+}
+
+func (r *Chat) PinChatMessage(b Bot, messageId int,
+	optionalParams *PinChatMessageOptionalParams) (response *BooleanResponse, err error) {
+	type data struct {
+		ChatId    int `json:"chat_id"`
+		MessageId int `json:"message_id"`
+	}
+	d := data{ChatId: r.Id, MessageId: messageId}
+	var op interface{}
+	if optionalParams != nil {
+		op = *optionalParams
+	}
+	u := BooleanResponse{}
+	res, err := request(r.Id, "pinChatMessage", b.Token, d, op, &u)
+	return res.(*BooleanResponse), err
+}
+
+func (r *Chat) UnpinChatMessage(b Bot,
+	optionalParams *UnpinChatMessageOptionalParams) (response *BooleanResponse, err error) {
+	type data struct {
+		ChatId int `json:"chat_id"`
+	}
+	d := data{ChatId: r.Id}
+	var op interface{}
+	if optionalParams != nil {
+		op = *optionalParams
+	}
+	u := BooleanResponse{}
+	res, err := request(r.Id, "unpinChatMessage", b.Token, d, op, &u)
+	return res.(*BooleanResponse), err
+}
+
+func (r *Chat) UnpinAllChatMessages(b Bot) (response *BooleanResponse, err error) {
+	type data struct {
+		ChatId int `json:"chat_id"`
+	}
+	d := data{ChatId: r.Id}
+	u := BooleanResponse{}
+	res, err := request(r.Id, "unpinAllChatMessages", b.Token, d, nil, &u)
+	return res.(*BooleanResponse), err
+}
+
+func (r *Chat) LeaveChat(b Bot) (response *BooleanResponse, err error) {
+	type data struct {
+		ChatId int `json:"chat_id"`
+	}
+	d := data{ChatId: r.Id}
+	u := BooleanResponse{}
+	res, err := request(r.Id, "leaveChat", b.Token, d, nil, &u)
+	return res.(*BooleanResponse), err
+}
+
+// GetChat gets up-to-date information about the chat (current name of the user
+// for one-on-one conversations, current username of a user, group or channel, etc.)
+func (r *Chat) GetChat(b Bot) (response *ChatResponse, err error) {
+	type data struct {
+		ChatId int `json:"chat_id"`
+	}
+	d := data{ChatId: r.Id}
+	u := ChatResponse{}
+	res, err := request(r.Id, "getChat", b.Token, d, nil, &u)
+	return res.(*ChatResponse), err
+}

@@ -16,6 +16,15 @@ type CallbackQuery struct {
 	Data         string  `json:"data"`
 }
 
+type MessageEntity struct {
+	Type     string
+	offset   int
+	length   int
+	url      string
+	user     User
+	language string
+}
+
 type Poll struct {
 	Id              string       `json:"id,omitempty"`
 	Question        string       `json:"question,omitempty"`
@@ -64,6 +73,7 @@ type Message struct {
 type ReplyAble struct {
 	Id        int    `json:"id"`
 	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
 	Username  string `json:"username"`
 }
 
@@ -84,7 +94,18 @@ type User struct {
 // However, the Telegram User id is a unique identification number of a particular Telegram user.
 // Use Chat id for groups, and User id for a specific user
 type Chat struct {
-	Type string `json:"type"`
+	Type                  string          `json:"type"`
+	Title                 string          `json:"title"`
+	Bio                   string          `json:"bio"`
+	Description           string          `json:"description"`
+	InviteLink            string          `json:"invite_link"`
+	PinnedMessage         *Message        `json:"pinned_message"`
+	Permissions           ChatPermissions `json:"permissions"`
+	SlowModeDelay         int             `json:"slow_mode_delay"`
+	MessageAutoDeleteTime int             `json:"message_auto_delete_time"`
+	StickerSetName        string          `json:"sticker_set_name"`
+	CanSetStickerSet      bool            `json:"can_set_sticker_set"`
+	LinkedChatId          int             `json:"linked_chat_id"`
 	ReplyAble
 }
 
@@ -214,6 +235,11 @@ type MessageResponse struct {
 
 type InviteLinkResponse struct {
 	Result ChatInviteLink `json:"result"`
+	Response
+}
+
+type ChatResponse struct {
+	Result Chat `json:"result"`
 	Response
 }
 
