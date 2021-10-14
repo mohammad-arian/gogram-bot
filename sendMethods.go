@@ -624,9 +624,41 @@ func (r *Chat) GetChatAdministrators(b Bot) (response *ChatMemberResponse, err e
 	u := ChatMemberResponse{}
 	res, err := request(r.Id, "getChatAdministrators", b.Token, d, nil, &u)
 	member := res.(*ChatMemberResponse)
-	for _, i := range member.Result {
-		if i.Status != "restricted" {
-			i.UntilDate = -1
+	for j := range member.Result {
+		if member.Result[j].Status != "restricted" {
+			member.Result[j].UntilDate = -1
+		}
+		if member.Result[j].Status == "creator" {
+			member.Result[j].IsMember = true
+			member.Result[j].CanPostMessages = true
+			member.Result[j].CanInviteUsers = true
+			member.Result[j].CanSendPolls = true
+			member.Result[j].CanAddWebPagePreviews = true
+			member.Result[j].CanChangeInfo = true
+			member.Result[j].CanSendOtherMessages = true
+			member.Result[j].CanSendMessages = true
+			member.Result[j].CanDeleteMessages = true
+			member.Result[j].CanManageChat = true
+			member.Result[j].CanPromoteMembers = true
+			member.Result[j].CanSendMediaMessages = true
+			member.Result[j].CanRestrictMembers = true
+			member.Result[j].CanPinMessages = true
+			member.Result[j].CanManageVoiceChats = true
+			member.Result[j].CanEditMessages = true
+		}
+		if member.Result[j].Status == "administrator" {
+			member.Result[j].IsMember = true
+		}
+		if member.Result[j].Status == "member" {
+			member.Result[j].IsMember = true
+			member.Result[j].CanPostMessages = true
+			member.Result[j].CanInviteUsers = true
+			member.Result[j].CanSendPolls = true
+			member.Result[j].CanAddWebPagePreviews = true
+			member.Result[j].CanChangeInfo = true
+			member.Result[j].CanSendMessages = true
+			member.Result[j].CanPinMessages = true
+			member.Result[j].CanBeEdited = true
 		}
 	}
 	return member, err
