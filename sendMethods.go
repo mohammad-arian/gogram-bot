@@ -615,3 +615,19 @@ func (r *Chat) GetChat(b Bot) (response *ChatResponse, err error) {
 	res, err := request(r.Id, "getChat", b.Token, d, nil, &u)
 	return res.(*ChatResponse), err
 }
+
+func (r *Chat) getChatAdministrators(b Bot) (response *ChatMemberResponse, err error) {
+	type data struct {
+		ChatId int `json:"chat_id"`
+	}
+	d := data{ChatId: r.Id}
+	u := ChatMemberResponse{}
+	res, err := request(r.Id, "getChatAdministrators", b.Token, d, nil, &u)
+	member := res.(*ChatMemberResponse)
+	for _, i := range member.Result {
+		if i.Status != "restricted" {
+			i.UntilDate = -1
+		}
+	}
+	return member, err
+}

@@ -59,15 +59,39 @@ type PhotoSize struct {
 }
 
 type Message struct {
-	MessageId   int                  `json:"message_id"`
-	User        User                 `json:"from"`
-	Chat        Chat                 `json:"chat"`
-	Text        string               `json:"text"`
-	Animation   Animation            `json:"animation"`
-	Photo       []PhotoSize          `json:"photo"`
-	Date        int                  `json:"date"`
-	ReplyMarkup inlineKeyboardMarkup `json:"reply_markup"`
-	Poll        Poll                 `json:"poll"`
+	MessageId       int                  `json:"message_id"`
+	User            User                 `json:"from"`
+	Chat            Chat                 `json:"chat"`
+	Text            string               `json:"text"`
+	Animation       Animation            `json:"animation"`
+	Photo           []PhotoSize          `json:"photo"`
+	Date            int                  `json:"date"`
+	ReplyMarkup     inlineKeyboardMarkup `json:"reply_markup"`
+	Poll            Poll                 `json:"poll"`
+	NewChatPhoto    []PhotoSize          `json:"new_chat_photo"`
+	NewChatTitle    string               `json:"new_chat_title"`
+	NewChatMembers  []User               `json:"new_chat_members"`
+	DeleteChatPhoto bool                 `json:"delete_chat_photo"`
+}
+
+// TypeIndicator function returns the type of message
+// This make it easier to know which fields are empty and which aren't
+// TypeIndicator may return "Text", "Animation", "Photo" and etc
+func (m Message) TypeIndicator() string {
+	switch {
+	case m.Text != "":
+		return "Text"
+	case m.Animation != Animation{}:
+		return "Animation"
+	case m.Photo != nil:
+		return "Photo"
+	case m.DeleteChatPhoto == true:
+		return "DeleteChatPhoto"
+	case m.NewChatPhoto != nil:
+		return "NewChatPhoto"
+	default:
+		return "Unknown"
+	}
 }
 
 type ReplyAble struct {
@@ -111,22 +135,6 @@ type Chat struct {
 
 type Animation struct {
 	FileId string `json:"file_id"`
-}
-
-// TypeIndicator function returns the type of message
-// This make it easier to know which fields are empty and which aren't
-// TypeIndicator may return "Text", "Animation", "Photo" and etc
-func (m Message) TypeIndicator() string {
-	switch {
-	case m.Text != "":
-		return "Text"
-	case m.Animation != Animation{}:
-		return "Animation"
-	case m.Photo != nil:
-		return "Photo"
-	default:
-		return "Unknown"
-	}
 }
 
 // inputMediaPhoto Represents a photo to be sent.
@@ -240,6 +248,39 @@ type InviteLinkResponse struct {
 
 type ChatResponse struct {
 	Result Chat `json:"result"`
+	Response
+}
+
+type ChatMember struct {
+	Status                string `json:"status"`
+	User                  User   `json:"user"`
+	IsAnonymous           bool   `json:"is_anonymous"`
+	CustomTitle           string `json:"custom_title"`
+	IsMember              bool   `json:"is_member"`
+	CanBeEdited           bool   `json:"can_be_edited"`
+	CanManageChat         bool   `json:"can_manage_chat"`
+	CanDeleteMessages     bool   `json:"can_delete_messages"`
+	CanManageVoiceChats   bool   `json:"can_manage_voice_chats"`
+	CanRestrictMembers    bool   `json:"can_restrict_members"`
+	CanSendPolls          bool   `json:"can_send_polls"`
+	CanSendOtherMessages  bool   `json:"can_send_other_messages"`
+	CanPromoteMembers     bool   `json:"can_promote_members"`
+	CanAddWebPagePreviews bool   `json:"can_add_web_page_previews"`
+	CanChangeInfo         bool   `json:"can_change_info"`
+	CanSendMediaMessages  bool   `json:"can_send_media_messages"`
+	CanSendMessages       bool   `json:"can_send_messages"`
+	CanInviteUsers        bool   `json:"can_invite_users"`
+	CanPostMessages       bool   `json:"can_post_messages"`
+	CanEditMessages       bool   `json:"can_edit_messages"`
+	CanPinMessages        bool   `json:"can_pin_messages"`
+	// if member is restricted, UntilDate is the date when restrictions will be lifted for this user;
+	// unix time. If 0, then the user is restricted forever. If -1 user is not
+	// restricted.
+	UntilDate int `json:"until_date"`
+}
+
+type ChatMemberResponse struct {
+	Result []ChatMember `json:"result"`
 	Response
 }
 
