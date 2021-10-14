@@ -616,7 +616,7 @@ func (r *Chat) GetChat(b Bot) (response *ChatResponse, err error) {
 	return res.(*ChatResponse), err
 }
 
-func (r *Chat) getChatAdministrators(b Bot) (response *ChatMemberResponse, err error) {
+func (r *Chat) GetChatAdministrators(b Bot) (response *ChatMemberResponse, err error) {
 	type data struct {
 		ChatId int `json:"chat_id"`
 	}
