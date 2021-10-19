@@ -1,5 +1,7 @@
 package gogram
 
+import "errors"
+
 // Update from webhook
 type Update struct {
 	UpdateId      int           `json:"update_id"`
@@ -231,6 +233,11 @@ type BooleanResponse struct {
 	Response
 }
 
+type IntResponse struct {
+	Result int `json:"result"`
+	Response
+}
+
 type StringResponse struct {
 	Result string `json:"result"`
 	Response
@@ -251,37 +258,30 @@ type ChatResponse struct {
 	Response
 }
 
+type ChatMemberResponse struct {
+	Result []ChatMember `json:"result"`
+	Response
+}
+
 type ChatMember struct {
-	Status                string `json:"status"`
-	User                  User   `json:"user"`
-	IsAnonymous           bool   `json:"is_anonymous"`
-	CustomTitle           string `json:"custom_title"`
-	IsMember              bool   `json:"is_member"`
-	CanBeEdited           bool   `json:"can_be_edited"`
-	CanManageChat         bool   `json:"can_manage_chat"`
-	CanDeleteMessages     bool   `json:"can_delete_messages"`
-	CanManageVoiceChats   bool   `json:"can_manage_voice_chats"`
-	CanRestrictMembers    bool   `json:"can_restrict_members"`
-	CanSendPolls          bool   `json:"can_send_polls"`
-	CanSendOtherMessages  bool   `json:"can_send_other_messages"`
-	CanPromoteMembers     bool   `json:"can_promote_members"`
-	CanAddWebPagePreviews bool   `json:"can_add_web_page_previews"`
-	CanChangeInfo         bool   `json:"can_change_info"`
-	CanSendMediaMessages  bool   `json:"can_send_media_messages"`
-	CanSendMessages       bool   `json:"can_send_messages"`
-	CanInviteUsers        bool   `json:"can_invite_users"`
-	CanPostMessages       bool   `json:"can_post_messages"`
-	CanEditMessages       bool   `json:"can_edit_messages"`
-	CanPinMessages        bool   `json:"can_pin_messages"`
+	Status              string `json:"status"`
+	User                User   `json:"user"`
+	IsAnonymous         bool   `json:"is_anonymous"`
+	CustomTitle         string `json:"custom_title"`
+	IsMember            bool   `json:"is_member"`
+	CanBeEdited         bool   `json:"can_be_edited"`
+	CanManageChat       bool   `json:"can_manage_chat"`
+	CanDeleteMessages   bool   `json:"can_delete_messages"`
+	CanManageVoiceChats bool   `json:"can_manage_voice_chats"`
+	CanRestrictMembers  bool   `json:"can_restrict_members"`
+	CanPromoteMembers   bool   `json:"can_promote_members"`
+	CanPostMessages     bool   `json:"can_post_messages"`
+	CanEditMessages     bool   `json:"can_edit_messages"`
 	// if member is restricted, UntilDate is the date when restrictions will be lifted for this user;
 	// unix time. If 0, then the user is restricted forever. If -1 user is not
 	// restricted.
 	UntilDate int `json:"until_date"`
-}
-
-type ChatMemberResponse struct {
-	Result []ChatMember `json:"result"`
-	Response
+	ChatPermissions
 }
 
 type ChatPermissions struct {
@@ -293,4 +293,93 @@ type ChatPermissions struct {
 	CanChangeInfo         bool `json:"can_change_info"`
 	CanInviteUsers        bool `json:"can_invite_users"`
 	CanPinMessages        bool `json:"can_pin_messages"`
+}
+type BotCommand struct {
+	Command     string `json:"command"`
+	Description string `json:"description"`
+}
+
+type botCommandScope interface {
+	botCommandReturn() (interface{}, error)
+}
+
+type BotCommandScopeDefault struct {
+	Type string `json:"type"`
+}
+
+func (b BotCommandScopeDefault) botCommandReturn() (interface{}, error) {
+	if b.Type != "default" {
+		return nil, errors.New(`"Type" field must be "default", not ` + b.Type)
+	}
+	return b, nil
+}
+
+type BotCommandScopeAllPrivateChats struct {
+	Type string `json:"type"`
+}
+
+func (b BotCommandScopeAllPrivateChats) botCommandReturn() (interface{}, error) {
+	if b.Type != "all_private_chats" {
+		return nil, errors.New(`"Type" field must be "all_private_chats", not ` + b.Type)
+	}
+	return b, nil
+}
+
+type BotCommandScopeAllGroupChats struct {
+	Type string `json:"type"`
+}
+
+func (b BotCommandScopeAllGroupChats) botCommandReturn() (interface{}, error) {
+	if b.Type != "all_private_chats" {
+		return nil, errors.New(`"Type" field must be "all_private_chats", not ` + b.Type)
+	}
+	return b, nil
+}
+
+type BotCommandScopeAllChatAdministrators struct {
+	Type string `json:"type"`
+}
+
+func (b BotCommandScopeAllChatAdministrators) botCommandReturn() (interface{}, error) {
+	if b.Type != "all_chat_administrators" {
+		return nil, errors.New(`"Type" field must be "all_chat_administrators", not ` + b.Type)
+	}
+	return b, nil
+}
+
+type BotCommandScopeChat struct {
+	Type   string `json:"type"`
+	ChatId int    `json:"chat_id"`
+}
+
+func (b BotCommandScopeChat) botCommandReturn() (interface{}, error) {
+	if b.Type != "chat" {
+		return nil, errors.New(`"Type" field must be "chat", not ` + b.Type)
+	}
+	return b, nil
+}
+
+type BotCommandScopeChatAdministrators struct {
+	Type   string `json:"type"`
+	ChatId int    `json:"chat_id"`
+}
+
+func (b BotCommandScopeChatAdministrators) botCommandReturn() (interface{}, error) {
+	if b.Type != "chat_administrators" {
+		return nil, errors.New(`"Type" field must be "chat_administrators", not ` + b.Type)
+	}
+	return b, nil
+}
+
+type BotCommandScopeChatMember struct {
+	Type   string `json:"type"`
+	ChatId int    `json:"chat_id"`
+	UserId int    `json:"user_id"`
+}
+
+func (b BotCommandScopeChatMember) botCommandReturn() (interface{}, error) {
+	if b.Type != "chat_member" {
+		return nil, errors.New(`"Type" field must be "chat_member", not ` + b.Type)
+	}
+	return b, nil
 }

@@ -14,7 +14,7 @@ import (
 	"strconv"
 )
 
-func formFieldSetter(s interface{}, w *multipart.Writer) {
+func formFieldSetter(s interface{}, w *multipart.Writer) error {
 	for i := 0; i < reflect.ValueOf(s).NumField(); i++ {
 		tag := reflect.TypeOf(s).Field(i).Tag.Get("json")
 		value := reflect.ValueOf(s).Field(i).Interface()
@@ -43,6 +43,12 @@ func formFieldSetter(s interface{}, w *multipart.Writer) {
 		case ForceReply:
 			a, _ := json.Marshal(j)
 			_ = w.WriteField("reply_markup", string(a))
+		case botCommandScope:
+			_, obj := j.botCommandReturn()
+			err := formFieldSetter(obj, w)
+			if err != nil {
+				return err
+			}
 		case *os.File:
 			file, _ := w.CreateFormFile(tag, j.Name())
 			_, _ = io.Copy(file, j)
@@ -55,6 +61,7 @@ func formFieldSetter(s interface{}, w *multipart.Writer) {
 			}
 		}
 	}
+	return nil
 }
 
 // inlineKeyboardButtonColumnAdder add a InlineKeyboard in vertical orientation.
@@ -143,9 +150,15 @@ func request(id int, method string, token string, data interface{},
 	}
 	var body = &bytes.Buffer{}
 	w := multipart.NewWriter(body)
-	formFieldSetter(data, w)
+	err = formFieldSetter(data, w)
+	if err != nil {
+		return nil, err
+	}
 	if optionalParams != nil {
-		formFieldSetter(optionalParams, w)
+		err = formFieldSetter(optionalParams, w)
+		if err != nil {
+			return nil, err
+		}
 	}
 	err = w.Close()
 	if err != nil {

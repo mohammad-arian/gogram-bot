@@ -645,9 +645,15 @@ func (r *Chat) GetChatAdministrators(b Bot) (response *ChatMemberResponse, err e
 			member.Result[j].CanPinMessages = true
 			member.Result[j].CanManageVoiceChats = true
 			member.Result[j].CanEditMessages = true
+			member.Result[j].CanSendPolls = true
 		}
 		if member.Result[j].Status == "administrator" {
 			member.Result[j].IsMember = true
+			member.Result[j].CanSendPolls = true
+			member.Result[j].CanSendMediaMessages = true
+			member.Result[j].CanSendOtherMessages = true
+			member.Result[j].CanAddWebPagePreviews = true
+			member.Result[j].CanSendMessages = true
 		}
 		if member.Result[j].Status == "member" {
 			member.Result[j].IsMember = true
@@ -662,4 +668,76 @@ func (r *Chat) GetChatAdministrators(b Bot) (response *ChatMemberResponse, err e
 		}
 	}
 	return member, err
+}
+
+func (r *Chat) GetChatMemberCount(b Bot) (response *IntResponse, err error) {
+	type data struct {
+		ChatId int `json:"chat_id"`
+	}
+	d := data{ChatId: r.Id}
+	u := IntResponse{}
+	res, err := request(r.Id, "getChatMemberCount", b.Token, d, nil, &u)
+	return res.(*IntResponse), err
+}
+
+func (r *Chat) GetChatMember(b Bot, userId int) (response *ChatMemberResponse, err error) {
+	type data struct {
+		ChatId int `json:"chat_id"`
+		UserId int `json:"user_id"`
+	}
+	d := data{ChatId: r.Id, UserId: userId}
+	u := ChatMemberResponse{}
+	res, err := request(r.Id, "getChatMember", b.Token, d, nil, &u)
+	return res.(*ChatMemberResponse), err
+}
+
+func (r *Chat) SetChatStickerSet(b Bot, stickerSetName string) (response *BooleanResponse, err error) {
+	type data struct {
+		ChatId         int    `json:"chat_id"`
+		StickerSetName string `json:"sticker_set_name"`
+	}
+	d := data{ChatId: r.Id, StickerSetName: stickerSetName}
+	u := BooleanResponse{}
+	res, err := request(r.Id, "setChatStickerSet", b.Token, d, nil, &u)
+	return res.(*BooleanResponse), err
+}
+
+func (r *Chat) DeleteChatStickerSet(b Bot) (response *BooleanResponse, err error) {
+	type data struct {
+		ChatId int `json:"chat_id"`
+	}
+	d := data{ChatId: r.Id}
+	u := BooleanResponse{}
+	res, err := request(r.Id, "deleteChatStickerSet", b.Token, d, nil, &u)
+	return res.(*BooleanResponse), err
+}
+
+func (r *ReplyAble) AnswerCallbackQuery(b Bot, callbackQueryId string,
+	optionalParams *AnswerCallbackQueryOptionalParams) (response *BooleanResponse, err error) {
+	type data struct {
+		CallbackQueryId string `json:"callback_query_id"`
+	}
+	d := data{CallbackQueryId: callbackQueryId}
+	var op interface{}
+	if optionalParams != nil {
+		op = *optionalParams
+	}
+	u := BooleanResponse{}
+	res, err := request(r.Id, "answerCallbackQuery", b.Token, d, op, &u)
+	return res.(*BooleanResponse), err
+}
+
+func (r *ReplyAble) SetMyCommands(b Bot, commands []BotCommand,
+	optionalParams *SetMyCommandsOptionalParams) (response *BooleanResponse, err error) {
+	type data struct {
+		Commands []BotCommand `json:"Commands"`
+	}
+	d := data{Commands: commands}
+	var op interface{}
+	if optionalParams != nil {
+		op = *optionalParams
+	}
+	u := BooleanResponse{}
+	res, err := request(r.Id, "setMyCommands", b.Token, d, op, &u)
+	return res.(*BooleanResponse), err
 }

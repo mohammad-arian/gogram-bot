@@ -297,6 +297,18 @@ type UnpinChatMessageOptionalParams struct {
 	MessageId int `json:"message_id"`
 }
 
+type AnswerCallbackQueryOptionalParams struct {
+	text      string
+	showAlert bool
+	url       string
+	cacheTime string
+}
+
+type SetMyCommandsOptionalParams struct {
+	Scope        botCommandScope `json:"scope"`
+	LanguageCode string          `json:"language_code"`
+}
+
 func (i *InlineKeyboard) AddInlineKeyboardButton(horizontal bool, a ...InlineKeyboardButton) {
 	if horizontal {
 		inlineKeyboardButtonRowAdder(i, a...)

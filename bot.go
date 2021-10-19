@@ -15,24 +15,24 @@ type Bot struct {
 	Token string
 	/*
 			MessageHandler invokes when webhook sends a new update.
-			It must have two parameters, one of type Message
-			the other of type Bot.
 		    In the below example, we have a Bot variable called bot.
 		    We passed a function of type func (message gogram.Update, bot gogram.Bot)
 			to our bot called handle.
-			When telegram server sends something, handle function is invoked.
-			Then we can use bot parameter to send something back to user who sent bot message;
+			When telegram server sends something, handle function is called.
+			Then we can use update parameter to send something back to user who sent bot a message;
 			or we can use another bot.
 
 			var bot = gogram.NewBot("<Token>", handle)
 			bot.Listener(<Port>)
 
-			func handle(message gogram.Update, bot gogram.Bot) {
-				message.User.SendText(bot, message.Text)
+			func handle(update gogram.Update, bot gogram.Bot) {
+				update.Message.User.SendText(bot, message.Text)
 			}
 	*/
 	MessageHandler func(message Update, bot Bot)
 	Self           User `json:"result"`
+	// if debug set to true, every time Listener receives something, it will be printed.
+	debug bool
 }
 
 // NewBot creates a Bot
@@ -69,7 +69,9 @@ func (b Bot) Listener(port string) {
 
 func webhookHandler(w http.ResponseWriter, r *http.Request, bot Bot) {
 	res, _ := ioutil.ReadAll(r.Body)
-	log.Println("res is:" + string(res))
+	if bot.debug {
+		log.Println(string(res))
+	}
 	update := Update{}
 	err := json.Unmarshal(res, &update)
 	if err != nil {
