@@ -65,6 +65,7 @@ func (b Bot) SetWebhook(url string) {
 func (b Bot) Listener(port string) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { webhookHandler(r, b) })
 	_ = http.ListenAndServe(":"+port, nil)
+	return
 }
 
 func webhookHandler(r *http.Request, bot Bot) {

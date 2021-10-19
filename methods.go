@@ -730,7 +730,7 @@ func (r *ReplyAble) AnswerCallbackQuery(b Bot, callbackQueryId string,
 func (b *Bot) SetMyCommands(commands []BotCommand,
 	optionalParams *MyCommandsOptionalParams) (response *BooleanResponse, err error) {
 	type data struct {
-		Commands []BotCommand `json:"Commands"`
+		Commands []BotCommand `json:"commands"`
 	}
 	d := data{Commands: commands}
 	var op interface{}
@@ -754,12 +754,12 @@ func (b *Bot) DeleteMyCommands(
 }
 
 func (b *Bot) GetMyCommands(
-	optionalParams *MyCommandsOptionalParams) (response *BooleanResponse, err error) {
+	optionalParams *MyCommandsOptionalParams) (response *BotCommandResponse, err error) {
 	var op interface{}
 	if optionalParams != nil {
 		op = *optionalParams
 	}
-	u := BooleanResponse{}
+	u := BotCommandResponse{}
 	res, err := request(-1, "getMyCommands", b.Token, nil, op, &u)
-	return res.(*BooleanResponse), err
+	return res.(*BotCommandResponse), err
 }

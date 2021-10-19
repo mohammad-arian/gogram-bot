@@ -263,6 +263,11 @@ type ChatMemberResponse struct {
 	Response
 }
 
+type BotCommandResponse struct {
+	Result []BotCommand `json:"result"`
+	Response
+}
+
 type ChatMember struct {
 	Status              string `json:"status"`
 	User                User   `json:"user"`
