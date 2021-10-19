@@ -20,32 +20,59 @@ func formFieldSetter(s interface{}, w *multipart.Writer) error {
 		value := reflect.ValueOf(s).Field(i).Interface()
 		switch j := value.(type) {
 		case string:
-			_ = w.WriteField(tag, value.(string))
+			err := w.WriteField(tag, value.(string))
+			if err != nil {
+				return err
+			}
 		case int:
-			_ = w.WriteField(tag, strconv.Itoa(value.(int)))
+			err := w.WriteField(tag, strconv.Itoa(value.(int)))
+			if err != nil {
+				return err
+			}
 		case float64:
-			_ = w.WriteField(tag, fmt.Sprintf("%v", value.(float64)))
+			err := w.WriteField(tag, fmt.Sprintf("%v", value.(float64)))
+			if err != nil {
+				return err
+			}
 		case bool:
-			_ = w.WriteField(tag, strconv.FormatBool(value.(bool)))
+			err := w.WriteField(tag, strconv.FormatBool(value.(bool)))
+			if err != nil {
+				return err
+			}
 		case InlineKeyboard:
 			if j.inlineKeyboardMarkup.InlineKeyboardButtons != nil {
 				a, _ := json.Marshal(j.inlineKeyboardMarkup)
-				_ = w.WriteField("reply_markup", string(a))
+				err := w.WriteField("reply_markup", string(a))
+				if err != nil {
+					return err
+				}
 			}
 		case ReplyKeyboard:
 			if j.replyKeyboardMarkup.Keyboard != nil {
 				a, _ := json.Marshal(j.replyKeyboardMarkup)
-				_ = w.WriteField("reply_markup", string(a))
+				err := w.WriteField("reply_markup", string(a))
+				if err != nil {
+					return err
+				}
 			} else if j.replyKeyboardRemove != (replyKeyboardRemove{}) {
 				a, _ := json.Marshal(j.replyKeyboardRemove)
-				_ = w.WriteField("reply_markup", string(a))
+				err := w.WriteField("reply_markup", string(a))
+				if err != nil {
+					return err
+				}
 			}
 		case ForceReply:
 			a, _ := json.Marshal(j)
-			_ = w.WriteField("reply_markup", string(a))
+			err := w.WriteField("reply_markup", string(a))
+			if err != nil {
+				return err
+			}
 		case botCommandScope:
-			_, obj := j.botCommandReturn()
-			err := formFieldSetter(obj, w)
+			obj, err := j.botCommandReturn()
+			if err != nil {
+				return err
+			}
+			err = formFieldSetter(obj, w)
 			if err != nil {
 				return err
 			}
