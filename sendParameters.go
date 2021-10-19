@@ -304,7 +304,7 @@ type AnswerCallbackQueryOptionalParams struct {
 	cacheTime string
 }
 
-type SetMyCommandsOptionalParams struct {
+type MyCommandsOptionalParams struct {
 	Scope        botCommandScope `json:"scope"`
 	LanguageCode string          `json:"language_code"`
 }

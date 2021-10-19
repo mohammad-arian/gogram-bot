@@ -31,12 +31,12 @@ type Bot struct {
 	*/
 	MessageHandler func(message Update, bot Bot)
 	Self           User `json:"result"`
-	// if debug set to true, every time Listener receives something, it will be printed.
-	debug bool
+	// if Debug set to true, every time Listener receives something, it will be printed.
+	Debug bool
 }
 
 // NewBot creates a Bot
-func NewBot(token string, handler func(message Update, bot Bot)) Bot {
+func NewBot(token string, handler func(message Update, bot Bot), debug bool) Bot {
 	res, err := http.Get(fmt.Sprintf("https://api.telegram.org/bot%s/getme", token))
 	if err != nil {
 		log.Fatalln(err)
@@ -47,7 +47,7 @@ func NewBot(token string, handler func(message Update, bot Bot)) Bot {
 	if resToMap["ok"] == false {
 		log.Fatalln("Your token is wrong")
 	}
-	var newBot = Bot{Token: token, MessageHandler: handler}
+	var newBot = Bot{Token: token, MessageHandler: handler, Debug: debug}
 	_ = json.Unmarshal(resToByte, &newBot)
 	return newBot
 }
@@ -63,13 +63,13 @@ func (b Bot) SetWebhook(url string) {
 
 // Listener listens to upcoming webhook updates
 func (b Bot) Listener(port string) {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { webhookHandler(w, r, b) })
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { webhookHandler(r, b) })
 	_ = http.ListenAndServe(":"+port, nil)
 }
 
-func webhookHandler(w http.ResponseWriter, r *http.Request, bot Bot) {
+func webhookHandler(r *http.Request, bot Bot) {
 	res, _ := ioutil.ReadAll(r.Body)
-	if bot.debug {
+	if bot.Debug {
 		log.Println(string(res))
 	}
 	update := Update{}

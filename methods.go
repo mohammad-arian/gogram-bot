@@ -727,8 +727,8 @@ func (r *ReplyAble) AnswerCallbackQuery(b Bot, callbackQueryId string,
 	return res.(*BooleanResponse), err
 }
 
-func (r *ReplyAble) SetMyCommands(b Bot, commands []BotCommand,
-	optionalParams *SetMyCommandsOptionalParams) (response *BooleanResponse, err error) {
+func (b *Bot) SetMyCommands(commands []BotCommand,
+	optionalParams *MyCommandsOptionalParams) (response *BooleanResponse, err error) {
 	type data struct {
 		Commands []BotCommand `json:"Commands"`
 	}
@@ -738,6 +738,28 @@ func (r *ReplyAble) SetMyCommands(b Bot, commands []BotCommand,
 		op = *optionalParams
 	}
 	u := BooleanResponse{}
-	res, err := request(r.Id, "setMyCommands", b.Token, d, op, &u)
+	res, err := request(-1, "setMyCommands", b.Token, d, op, &u)
+	return res.(*BooleanResponse), err
+}
+
+func (b *Bot) DeleteMyCommands(
+	optionalParams *MyCommandsOptionalParams) (response *BooleanResponse, err error) {
+	var op interface{}
+	if optionalParams != nil {
+		op = *optionalParams
+	}
+	u := BooleanResponse{}
+	res, err := request(-1, "deleteMyCommands", b.Token, nil, op, &u)
+	return res.(*BooleanResponse), err
+}
+
+func (b *Bot) GetMyCommands(
+	optionalParams *MyCommandsOptionalParams) (response *BooleanResponse, err error) {
+	var op interface{}
+	if optionalParams != nil {
+		op = *optionalParams
+	}
+	u := BooleanResponse{}
+	res, err := request(-1, "getMyCommands", b.Token, nil, op, &u)
 	return res.(*BooleanResponse), err
 }

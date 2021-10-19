@@ -150,9 +150,11 @@ func request(id int, method string, token string, data interface{},
 	}
 	var body = &bytes.Buffer{}
 	w := multipart.NewWriter(body)
-	err = formFieldSetter(data, w)
-	if err != nil {
-		return nil, err
+	if data != nil {
+		err = formFieldSetter(data, w)
+		if err != nil {
+			return nil, err
+		}
 	}
 	if optionalParams != nil {
 		err = formFieldSetter(optionalParams, w)
