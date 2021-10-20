@@ -18,7 +18,7 @@ func (r *ReplyAble) SendText(b Bot, text string, optionalParams *TextOptionalPar
 		Text   string `json:"text"`
 	}
 	d := data{ChatId: r.Id, Text: text}
-	res, err := request(r.Id, "sendMessage", b.Token, &d, optionalParams, &MessageResponse{})
+	res, err := request("sendMessage", b.Token, &d, optionalParams, &MessageResponse{})
 	return res.(*MessageResponse), err
 }
 
@@ -29,7 +29,7 @@ func (r *ReplyAble) SendPhoto(b Bot, photo interface{},
 		Photo  interface{} `json:"photo"`
 	}
 	d := data{ChatId: r.Id, Photo: photo}
-	res, err := request(r.Id, "sendPhoto", b.Token, &d, optionalParams, &MessageResponse{})
+	res, err := request("sendPhoto", b.Token, &d, optionalParams, &MessageResponse{})
 	return res.(*MessageResponse), err
 }
 
@@ -40,7 +40,7 @@ func (r *ReplyAble) SendVideo(b Bot, video interface{},
 		Video  interface{} `json:"video"`
 	}
 	d := data{ChatId: r.Id, Video: video}
-	res, err := request(r.Id, "sendVideo", b.Token, &d, optionalParams, &MessageResponse{})
+	res, err := request("sendVideo", b.Token, &d, optionalParams, &MessageResponse{})
 	return res.(*MessageResponse), err
 }
 
@@ -55,7 +55,7 @@ func (r *ReplyAble) SendAudio(b Bot, audio interface{},
 		Audio  interface{} `json:"audio"`
 	}
 	d := data{ChatId: r.Id, Audio: audio}
-	res, err := request(r.Id, "sendAudio", b.Token, &d, optionalParams, &MessageResponse{})
+	res, err := request("sendAudio", b.Token, &d, optionalParams, &MessageResponse{})
 	return res.(*MessageResponse), err
 }
 
@@ -66,7 +66,7 @@ func (r *ReplyAble) SendDocument(b Bot, document interface{},
 		Document interface{} `json:"document"`
 	}
 	d := data{ChatId: r.Id, Document: document}
-	res, err := request(r.Id, "sendDocument", b.Token, &d, optionalParams, &MessageResponse{})
+	res, err := request("sendDocument", b.Token, &d, optionalParams, &MessageResponse{})
 	return res.(*MessageResponse), err
 }
 
@@ -82,7 +82,7 @@ func (r *ReplyAble) SendVoice(b Bot, voice interface{},
 		Voice  interface{} `json:"voice"`
 	}
 	d := data{ChatId: r.Id, Voice: voice}
-	res, err := request(r.Id, "sendVoice", b.Token, &d, optionalParams, &MessageResponse{})
+	res, err := request("sendVoice", b.Token, &d, optionalParams, &MessageResponse{})
 	return res.(*MessageResponse), err
 }
 
@@ -93,7 +93,7 @@ func (r *ReplyAble) SendAnimation(b Bot, animation interface{},
 		Animation interface{} `json:"animation"`
 	}
 	d := data{ChatId: r.Id, Animation: animation}
-	res, err := request(r.Id, "sendAnimation", b.Token, &d, optionalParams, &MessageResponse{})
+	res, err := request("sendAnimation", b.Token, &d, optionalParams, &MessageResponse{})
 	return res.(*MessageResponse), err
 }
 
@@ -102,7 +102,7 @@ func (r *ReplyAble) SendDice(b Bot, optionalParams *DiceOptionalParams) (respons
 		ChatId int `json:"chat_id"`
 	}
 	d := data{ChatId: r.Id}
-	res, err := request(r.Id, "sendDice", b.Token, &d, optionalParams, &MessageResponse{})
+	res, err := request("sendDice", b.Token, &d, optionalParams, &MessageResponse{})
 	return res.(*MessageResponse), err
 }
 
@@ -113,7 +113,7 @@ func (r *ReplyAble) SendVideoNote(b Bot, videoNote interface{},
 		VideoNote interface{} `json:"videoNote"`
 	}
 	d := data{ChatId: r.Id, VideoNote: videoNote}
-	res, err := request(r.Id, "sendVideoNote", b.Token, &d, optionalParams, &MessageResponse{})
+	res, err := request("sendVideoNote", b.Token, &d, optionalParams, &MessageResponse{})
 	return res.(*MessageResponse), err
 }
 
@@ -128,7 +128,7 @@ func (r *ReplyAble) SendPoll(b Bot, question string, options []string,
 		Options  []string    `json:"options"`
 	}
 	d := data{ChatId: r.Id, Question: question, Options: options}
-	res, err := request(r.Id, "sendPoll", b.Token, &d, optionalParams, &MessageResponse{})
+	res, err := request("sendPoll", b.Token, &d, optionalParams, &MessageResponse{})
 	return res.(*MessageResponse), err
 }
 
@@ -188,7 +188,7 @@ func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOptionalPara
 	}
 	mediaToJson, _ := json.Marshal(media)
 	d.Media = string(mediaToJson)
-	res, err := request(r.Id, "sendMediaGroup", b.Token, &d, optionalParams, &[]MessageResponse{})
+	res, err := request("sendMediaGroup", b.Token, &d, optionalParams, &[]MessageResponse{})
 	return res.(*[]MessageResponse), err
 }
 
@@ -200,7 +200,7 @@ func (r *ReplyAble) SendLocation(b Bot, latitude float64, longitude float64,
 		Longitude float64 `json:"longitude"`
 	}
 	d := data{ChatId: r.Id, Latitude: latitude, Longitude: longitude}
-	res, err := request(r.Id, "sendLocation", b.Token, &d, optionalParams, &MessageResponse{})
+	res, err := request("sendLocation", b.Token, &d, optionalParams, &MessageResponse{})
 	return res.(*MessageResponse), err
 }
 
@@ -212,7 +212,7 @@ func (r *ReplyAble) SendContact(b Bot, phoneNumber string, firstName string,
 		FirstName   string `json:"first_name"`
 	}
 	d := data{ChatId: r.Id, PhoneNumber: phoneNumber, FirstName: firstName}
-	res, err := request(r.Id, "sendContact", b.Token, &d, optionalParams, &MessageResponse{})
+	res, err := request("sendContact", b.Token, &d, optionalParams, &MessageResponse{})
 	return res.(*MessageResponse), err
 }
 
@@ -233,7 +233,7 @@ func (r *ReplyAble) SendChatAction(b Bot, action string) (response *BooleanRespo
 	for _, v := range actions {
 		if v == action {
 			d := data{ChatId: r.Id, Action: action}
-			res, err := request(r.Id, "sendChatAction", b.Token, d, nil, &BooleanResponse{})
+			res, err := request("sendChatAction", b.Token, &d, nil, &BooleanResponse{})
 			return res.(*BooleanResponse), err
 		}
 	}
@@ -248,7 +248,7 @@ func (r *ReplyAble) ForwardMessage(b Bot, targetChatId int, messageId int,
 		MessageId  int `json:"message_id"`
 	}
 	d := data{ChatId: targetChatId, FromChatId: r.Id, MessageId: messageId}
-	res, err := request(r.Id, "forwardMessage", b.Token, &d, optionalParams, &MessageResponse{})
+	res, err := request("forwardMessage", b.Token, &d, optionalParams, &MessageResponse{})
 	return res.(*MessageResponse), err
 }
 
@@ -265,7 +265,7 @@ func (r *ReplyAble) CopyMessage(b Bot, targetChatId int, messageId int,
 		MessageId  int `json:"message_id"`
 	}
 	d := data{ChatId: targetChatId, FromChatId: r.Id, MessageId: messageId}
-	res, err := request(r.Id, "forwardMessage", b.Token, &d, optionalParams, &MessageResponse{})
+	res, err := request("forwardMessage", b.Token, &d, optionalParams, &MessageResponse{})
 	return res.(*MessageResponse), err
 }
 
@@ -275,7 +275,7 @@ func (r *ReplyAble) GetUserProfilePhotos(b Bot,
 		UserId int `json:"user_id"`
 	}
 	d := data{UserId: r.Id}
-	res, err := request(r.Id, "getUserProfilePhotos", b.Token, &d, optionalParams, &UserProfileResponse{})
+	res, err := request("getUserProfilePhotos", b.Token, &d, optionalParams, &UserProfileResponse{})
 	return res.(*UserProfileResponse), err
 }
 
@@ -292,7 +292,7 @@ func (r *User) BanChatMember(b Bot, chatId int,
 		UserId int `json:"user_id"`
 	}
 	d := data{ChatId: chatId, UserId: r.Id}
-	res, err := request(r.Id, "banChatMember", b.Token, &d, optionalParams, &BooleanResponse{})
+	res, err := request("banChatMember", b.Token, &d, optionalParams, &BooleanResponse{})
 	return res.(*BooleanResponse), err
 }
 
@@ -310,7 +310,7 @@ func (r *User) UnbanChatMember(b Bot, chatId int, onlyIfBanned bool) (response *
 		OnlyIfBanned bool `json:"only_if_banned"`
 	}
 	d := data{ChatId: chatId, UserId: r.Id, OnlyIfBanned: onlyIfBanned}
-	res, err := request(r.Id, "unbanChatMember", b.Token, d, nil, &BooleanResponse{})
+	res, err := request("unbanChatMember", b.Token, &d, nil, &BooleanResponse{})
 	return res.(*BooleanResponse), err
 }
 
@@ -322,7 +322,7 @@ func (r *User) RestrictChatMember(b Bot, chatId int, permissions ChatPermissions
 		Permissions ChatPermissions `json:"permissions"`
 	}
 	d := data{ChatId: chatId, UserId: r.Id, Permissions: permissions}
-	res, err := request(r.Id, "restrictChatMember", b.Token, &d, optionalParams, &BooleanResponse{})
+	res, err := request("restrictChatMember", b.Token, &d, optionalParams, &BooleanResponse{})
 	return res.(*BooleanResponse), err
 }
 
@@ -333,7 +333,7 @@ func (r *User) PromoteChatMember(b Bot, chatId int,
 		UserId int `json:"user_id"`
 	}
 	d := data{ChatId: chatId, UserId: r.Id}
-	res, err := request(r.Id, "promoteChatMember", b.Token, &d, optionalParams, &BooleanResponse{})
+	res, err := request("promoteChatMember", b.Token, &d, optionalParams, &BooleanResponse{})
 	return res.(*BooleanResponse), err
 }
 
@@ -345,7 +345,7 @@ func (r *User) SetChatAdministratorCustomTitle(b Bot, chatId int, customTitle st
 		CustomTitle string `json:"custom_title"`
 	}
 	d := data{ChatId: chatId, UserId: r.Id, CustomTitle: customTitle}
-	res, err := request(r.Id, "setChatAdministratorCustomTitle", b.Token, d, nil, &BooleanResponse{})
+	res, err := request("setChatAdministratorCustomTitle", b.Token, &d, nil, &BooleanResponse{})
 	return res.(*BooleanResponse), err
 }
 
@@ -355,7 +355,7 @@ func (r *User) SetChatPermissions(b Bot, permissions ChatPermissions) (response 
 		Permissions ChatPermissions `json:"permissions"`
 	}
 	d := data{ChatId: r.Id, Permissions: permissions}
-	res, err := request(r.Id, "setChatPermissions", b.Token, d, nil, &BooleanResponse{})
+	res, err := request("setChatPermissions", b.Token, &d, nil, &BooleanResponse{})
 	return res.(*BooleanResponse), err
 }
 
@@ -364,7 +364,7 @@ func (r *Chat) ExportChatInviteLink(b Bot) (response *StringResponse, err error)
 		ChatId int `json:"chat_id"`
 	}
 	d := data{ChatId: r.Id}
-	res, err := request(r.Id, "exportChatInviteLink", b.Token, d, nil, &StringResponse{})
+	res, err := request("exportChatInviteLink", b.Token, &d, nil, &StringResponse{})
 	return res.(*StringResponse), err
 }
 
@@ -374,7 +374,7 @@ func (r *Chat) CreateChatInviteLink(b Bot,
 		ChatId int `json:"chat_id"`
 	}
 	d := data{ChatId: r.Id}
-	res, err := request(r.Id, "createChatInviteLink", b.Token, &d, optionalParams, &InviteLinkResponse{})
+	res, err := request("createChatInviteLink", b.Token, &d, optionalParams, &InviteLinkResponse{})
 	return res.(*InviteLinkResponse), err
 }
 
@@ -385,7 +385,7 @@ func (r *Chat) EditChatInviteLink(b Bot, inviteLink string,
 		InviteLink string `json:"invite_link"`
 	}
 	d := data{ChatId: r.Id, InviteLink: inviteLink}
-	res, err := request(r.Id, "editChatInviteLink", b.Token, &d, optionalParams, &InviteLinkResponse{})
+	res, err := request("editChatInviteLink", b.Token, &d, optionalParams, &InviteLinkResponse{})
 	return res.(*InviteLinkResponse), err
 }
 
@@ -395,7 +395,7 @@ func (r *Chat) RevokeChatInviteLink(b Bot, inviteLink string) (response *InviteL
 		InviteLink string `json:"invite_link"`
 	}
 	d := data{ChatId: r.Id, InviteLink: inviteLink}
-	res, err := request(r.Id, "revokeChatInviteLink", b.Token, d, nil, &InviteLinkResponse{})
+	res, err := request("revokeChatInviteLink", b.Token, &d, nil, &InviteLinkResponse{})
 	return res.(*InviteLinkResponse), err
 }
 
@@ -405,7 +405,7 @@ func (r *Chat) SetChatPhoto(b Bot, photo *os.File) (response *BooleanResponse, e
 		Photo  *os.File `json:"photo"`
 	}
 	d := data{ChatId: r.Id, Photo: photo}
-	res, err := request(r.Id, "setChatPhoto", b.Token, d, nil, &BooleanResponse{})
+	res, err := request("setChatPhoto", b.Token, &d, nil, &BooleanResponse{})
 	return res.(*BooleanResponse), err
 }
 
@@ -414,7 +414,7 @@ func (r *Chat) DeleteChatPhoto(b Bot) (response *BooleanResponse, err error) {
 		ChatId int `json:"chat_id"`
 	}
 	d := data{ChatId: r.Id}
-	res, err := request(r.Id, "deleteChatPhoto", b.Token, d, nil, &BooleanResponse{})
+	res, err := request("deleteChatPhoto", b.Token, &d, nil, &BooleanResponse{})
 	return res.(*BooleanResponse), err
 }
 
@@ -424,7 +424,7 @@ func (r *Chat) SetChatTitle(b Bot, title string) (response *BooleanResponse, err
 		Title  string `json:"title"`
 	}
 	d := data{ChatId: r.Id, Title: title}
-	res, err := request(r.Id, "setChatTitle", b.Token, d, nil, &BooleanResponse{})
+	res, err := request("setChatTitle", b.Token, &d, nil, &BooleanResponse{})
 	return res.(*BooleanResponse), err
 }
 
@@ -434,7 +434,7 @@ func (r *Chat) SetChatDescription(b Bot, description string) (response *BooleanR
 		Description string `json:"description"`
 	}
 	d := data{ChatId: r.Id, Description: description}
-	res, err := request(r.Id, "setChatDescription", b.Token, d, nil, &BooleanResponse{})
+	res, err := request("setChatDescription", b.Token, &d, nil, &BooleanResponse{})
 	return res.(*BooleanResponse), err
 }
 
@@ -445,7 +445,7 @@ func (r *Chat) PinChatMessage(b Bot, messageId int,
 		MessageId int `json:"message_id"`
 	}
 	d := data{ChatId: r.Id, MessageId: messageId}
-	res, err := request(r.Id, "pinChatMessage", b.Token, &d, optionalParams, &BooleanResponse{})
+	res, err := request("pinChatMessage", b.Token, &d, optionalParams, &BooleanResponse{})
 	return res.(*BooleanResponse), err
 }
 
@@ -455,7 +455,7 @@ func (r *Chat) UnpinChatMessage(b Bot,
 		ChatId int `json:"chat_id"`
 	}
 	d := data{ChatId: r.Id}
-	res, err := request(r.Id, "unpinChatMessage", b.Token, &d, optionalParams, &BooleanResponse{})
+	res, err := request("unpinChatMessage", b.Token, &d, optionalParams, &BooleanResponse{})
 	return res.(*BooleanResponse), err
 }
 
@@ -464,7 +464,7 @@ func (r *Chat) UnpinAllChatMessages(b Bot) (response *BooleanResponse, err error
 		ChatId int `json:"chat_id"`
 	}
 	d := data{ChatId: r.Id}
-	res, err := request(r.Id, "unpinAllChatMessages", b.Token, d, nil, &BooleanResponse{})
+	res, err := request("unpinAllChatMessages", b.Token, &d, nil, &BooleanResponse{})
 	return res.(*BooleanResponse), err
 }
 
@@ -473,7 +473,7 @@ func (r *Chat) LeaveChat(b Bot) (response *BooleanResponse, err error) {
 		ChatId int `json:"chat_id"`
 	}
 	d := data{ChatId: r.Id}
-	res, err := request(r.Id, "leaveChat", b.Token, d, nil, &BooleanResponse{})
+	res, err := request("leaveChat", b.Token, &d, nil, &BooleanResponse{})
 	return res.(*BooleanResponse), err
 }
 
@@ -484,7 +484,7 @@ func (r *Chat) GetChat(b Bot) (response *ChatResponse, err error) {
 		ChatId int `json:"chat_id"`
 	}
 	d := data{ChatId: r.Id}
-	res, err := request(r.Id, "getChat", b.Token, d, nil, &ChatResponse{})
+	res, err := request("getChat", b.Token, &d, nil, &ChatResponse{})
 	return res.(*ChatResponse), err
 }
 
@@ -493,51 +493,9 @@ func (r *Chat) GetChatAdministrators(b Bot) (response *ChatMemberResponse, err e
 		ChatId int `json:"chat_id"`
 	}
 	d := data{ChatId: r.Id}
-	res, err := request(r.Id, "getChatAdministrators", b.Token, d, nil, &ChatMemberResponse{})
+	res, err := request("getChatAdministrators", b.Token, &d, nil, &ChatMemberResponse{})
 	member := res.(*ChatMemberResponse)
-	for j := range member.Result {
-		if member.Result[j].Status != "restricted" {
-			member.Result[j].UntilDate = -1
-		}
-		if member.Result[j].Status == "creator" {
-			member.Result[j].IsMember = true
-			member.Result[j].CanPostMessages = true
-			member.Result[j].CanInviteUsers = true
-			member.Result[j].CanSendPolls = true
-			member.Result[j].CanAddWebPagePreviews = true
-			member.Result[j].CanChangeInfo = true
-			member.Result[j].CanSendOtherMessages = true
-			member.Result[j].CanSendMessages = true
-			member.Result[j].CanDeleteMessages = true
-			member.Result[j].CanManageChat = true
-			member.Result[j].CanPromoteMembers = true
-			member.Result[j].CanSendMediaMessages = true
-			member.Result[j].CanRestrictMembers = true
-			member.Result[j].CanPinMessages = true
-			member.Result[j].CanManageVoiceChats = true
-			member.Result[j].CanEditMessages = true
-			member.Result[j].CanSendPolls = true
-		}
-		if member.Result[j].Status == "administrator" {
-			member.Result[j].IsMember = true
-			member.Result[j].CanSendPolls = true
-			member.Result[j].CanSendMediaMessages = true
-			member.Result[j].CanSendOtherMessages = true
-			member.Result[j].CanAddWebPagePreviews = true
-			member.Result[j].CanSendMessages = true
-		}
-		if member.Result[j].Status == "member" {
-			member.Result[j].IsMember = true
-			member.Result[j].CanPostMessages = true
-			member.Result[j].CanInviteUsers = true
-			member.Result[j].CanSendPolls = true
-			member.Result[j].CanAddWebPagePreviews = true
-			member.Result[j].CanChangeInfo = true
-			member.Result[j].CanSendMessages = true
-			member.Result[j].CanPinMessages = true
-			member.Result[j].CanBeEdited = true
-		}
-	}
+	member.permissionSetter()
 	return member, err
 }
 
@@ -546,7 +504,7 @@ func (r *Chat) GetChatMemberCount(b Bot) (response *IntResponse, err error) {
 		ChatId int `json:"chat_id"`
 	}
 	d := data{ChatId: r.Id}
-	res, err := request(r.Id, "getChatMemberCount", b.Token, d, nil, &IntResponse{})
+	res, err := request("getChatMemberCount", b.Token, &d, nil, &IntResponse{})
 	return res.(*IntResponse), err
 }
 
@@ -556,7 +514,7 @@ func (r *Chat) GetChatMember(b Bot, userId int) (response *ChatMemberResponse, e
 		UserId int `json:"user_id"`
 	}
 	d := data{ChatId: r.Id, UserId: userId}
-	res, err := request(r.Id, "getChatMember", b.Token, d, nil, &ChatMemberResponse{})
+	res, err := request("getChatMember", b.Token, &d, nil, &ChatMemberResponse{})
 	return res.(*ChatMemberResponse), err
 }
 
@@ -566,7 +524,7 @@ func (r *Chat) SetChatStickerSet(b Bot, stickerSetName string) (response *Boolea
 		StickerSetName string `json:"sticker_set_name"`
 	}
 	d := data{ChatId: r.Id, StickerSetName: stickerSetName}
-	res, err := request(r.Id, "setChatStickerSet", b.Token, d, nil, &BooleanResponse{})
+	res, err := request("setChatStickerSet", b.Token, &d, nil, &BooleanResponse{})
 	return res.(*BooleanResponse), err
 }
 
@@ -575,7 +533,7 @@ func (r *Chat) DeleteChatStickerSet(b Bot) (response *BooleanResponse, err error
 		ChatId int `json:"chat_id"`
 	}
 	d := data{ChatId: r.Id}
-	res, err := request(r.Id, "deleteChatStickerSet", b.Token, d, nil, &BooleanResponse{})
+	res, err := request("deleteChatStickerSet", b.Token, &d, nil, &BooleanResponse{})
 	return res.(*BooleanResponse), err
 }
 
@@ -585,7 +543,7 @@ func (r *ReplyAble) AnswerCallbackQuery(b Bot, callbackQueryId string,
 		CallbackQueryId string `json:"callback_query_id"`
 	}
 	d := data{CallbackQueryId: callbackQueryId}
-	res, err := request(r.Id, "answerCallbackQuery", b.Token, &d, optionalParams, &BooleanResponse{})
+	res, err := request("answerCallbackQuery", b.Token, &d, optionalParams, &BooleanResponse{})
 	return res.(*BooleanResponse), err
 }
 
@@ -595,18 +553,18 @@ func (b *Bot) SetMyCommands(commands []BotCommand,
 		Commands []BotCommand `json:"commands"`
 	}
 	d := data{Commands: commands}
-	res, err := request(-1, "setMyCommands", b.Token, &d, optionalParams, &BooleanResponse{})
+	res, err := request("setMyCommands", b.Token, &d, optionalParams, &BooleanResponse{})
 	return res.(*BooleanResponse), err
 }
 
 func (b *Bot) DeleteMyCommands(
 	optionalParams *MyCommandsOptionalParams) (response *BooleanResponse, err error) {
-	res, err := request(-1, "deleteMyCommands", b.Token, nil, optionalParams, &BooleanResponse{})
+	res, err := request("deleteMyCommands", b.Token, nil, optionalParams, &BooleanResponse{})
 	return res.(*BooleanResponse), err
 }
 
 func (b *Bot) GetMyCommands(
 	optionalParams *MyCommandsOptionalParams) (response *BotCommandResponse, err error) {
-	res, err := request(-1, "getMyCommands", b.Token, nil, optionalParams, &BotCommandResponse{})
+	res, err := request("getMyCommands", b.Token, nil, optionalParams, &BotCommandResponse{})
 	return res.(*BotCommandResponse), err
 }

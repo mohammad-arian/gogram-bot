@@ -261,6 +261,52 @@ type ChatMemberResponse struct {
 	Response
 }
 
+func (c *ChatMemberResponse) permissionSetter() {
+	for j := range c.Result {
+		if c.Result[j].Status != "restricted" {
+			c.Result[j].UntilDate = -1
+		}
+		if c.Result[j].Status == "creator" {
+			c.Result[j].IsMember = true
+			c.Result[j].CanPostMessages = true
+			c.Result[j].CanInviteUsers = true
+			c.Result[j].CanSendPolls = true
+			c.Result[j].CanAddWebPagePreviews = true
+			c.Result[j].CanChangeInfo = true
+			c.Result[j].CanSendOtherMessages = true
+			c.Result[j].CanSendMessages = true
+			c.Result[j].CanDeleteMessages = true
+			c.Result[j].CanManageChat = true
+			c.Result[j].CanPromoteMembers = true
+			c.Result[j].CanSendMediaMessages = true
+			c.Result[j].CanRestrictMembers = true
+			c.Result[j].CanPinMessages = true
+			c.Result[j].CanManageVoiceChats = true
+			c.Result[j].CanEditMessages = true
+			c.Result[j].CanSendPolls = true
+		}
+		if c.Result[j].Status == "administrator" {
+			c.Result[j].IsMember = true
+			c.Result[j].CanSendPolls = true
+			c.Result[j].CanSendMediaMessages = true
+			c.Result[j].CanSendOtherMessages = true
+			c.Result[j].CanAddWebPagePreviews = true
+			c.Result[j].CanSendMessages = true
+		}
+		if c.Result[j].Status == "member" {
+			c.Result[j].IsMember = true
+			c.Result[j].CanPostMessages = true
+			c.Result[j].CanInviteUsers = true
+			c.Result[j].CanSendPolls = true
+			c.Result[j].CanAddWebPagePreviews = true
+			c.Result[j].CanChangeInfo = true
+			c.Result[j].CanSendMessages = true
+			c.Result[j].CanPinMessages = true
+			c.Result[j].CanBeEdited = true
+		}
+	}
+}
+
 type BotCommandResponse struct {
 	Result []BotCommand `json:"result"`
 	Response

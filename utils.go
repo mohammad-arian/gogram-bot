@@ -3,7 +3,6 @@ package gogram
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -156,11 +155,8 @@ func replyKeyboardButtonRowAdder(t *ReplyKeyboard, oneTimeKeyboard bool,
 	}
 }
 
-func request(id int, method string, token string, data interface{},
+func request(method string, token string, data interface{},
 	optionalParams interface{}, responseType interface{}) (response interface{}, error error) {
-	if id == 0 {
-		return "", errors.New("id field is empty")
-	}
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://api.telegram.org/bot%s/%s", token, method),
 		nil)
 	if err != nil {
