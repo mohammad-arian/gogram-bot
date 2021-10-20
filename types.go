@@ -1,7 +1,5 @@
 package gogram
 
-import "errors"
-
 // Update from webhook
 type Update struct {
 	UpdateId      int           `json:"update_id"`
@@ -304,87 +302,23 @@ type BotCommand struct {
 	Description string `json:"description"`
 }
 
-type botCommandScope interface {
-	botCommandReturn() (interface{}, error)
-}
-
-type BotCommandScopeDefault struct {
+// BotCommandScope Represents the scope of bot commands.
+type BotCommandScope struct {
+	// Type is the scope type. It can be:
+	// "default"                 -> Default commands are used if no commands with a narrower
+	//                              scope are specified for the user.
+	// "chat_member"             -> covers a specific member of a group or supergroup chat.
+	// "all_private_chats"       -> covers all private chats.
+	// "all_group_chats"         -> covers all group and supergroup chats.
+	// "all_chat_administrators" -> covers all group and supergroup chat administrators.
+	// "chat"                    -> covers a specific chat.
+	// "chat_administrators"     -> covers all administrators of a specific group or supergroup chat.
 	Type string `json:"type"`
-}
-
-func (b BotCommandScopeDefault) botCommandReturn() (interface{}, error) {
-	if b.Type != "default" {
-		return nil, errors.New(`"Type" field must be "default", not ` + b.Type)
-	}
-	return b, nil
-}
-
-type BotCommandScopeAllPrivateChats struct {
-	Type string `json:"type"`
-}
-
-func (b BotCommandScopeAllPrivateChats) botCommandReturn() (interface{}, error) {
-	if b.Type != "all_private_chats" {
-		return nil, errors.New(`"Type" field must be "all_private_chats", not ` + b.Type)
-	}
-	return b, nil
-}
-
-type BotCommandScopeAllGroupChats struct {
-	Type string `json:"type"`
-}
-
-func (b BotCommandScopeAllGroupChats) botCommandReturn() (interface{}, error) {
-	if b.Type != "all_private_chats" {
-		return nil, errors.New(`"Type" field must be "all_private_chats", not ` + b.Type)
-	}
-	return b, nil
-}
-
-type BotCommandScopeAllChatAdministrators struct {
-	Type string `json:"type"`
-}
-
-func (b BotCommandScopeAllChatAdministrators) botCommandReturn() (interface{}, error) {
-	if b.Type != "all_chat_administrators" {
-		return nil, errors.New(`"Type" field must be "all_chat_administrators", not ` + b.Type)
-	}
-	return b, nil
-}
-
-type BotCommandScopeChat struct {
-	Type   string `json:"type"`
-	ChatId int    `json:"chat_id"`
-}
-
-func (b BotCommandScopeChat) botCommandReturn() (interface{}, error) {
-	if b.Type != "chat" {
-		return nil, errors.New(`"Type" field must be "chat", not ` + b.Type)
-	}
-	return b, nil
-}
-
-type BotCommandScopeChatAdministrators struct {
-	Type   string `json:"type"`
-	ChatId int    `json:"chat_id"`
-}
-
-func (b BotCommandScopeChatAdministrators) botCommandReturn() (interface{}, error) {
-	if b.Type != "chat_administrators" {
-		return nil, errors.New(`"Type" field must be "chat_administrators", not ` + b.Type)
-	}
-	return b, nil
-}
-
-type BotCommandScopeChatMember struct {
-	Type   string `json:"type"`
-	ChatId int    `json:"chat_id"`
-	UserId int    `json:"user_id"`
-}
-
-func (b BotCommandScopeChatMember) botCommandReturn() (interface{}, error) {
-	if b.Type != "chat_member" {
-		return nil, errors.New(`"Type" field must be "chat_member", not ` + b.Type)
-	}
-	return b, nil
+	// ChatId is unique identifier for the target chat or username of the target
+	// supergroup (in the format @supergroupusername).
+	// Required only if Type is "chat_administrators", "chat" or "chat_member".
+	ChatId int `json:"chat_id"`
+	// UserId is unique identifier of the target user.
+	// Required only if Type is "chat_member"
+	UserId int `json:"user_id"`
 }

@@ -15,9 +15,9 @@ import (
 )
 
 func formFieldSetter(s interface{}, w *multipart.Writer) error {
-	for i := 0; i < reflect.ValueOf(s).NumField(); i++ {
-		tag := reflect.TypeOf(s).Field(i).Tag.Get("json")
-		value := reflect.ValueOf(s).Field(i).Interface()
+	for i := 0; i < reflect.ValueOf(s).Elem().NumField(); i++ {
+		tag := reflect.TypeOf(s).Elem().Field(i).Tag.Get("json")
+		value := reflect.ValueOf(s).Elem().Field(i).Interface()
 		switch j := value.(type) {
 		case string:
 			err := w.WriteField(tag, value.(string))
@@ -64,15 +64,6 @@ func formFieldSetter(s interface{}, w *multipart.Writer) error {
 		case ForceReply:
 			a, _ := json.Marshal(j)
 			err := w.WriteField("reply_markup", string(a))
-			if err != nil {
-				return err
-			}
-		case botCommandScope:
-			obj, err := j.botCommandReturn()
-			if err != nil {
-				return err
-			}
-			err = formFieldSetter(obj, w)
 			if err != nil {
 				return err
 			}
@@ -175,26 +166,28 @@ func request(id int, method string, token string, data interface{},
 	if err != nil {
 		return "", err
 	}
-	var body = &bytes.Buffer{}
-	w := multipart.NewWriter(body)
-	if data != nil {
-		err = formFieldSetter(data, w)
-		if err != nil {
-			return nil, err
+	if !reflect.ValueOf(optionalParams).IsNil() || data != nil {
+		var body = &bytes.Buffer{}
+		w := multipart.NewWriter(body)
+		if data != nil {
+			err = formFieldSetter(data, w)
+			if err != nil {
+				return nil, err
+			}
 		}
-	}
-	if optionalParams != nil {
-		err = formFieldSetter(optionalParams, w)
-		if err != nil {
-			return nil, err
+		if !reflect.ValueOf(optionalParams).IsNil() {
+			err = formFieldSetter(optionalParams, w)
+			if err != nil {
+				return nil, err
+			}
 		}
+		err = w.Close()
+		if err != nil {
+			return "", err
+		}
+		req.Header.Add("Content-Type", w.FormDataContentType())
+		req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
 	}
-	err = w.Close()
-	if err != nil {
-		return "", err
-	}
-	req.Header.Set("Content-Type", w.FormDataContentType())
-	req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {

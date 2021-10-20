@@ -305,7 +305,8 @@ type AnswerCallbackQueryOptionalParams struct {
 }
 
 type MyCommandsOptionalParams struct {
-	Scope        botCommandScope `json:"scope"`
+	// Scope describing scope of users for which the commands are relevant. Defaults to "default".
+	Scope        BotCommandScope `json:"scope"`
 	LanguageCode string          `json:"language_code"`
 }
 
