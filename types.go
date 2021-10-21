@@ -108,9 +108,11 @@ type ReplyAble struct {
 type User struct {
 	// SupportsInlineQueries shows if Bot supports inline queries
 	// This field is only for bots
-	SupportsInlineQueries bool   `json:"supports_inline_queries"`
-	LanguageCode          string `json:"language_code"`
-	IsBot                 bool   `json:"is_bot"`
+	SupportsInlineQueries   bool   `json:"supports_inline_queries"`
+	LanguageCode            string `json:"language_code"`
+	IsBot                   bool   `json:"is_bot"`
+	CanReadAllGroupMessages bool   `json:"can_read_all_group_messages"`
+	CanJoinGroups           bool   `json:"can_join_groups"`
 	ReplyAble
 }
 
@@ -238,6 +240,11 @@ type IntResponse struct {
 
 type StringResponse struct {
 	Result string `json:"result"`
+	Response
+}
+
+type GetMeResponse struct {
+	Result User `json:"result"`
 	Response
 }
 

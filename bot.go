@@ -2,6 +2,7 @@ package gogram
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -36,20 +37,17 @@ type Bot struct {
 }
 
 // NewBot creates a Bot
-func NewBot(token string, handler func(message Update, bot Bot), debug bool) Bot {
-	res, err := http.Get(fmt.Sprintf("https://api.telegram.org/bot%s/getme", token))
+func NewBot(token string, handler func(message Update, bot Bot), debug bool) (Bot, error) {
+	res, err := request("getme", token, nil, nil, &GetMeResponse{})
 	if err != nil {
-		log.Fatalln(err)
+		return Bot{}, err
 	}
-	resToMap := map[string]interface{}{}
-	resToByte, _ := ioutil.ReadAll(res.Body)
-	_ = json.Unmarshal(resToByte, &resToMap)
-	if resToMap["ok"] == false {
-		log.Fatalln("Your token is wrong")
+	getMeRes := res.(*GetMeResponse)
+	if getMeRes.Ok == false {
+		return Bot{}, errors.New("your token is wrong")
 	}
-	var newBot = Bot{Token: token, MessageHandler: handler, Debug: debug}
-	_ = json.Unmarshal(resToByte, &newBot)
-	return newBot
+	var newBot = Bot{Token: token, MessageHandler: handler, Self: getMeRes.Result, Debug: debug}
+	return newBot, nil
 }
 
 // SetWebhook sets the webhook url

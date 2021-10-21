@@ -162,25 +162,30 @@ func request(method string, token string, data interface{},
 	if err != nil {
 		return "", err
 	}
-	if !reflect.ValueOf(optionalParams).IsNil() || data != nil {
-		var body = &bytes.Buffer{}
-		w := multipart.NewWriter(body)
-		if data != nil {
-			err = formFieldSetter(data, w)
-			if err != nil {
-				return nil, err
-			}
-		}
+	var body = &bytes.Buffer{}
+	w := multipart.NewWriter(body)
+	var set bool
+	if optionalParams != nil {
 		if !reflect.ValueOf(optionalParams).IsNil() {
 			err = formFieldSetter(optionalParams, w)
 			if err != nil {
 				return nil, err
 			}
+			set = true
 		}
-		err = w.Close()
+	}
+	if data != nil {
+		err = formFieldSetter(data, w)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
+		set = true
+	}
+	err = w.Close()
+	if err != nil {
+		return "", err
+	}
+	if set {
 		req.Header.Add("Content-Type", w.FormDataContentType())
 		req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
 	}
