@@ -77,8 +77,11 @@ func multipartSetter(s interface{}, w *multipart.Writer, tag string) error {
 	default:
 		Type := reflect.TypeOf(s).Kind()
 		if Type == reflect.Slice {
-			a, _ := json.Marshal(j)
-			err := w.WriteField(tag, string(a))
+			a, err := json.Marshal(j)
+			if err != nil {
+				return err
+			}
+			err = w.WriteField(tag, string(a))
 			if err != nil {
 				return err
 			}
@@ -91,12 +94,9 @@ func structMultipartParser(s interface{}, w *multipart.Writer) error {
 	for i := 0; i < reflect.ValueOf(s).Elem().NumField(); i++ {
 		tag := reflect.TypeOf(s).Elem().Field(i).Tag.Get("json")
 		value := reflect.ValueOf(s).Elem().Field(i).Interface()
-		Type := reflect.TypeOf(s).Kind()
-		if Type == reflect.Struct {
-			err := multipartSetter(value, w, tag)
-			if err != nil {
-				return err
-			}
+		err := multipartSetter(value, w, tag)
+		if err != nil {
+			return err
 		}
 	}
 	return nil
@@ -118,7 +118,7 @@ func inlineKeyboardButtonColumnAdder(t *InlineKeyboard, i ...InlineKeyboardButto
 	}
 }
 
-// inlineKeyboardButtonRowAdder is like inlineKeyboardButtonColumnAdder but adds a
+// inlineKeyboardButtonRowAdder is like inlineKeyboardButtonColumnAdder but adds an
 // inline keyboard in horizontal orientation.
 func inlineKeyboardButtonRowAdder(t *InlineKeyboard, i ...InlineKeyboardButton) {
 	row := [][]InlineKeyboardButton{{}}
@@ -178,17 +178,14 @@ func replyKeyboardButtonRowAdder(t *ReplyKeyboard, oneTimeKeyboard bool,
 
 func request(method string, token string, data interface{},
 	optionalParams interface{}, responseType interface{}) (response interface{}, error error) {
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://api.telegram.org/bot%s/%s", token, method),
+	req, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/%s", token, method),
 		nil)
-	if err != nil {
-		return responseType, err
-	}
 	var body = &bytes.Buffer{}
-	w := multipart.NewWriter(body)
 	var set bool
+	w := multipart.NewWriter(body)
 	if optionalParams != nil {
 		if !reflect.ValueOf(optionalParams).IsNil() {
-			err = structMultipartParser(optionalParams, w)
+			err := structMultipartParser(optionalParams, w)
 			if err != nil {
 				return responseType, err
 			}
@@ -196,27 +193,22 @@ func request(method string, token string, data interface{},
 		}
 	}
 	if data != nil {
-		err = structMultipartParser(data, w)
+		err := structMultipartParser(data, w)
 		if err != nil {
 			return responseType, err
 		}
 		set = true
 	}
-	err = w.Close()
-	if err != nil {
-		return responseType, err
-	}
+	w.Close()
 	if set {
 		req.Header.Add("Content-Type", w.FormDataContentType())
 		req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
 	}
-	client := &http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		return responseType, err
-	}
+	res, _ := http.DefaultClient.Do(req)
+	defer res.Body.Close()
 	readRes, _ := ioutil.ReadAll(res.Body)
-	err = json.Unmarshal(readRes, responseType)
+	fmt.Println(string(readRes))
+	err := json.Unmarshal(readRes, responseType)
 	if err != nil {
 		return responseType, err
 	}
