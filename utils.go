@@ -13,68 +13,89 @@ import (
 	"strconv"
 )
 
-func formFieldSetter(s interface{}, w *multipart.Writer) error {
-	for i := 0; i < reflect.ValueOf(s).Elem().NumField(); i++ {
-		tag := reflect.TypeOf(s).Elem().Field(i).Tag.Get("json")
-		value := reflect.ValueOf(s).Elem().Field(i).Interface()
-		switch j := value.(type) {
-		case string:
-			err := w.WriteField(tag, value.(string))
-			if err != nil {
-				return err
-			}
-		case int:
-			err := w.WriteField(tag, strconv.Itoa(value.(int)))
-			if err != nil {
-				return err
-			}
-		case float64:
-			err := w.WriteField(tag, fmt.Sprintf("%v", value.(float64)))
-			if err != nil {
-				return err
-			}
-		case bool:
-			err := w.WriteField(tag, strconv.FormatBool(value.(bool)))
-			if err != nil {
-				return err
-			}
-		case InlineKeyboard:
-			if j.inlineKeyboardMarkup.InlineKeyboardButtons != nil {
-				a, _ := json.Marshal(j.inlineKeyboardMarkup)
-				err := w.WriteField("reply_markup", string(a))
-				if err != nil {
-					return err
-				}
-			}
-		case ReplyKeyboard:
-			if j.replyKeyboardMarkup.Keyboard != nil {
-				a, _ := json.Marshal(j.replyKeyboardMarkup)
-				err := w.WriteField("reply_markup", string(a))
-				if err != nil {
-					return err
-				}
-			} else if j.replyKeyboardRemove != (replyKeyboardRemove{}) {
-				a, _ := json.Marshal(j.replyKeyboardRemove)
-				err := w.WriteField("reply_markup", string(a))
-				if err != nil {
-					return err
-				}
-			}
-		case ForceReply:
-			a, _ := json.Marshal(j)
+func multipartSetter(s interface{}, w *multipart.Writer, tag string) error {
+	switch j := s.(type) {
+	case string:
+		err := w.WriteField(tag, s.(string))
+		if err != nil {
+			return err
+		}
+	case int:
+		err := w.WriteField(tag, strconv.Itoa(s.(int)))
+		if err != nil {
+			return err
+		}
+	case float64:
+		err := w.WriteField(tag, fmt.Sprintf("%v", s.(float64)))
+		if err != nil {
+			return err
+		}
+	case bool:
+		err := w.WriteField(tag, strconv.FormatBool(s.(bool)))
+		if err != nil {
+			return err
+		}
+	case InlineKeyboard:
+		if j.inlineKeyboardMarkup.InlineKeyboardButtons != nil {
+			a, _ := json.Marshal(j.inlineKeyboardMarkup)
 			err := w.WriteField("reply_markup", string(a))
 			if err != nil {
 				return err
 			}
-		case *os.File:
-			file, _ := w.CreateFormFile(tag, j.Name())
-			_, _ = io.Copy(file, j)
-			_, _ = j.Seek(0, io.SeekStart)
-		case []*os.File:
-			for _, f := range j {
-				file, _ := w.CreateFormFile(f.Name(), f.Name())
-				_, _ = io.Copy(file, f)
-				_, _ = f.Seek(0, io.SeekStart)
+		}
+	case ReplyKeyboard:
+		if j.replyKeyboardMarkup.Keyboard != nil {
+			a, _ := json.Marshal(j.replyKeyboardMarkup)
+			err := w.WriteField("reply_markup", string(a))
+			if err != nil {
+				return err
+			}
+		} else if j.replyKeyboardRemove != (replyKeyboardRemove{}) {
+			a, _ := json.Marshal(j.replyKeyboardRemove)
+			err := w.WriteField("reply_markup", string(a))
+			if err != nil {
+				return err
+			}
+		}
+	case ForceReply:
+		a, _ := json.Marshal(j)
+		err := w.WriteField("reply_markup", string(a))
+		if err != nil {
+			return err
+		}
+	case *os.File:
+		file, _ := w.CreateFormFile(tag, j.Name())
+		_, _ = io.Copy(file, j)
+		_, _ = j.Seek(0, io.SeekStart)
+	case []*os.File:
+		for _, f := range j {
+			err := multipartSetter(f, w, f.Name())
+			if err != nil {
+				return err
+			}
+		}
+	default:
+		Type := reflect.TypeOf(s).Kind()
+		if Type == reflect.Slice {
+			a, _ := json.Marshal(j)
+			err := w.WriteField(tag, string(a))
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func structMultipartParser(s interface{}, w *multipart.Writer) error {
+	for i := 0; i < reflect.ValueOf(s).Elem().NumField(); i++ {
+		tag := reflect.TypeOf(s).Elem().Field(i).Tag.Get("json")
+		value := reflect.ValueOf(s).Elem().Field(i).Interface()
+		Type := reflect.TypeOf(s).Kind()
+		if Type == reflect.Struct {
+			err := multipartSetter(value, w, tag)
+			if err != nil {
+				return err
 			}
 		}
 	}
@@ -160,30 +181,30 @@ func request(method string, token string, data interface{},
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://api.telegram.org/bot%s/%s", token, method),
 		nil)
 	if err != nil {
-		return "", err
+		return responseType, err
 	}
 	var body = &bytes.Buffer{}
 	w := multipart.NewWriter(body)
 	var set bool
 	if optionalParams != nil {
 		if !reflect.ValueOf(optionalParams).IsNil() {
-			err = formFieldSetter(optionalParams, w)
+			err = structMultipartParser(optionalParams, w)
 			if err != nil {
-				return nil, err
+				return responseType, err
 			}
 			set = true
 		}
 	}
 	if data != nil {
-		err = formFieldSetter(data, w)
+		err = structMultipartParser(data, w)
 		if err != nil {
-			return nil, err
+			return responseType, err
 		}
 		set = true
 	}
 	err = w.Close()
 	if err != nil {
-		return "", err
+		return responseType, err
 	}
 	if set {
 		req.Header.Add("Content-Type", w.FormDataContentType())
@@ -192,7 +213,7 @@ func request(method string, token string, data interface{},
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		return "", err
+		return responseType, err
 	}
 	readRes, _ := ioutil.ReadAll(res.Body)
 	err = json.Unmarshal(readRes, responseType)

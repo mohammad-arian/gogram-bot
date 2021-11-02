@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 // Bot represents a bot. you can create multiple bots
@@ -44,7 +45,7 @@ func NewBot(token string, handler func(message Update, bot Bot), debug bool) (Bo
 	}
 	getMeRes := res.(*GetMeResponse)
 	if getMeRes.Ok == false {
-		return Bot{}, errors.New("your token is wrong")
+		return Bot{}, errors.New("error code: " + strconv.Itoa(getMeRes.ErrorCode) + " description: " + getMeRes.Description)
 	}
 	var newBot = Bot{Token: token, MessageHandler: handler, Self: getMeRes.Result, Debug: debug}
 	return newBot, nil
