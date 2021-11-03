@@ -569,7 +569,7 @@ func (b *Bot) GetMyCommands(
 	return res.(*BotCommandResponse), err
 }
 
-func (r *ReplyAble) EditMessageText(b Bot, text string,
+func EditMessageText(b Bot, text string,
 	optionalParams EditMessageTextOptionalParams) (response *StringResponse, err error) {
 	type data struct {
 		Text string `json:"text"`
