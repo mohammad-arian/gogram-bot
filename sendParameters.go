@@ -310,6 +310,16 @@ type MyCommandsOptionalParams struct {
 	LanguageCode string          `json:"language_code"`
 }
 
+type EditMessageTextOptionalParams struct {
+	ChatId                int `json:"chat_id"`
+	MessageId             int `json:"message_id"`
+	InlineMessageId       int `json:"inline_message_id"`
+	parseMode             string
+	Entities              []MessageEntity `json:"entities"`
+	DisableWebPagePreview bool            `json:"disable_web_page_preview"`
+	InlineKeyboard
+}
+
 func (i *InlineKeyboard) AddInlineKeyboardButton(horizontal bool, a ...InlineKeyboardButton) {
 	if horizontal {
 		inlineKeyboardButtonRowAdder(i, a...)

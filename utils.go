@@ -3,6 +3,7 @@ package gogram
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -85,6 +86,8 @@ func multipartSetter(s interface{}, w *multipart.Writer, tag string) error {
 			if err != nil {
 				return err
 			}
+		} else {
+			return errors.New("incompatible type: " + Type.String())
 		}
 	}
 	return nil
@@ -207,7 +210,6 @@ func request(method string, token string, data interface{},
 	res, _ := http.DefaultClient.Do(req)
 	defer res.Body.Close()
 	readRes, _ := ioutil.ReadAll(res.Body)
-	fmt.Println(string(readRes))
 	err := json.Unmarshal(readRes, responseType)
 	if err != nil {
 		return responseType, err

@@ -568,3 +568,22 @@ func (b *Bot) GetMyCommands(
 	res, err := request("getMyCommands", b.Token, nil, optionalParams, &BotCommandResponse{})
 	return res.(*BotCommandResponse), err
 }
+
+func (r *ReplyAble) EditMessageText(b Bot, text string,
+	optionalParams EditMessageTextOptionalParams) (response *StringResponse, err error) {
+	type data struct {
+		Text string `json:"text"`
+	}
+	if optionalParams.ChatId == 0 && optionalParams.MessageId == 0 && optionalParams.InlineMessageId == 0 {
+		return nil, errors.New("ChatId, MessageId and InlineMessageId of optionalParams" +
+			" are empty. You need to set both ChatId and MessageId, or InlineMessageId")
+	}
+	if (optionalParams.ChatId == 0 && optionalParams.MessageId != 0) ||
+		(optionalParams.ChatId != 0 && optionalParams.MessageId == 0) {
+		return nil, errors.New("ChatId or MessageId of optionalParams" +
+			" are empty. you need to set both ChatId and MessageId or InlineMessageId")
+	}
+	d := data{Text: text}
+	res, err := request("editMessageText", b.Token, &d, &optionalParams, &MessageResponse{})
+	return res.(*StringResponse), err
+}

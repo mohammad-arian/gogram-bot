@@ -268,6 +268,11 @@ type ChatMemberResponse struct {
 	Response
 }
 
+type BotCommandResponse struct {
+	Result []BotCommand `json:"result"`
+	Response
+}
+
 func (c *ChatMemberResponse) permissionSetter() {
 	for j := range c.Result {
 		if c.Result[j].Status != "restricted" {
@@ -312,11 +317,6 @@ func (c *ChatMemberResponse) permissionSetter() {
 			c.Result[j].CanBeEdited = true
 		}
 	}
-}
-
-type BotCommandResponse struct {
-	Result []BotCommand `json:"result"`
-	Response
 }
 
 type ChatMember struct {
