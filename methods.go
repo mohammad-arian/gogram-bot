@@ -584,6 +584,6 @@ func EditMessageText(b Bot, text string,
 			" are empty. you need to set both ChatId and MessageId or InlineMessageId")
 	}
 	d := data{Text: text}
-	res, err := request("editMessageText", b.Token, &d, &optionalParams, &MessageResponse{})
+	res, err := request("editMessageText", b.Token, &d, &optionalParams, &StringResponse{})
 	return res.(*StringResponse), err
 }
