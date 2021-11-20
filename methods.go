@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"reflect"
 )
 
 // SendText sends message to a User.
@@ -151,36 +152,36 @@ func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOptionalPara
 		switch v := i.(type) {
 		case *os.File:
 			d.Files = append(d.Files, v)
-			media = append(media, inputMediaPhoto{Media: "attach://" + v.Name(), Type: "photo"})
+			media = append(media, InputMediaPhoto{Media: "attach://" + v.Name(), Type: "photo"})
 		case string:
-			media = append(media, inputMediaPhoto{Media: v, Type: "photo"})
+			media = append(media, InputMediaPhoto{Media: v, Type: "photo"})
 		}
 	}
 	for _, i := range videos {
 		switch v := i.(type) {
 		case *os.File:
 			d.Files = append(d.Files, v)
-			media = append(media, inputMediaVideo{Media: "attach://" + v.Name(), Type: "video"})
+			media = append(media, InputMediaVideo{Media: "attach://" + v.Name(), Type: "video"})
 		case string:
-			media = append(media, inputMediaVideo{Media: v, Type: "video"})
+			media = append(media, InputMediaVideo{Media: v, Type: "video"})
 		}
 	}
 	for _, i := range documents {
 		switch v := i.(type) {
 		case *os.File:
 			d.Files = append(d.Files, v)
-			media = append(media, inputMediaDocument{Media: "attach://" + v.Name(), Type: "document"})
+			media = append(media, InputMediaDocument{Media: "attach://" + v.Name(), Type: "document"})
 		case string:
-			media = append(media, inputMediaDocument{Media: v, Type: "documents"})
+			media = append(media, InputMediaDocument{Media: v, Type: "documents"})
 		}
 	}
 	for _, i := range audios {
 		switch v := i.(type) {
 		case *os.File:
 			d.Files = append(d.Files, v)
-			media = append(media, inputMediaAudio{Media: "attach://" + v.Name(), Type: "audio"})
+			media = append(media, InputMediaAudio{Media: "attach://" + v.Name(), Type: "audio"})
 		case string:
-			media = append(media, inputMediaAudio{Media: v, Type: "audio"})
+			media = append(media, InputMediaAudio{Media: v, Type: "audio"})
 		}
 	}
 	if media == nil {
@@ -585,5 +586,54 @@ func EditMessageText(b Bot, text string,
 	}
 	d := data{Text: text}
 	res, err := request("editMessageText", b.Token, &d, &optionalParams, &StringResponse{})
+	return res.(*StringResponse), err
+}
+
+// EditMessageCaption edits captions of messages.
+// On success, if the edited message is not an inline message, StringResponse's Result is the
+// edited Message as a string, otherwise StringResponse's Result is True as a string.
+func EditMessageCaption(b Bot,
+	optionalParams EditMessageCaptionOptionalParams) (response *StringResponse, err error) {
+	if optionalParams.ChatId == 0 && optionalParams.MessageId == 0 && optionalParams.InlineMessageId == 0 {
+		return nil, errors.New("ChatId, MessageId and InlineMessageId of optionalParams" +
+			" are empty. You need to set both ChatId and MessageId, or InlineMessageId")
+	}
+	if (optionalParams.ChatId == 0 && optionalParams.MessageId != 0) ||
+		(optionalParams.ChatId != 0 && optionalParams.MessageId == 0) {
+		return nil, errors.New("ChatId or MessageId of optionalParams" +
+			" are empty. you need to set both ChatId and MessageId or InlineMessageId")
+	}
+	res, err := request("editMessageCaption", b.Token, nil, &optionalParams, &StringResponse{})
+	return res.(*StringResponse), err
+}
+
+// EditMessageMedia edits animation, audio, document, photo, or video messages.
+// If a message is part of a message album, then it can be edited only to an audio for audio albums,
+// only to a document for document albums and to a photo or a video otherwise.
+// When an inline message is edited, a new file can't be uploaded; use a previously
+// uploaded file via its file_id or specify a URL.
+// On success, if the edited message is not an inline message, StringResponse's Result is the
+// edited Message as a string, otherwise StringResponse's Result is True as a string.
+func EditMessageMedia(b Bot, media interface{}, file *os.File,
+	optionalParams EditMessageMediaOptionalParams) (response *StringResponse, err error) {
+	switch media.(type) {
+	case InputMediaAudio:
+	case InputMediaPhoto:
+	case InputMediaVideo:
+	case InputMediaDocument:
+	default:
+		return nil, errors.New("pass media a type of InputMediaAudio, InputMediaPhoto, InputMediaVideo " +
+			"or InputMediaDocument not " + reflect.TypeOf(media).String())
+	}
+	if optionalParams.ChatId == 0 && optionalParams.MessageId == 0 && optionalParams.InlineMessageId == 0 {
+		return nil, errors.New("ChatId, MessageId and InlineMessageId of optionalParams" +
+			" are empty. You need to set both ChatId and MessageId, or InlineMessageId")
+	}
+	if (optionalParams.ChatId == 0 && optionalParams.MessageId != 0) ||
+		(optionalParams.ChatId != 0 && optionalParams.MessageId == 0) {
+		return nil, errors.New("ChatId or MessageId of optionalParams" +
+			" are empty. you need to set both ChatId and MessageId or InlineMessageId")
+	}
+	res, err := request("editMessageMedia", b.Token, file, &optionalParams, &StringResponse{})
 	return res.(*StringResponse), err
 }

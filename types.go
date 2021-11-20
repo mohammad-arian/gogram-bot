@@ -139,8 +139,8 @@ type Animation struct {
 	FileId string `json:"file_id"`
 }
 
-// inputMediaPhoto Represents a photo to be sent.
-type inputMediaPhoto struct {
+// InputMediaPhoto Represents a photo to be sent.
+type InputMediaPhoto struct {
 	// Type of the result, must be "photo"
 	Type string `json:"type"`
 	// File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended),
@@ -153,7 +153,7 @@ type inputMediaPhoto struct {
 	CaptionEntities []MessageEntity `json:"caption_entities"`
 }
 
-type inputMediaVideo struct {
+type InputMediaVideo struct {
 	// Type of the result, must be "video"
 	Type string `json:"type"`
 	// File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended),
@@ -170,7 +170,7 @@ type inputMediaVideo struct {
 	CaptionEntities   []MessageEntity `json:"caption_entities"`
 }
 
-type inputMediaDocument struct {
+type InputMediaDocument struct {
 	// Type of the result, must be "document"
 	Type string `json:"type"`
 	// File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended),
@@ -186,7 +186,7 @@ type inputMediaDocument struct {
 	DisableContentTypeDetection bool `json:"disable_content_type_detection"`
 }
 
-type inputMediaAudio struct {
+type InputMediaAudio struct {
 	// Type of the result, must be "audio"
 	Type string `json:"type"`
 	// File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended),
@@ -200,6 +200,21 @@ type inputMediaAudio struct {
 	Duration        int             `json:"duration"`
 	Performer       string          `json:"performer"`
 	Tile            string          `json:"tile"`
+}
+
+type InputMediaAnimation struct {
+	// Type of the result, must be "animation"
+	Type string `json:"type"`
+	// File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended),
+	// pass an HTTP URL for Telegram to get a file from the Internet, or pass
+	// "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name>
+	Media string `json:"media"`
+	// Optional. Caption of the photo to be sent, 0-1024 characters after entities parsing
+	Caption         string          `json:"caption"`
+	ParseMode       string          `json:"parse_mode"`
+	CaptionEntities []MessageEntity `json:"caption_entities"`
+	Width           int             `json:"width"`
+	Height          int             `json:"height"`
 }
 
 type ChatInviteLink struct {

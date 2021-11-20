@@ -320,6 +320,23 @@ type EditMessageTextOptionalParams struct {
 	InlineKeyboard
 }
 
+type EditMessageCaptionOptionalParams struct {
+	ChatId          int             `json:"chat_id"`
+	MessageId       int             `json:"message_id"`
+	InlineMessageId int             `json:"inline_message_id"`
+	Caption         string          `json:"caption"`
+	ParseMode       string          `json:"parse_mode"`
+	CaptionEntities []MessageEntity `json:"caption_entities"`
+	InlineKeyboard
+}
+
+type EditMessageMediaOptionalParams struct {
+	ChatId          int `json:"chat_id"`
+	MessageId       int `json:"message_id"`
+	InlineMessageId int `json:"inline_message_id"`
+	InlineKeyboard
+}
+
 func (i *InlineKeyboard) AddInlineKeyboardButton(horizontal bool, a ...InlineKeyboardButton) {
 	if horizontal {
 		inlineKeyboardButtonRowAdder(i, a...)
