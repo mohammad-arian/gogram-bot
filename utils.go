@@ -65,9 +65,13 @@ func multipartSetter(s interface{}, w *multipart.Writer, tag string) error {
 			return err
 		}
 	case *os.File:
-		file, _ := w.CreateFormFile(tag, j.Name())
-		_, _ = io.Copy(file, j)
-		_, _ = j.Seek(0, io.SeekStart)
+		// some file fields are optional. below if statement makes sure program won't panic
+		// even if a file field of data structure is empty.
+		if j != nil {
+			file, _ := w.CreateFormFile(tag, j.Name())
+			_, _ = io.Copy(file, j)
+			_, _ = j.Seek(0, io.SeekStart)
+		}
 	case []*os.File:
 		for _, f := range j {
 			err := multipartSetter(f, w, f.Name())

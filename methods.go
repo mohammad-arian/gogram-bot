@@ -634,6 +634,10 @@ func EditMessageMedia(b Bot, media interface{}, file *os.File,
 		return nil, errors.New("ChatId or MessageId of optionalParams" +
 			" are empty. you need to set both ChatId and MessageId or InlineMessageId")
 	}
-	res, err := request("editMessageMedia", b.Token, file, &optionalParams, &StringResponse{})
+	type data struct {
+		File *os.File
+	}
+	d := data{File: file}
+	res, err := request("editMessageMedia", b.Token, &d, &optionalParams, &StringResponse{})
 	return res.(*StringResponse), err
 }
