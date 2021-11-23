@@ -1,5 +1,11 @@
 package gogram
 
+import (
+	"errors"
+	"os"
+	"reflect"
+)
+
 // Update from webhook
 type Update struct {
 	UpdateId      int           `json:"update_id"`
@@ -144,22 +150,36 @@ type InputMediaPhoto struct {
 	// Type of the result, must be "photo"
 	Type string `json:"type"`
 	// File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended),
-	// pass an HTTP URL for Telegram to get a file from the Internet, or pass
-	// "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name>
-	Media string `json:"media"`
+	// pass an HTTP URL for Telegram to get a file from the Internet, or pass a file of type *os.File
+	// to upload a new one.
+	Media interface{} `json:"media"`
 	// Optional. Caption of the photo to be sent, 0-1024 characters after entities parsing
 	Caption         string          `json:"caption"`
 	ParseMode       string          `json:"parse_mode"`
 	CaptionEntities []MessageEntity `json:"caption_entities"`
 }
 
+func (i *InputMediaPhoto) setMediaAndType(files *[]*os.File) error {
+	switch v := i.Media.(type) {
+	case *os.File:
+		i.Media = "attach://" + v.Name()
+		*files = append(*files, v)
+	case string:
+	default:
+		return errors.New("your Media is of type " + reflect.TypeOf(i.Media).String() + ". " +
+			"Media must be of type *os.File for files or string for file_ids and urls")
+	}
+	i.Type = "photo"
+	return nil
+}
+
 type InputMediaVideo struct {
 	// Type of the result, must be "video"
 	Type string `json:"type"`
 	// File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended),
-	// pass an HTTP URL for Telegram to get a file from the Internet, or pass
-	// "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name>
-	Media string `json:"media"`
+	// pass an HTTP URL for Telegram to get a file from the Internet, or pass a file of type *os.File
+	// to upload a new one.
+	Media interface{} `json:"media"`
 	// Optional. Caption of the photo to be sent, 0-1024 characters after entities parsing
 	Caption           string          `json:"caption"`
 	ParseMode         string          `json:"parse_mode"`
@@ -170,13 +190,27 @@ type InputMediaVideo struct {
 	CaptionEntities   []MessageEntity `json:"caption_entities"`
 }
 
+func (i *InputMediaVideo) setMediaAndType(files *[]*os.File) error {
+	switch v := i.Media.(type) {
+	case *os.File:
+		i.Media = "attach://" + v.Name()
+		*files = append(*files, v)
+	case string:
+	default:
+		return errors.New("your Media is of type " + reflect.TypeOf(i.Media).String() + ". " +
+			"Media must be of type *os.File for files or string for file_ids and urls")
+	}
+	i.Type = "video"
+	return nil
+}
+
 type InputMediaDocument struct {
 	// Type of the result, must be "document"
 	Type string `json:"type"`
 	// File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended),
-	// pass an HTTP URL for Telegram to get a file from the Internet, or pass
-	// "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name>
-	Media string `json:"media"`
+	// pass an HTTP URL for Telegram to get a file from the Internet, or pass a file of type *os.File
+	// to upload a new one.
+	Media interface{} `json:"media"`
 	// Optional. Caption of the photo to be sent, 0-1024 characters after entities parsing
 	Caption         string          `json:"caption"`
 	ParseMode       string          `json:"parse_mode"`
@@ -186,13 +220,27 @@ type InputMediaDocument struct {
 	DisableContentTypeDetection bool `json:"disable_content_type_detection"`
 }
 
+func (i *InputMediaDocument) setMediaAndType(files *[]*os.File) error {
+	switch v := i.Media.(type) {
+	case *os.File:
+		i.Media = "attach://" + v.Name()
+		*files = append(*files, v)
+	case string:
+	default:
+		return errors.New("your Media is of type " + reflect.TypeOf(i.Media).String() + ". " +
+			"Media must be of type *os.File for files or string for file_ids and urls")
+	}
+	i.Type = "document"
+	return nil
+}
+
 type InputMediaAudio struct {
 	// Type of the result, must be "audio"
 	Type string `json:"type"`
 	// File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended),
-	// pass an HTTP URL for Telegram to get a file from the Internet, or pass
-	// "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name>
-	Media string `json:"media"`
+	// pass an HTTP URL for Telegram to get a file from the Internet, or pass a file of type *os.File
+	// to upload a new one.
+	Media interface{} `json:"media"`
 	// Optional. Caption of the photo to be sent, 0-1024 characters after entities parsing
 	Caption         string          `json:"caption"`
 	ParseMode       string          `json:"parse_mode"`
@@ -202,19 +250,47 @@ type InputMediaAudio struct {
 	Tile            string          `json:"tile"`
 }
 
+func (i *InputMediaAudio) setMediaAndType(files *[]*os.File) error {
+	switch v := i.Media.(type) {
+	case *os.File:
+		i.Media = "attach://" + v.Name()
+		*files = append(*files, v)
+	case string:
+	default:
+		return errors.New("your Media is of type " + reflect.TypeOf(i.Media).String() + ". " +
+			"Media must be of type *os.File for files or string for file_ids and urls")
+	}
+	i.Type = "audio"
+	return nil
+}
+
 type InputMediaAnimation struct {
 	// Type of the result, must be "animation"
 	Type string `json:"type"`
 	// File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended),
 	// pass an HTTP URL for Telegram to get a file from the Internet, or pass
 	// "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name>
-	Media string `json:"media"`
+	Media interface{} `json:"media"`
 	// Optional. Caption of the photo to be sent, 0-1024 characters after entities parsing
 	Caption         string          `json:"caption"`
 	ParseMode       string          `json:"parse_mode"`
 	CaptionEntities []MessageEntity `json:"caption_entities"`
 	Width           int             `json:"width"`
 	Height          int             `json:"height"`
+}
+
+func (i *InputMediaAnimation) setMediaAndType(files *[]*os.File) error {
+	switch v := i.Media.(type) {
+	case *os.File:
+		i.Media = "attach://" + v.Name()
+		*files = append(*files, v)
+	case string:
+	default:
+		return errors.New("your Media is of type " + reflect.TypeOf(i.Media).String() + ". " +
+			"Media must be of type *os.File for files or string for file_ids and urls")
+	}
+	i.Type = "animation"
+	return nil
 }
 
 type ChatInviteLink struct {
@@ -253,8 +329,8 @@ type IntResponse struct {
 	Response
 }
 
-type StringResponse struct {
-	Result string `json:"result"`
+type MapResponse struct {
+	Result interface{} `json:"result"`
 	Response
 }
 

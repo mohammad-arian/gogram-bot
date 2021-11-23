@@ -1,7 +1,6 @@
 package gogram
 
 import (
-	"encoding/json"
 	"errors"
 	"os"
 	"reflect"
@@ -139,56 +138,47 @@ func (r *ReplyAble) SendPoll(b Bot, question string, options []string,
 // You can add file_ids as string to send a media that exists on the Telegram servers (recommended),
 // HTTP URLs as string for Telegram to get a media from the Internet, or a file of type *os.File to
 // photos, videos, documents and audios slices.
-func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOptionalParams, photos []interface{},
-	videos []interface{}, documents []interface{}, audios []interface{}) (response *[]MessageResponse, err error) {
+func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOptionalParams, photos []InputMediaPhoto,
+	videos []InputMediaVideo, documents []InputMediaDocument, audios []InputMediaAudio) (response *[]MessageResponse, err error) {
 	type data struct {
-		ChatId int    `json:"chat_id"`
-		Media  string `json:"media"`
+		ChatId int           `json:"chat_id"`
+		Media  []interface{} `json:"media"`
 		Files  []*os.File
 	}
 	d := data{ChatId: r.Id}
-	var media []interface{}
+	var files []*os.File
 	for _, i := range photos {
-		switch v := i.(type) {
-		case *os.File:
-			d.Files = append(d.Files, v)
-			media = append(media, InputMediaPhoto{Media: "attach://" + v.Name(), Type: "photo"})
-		case string:
-			media = append(media, InputMediaPhoto{Media: v, Type: "photo"})
+		err := i.setMediaAndType(&files)
+		if err != nil {
+			return nil, err
 		}
+		d.Media = append(d.Media, i)
 	}
 	for _, i := range videos {
-		switch v := i.(type) {
-		case *os.File:
-			d.Files = append(d.Files, v)
-			media = append(media, InputMediaVideo{Media: "attach://" + v.Name(), Type: "video"})
-		case string:
-			media = append(media, InputMediaVideo{Media: v, Type: "video"})
+		err := i.setMediaAndType(&files)
+		if err != nil {
+			return nil, err
 		}
+		d.Media = append(d.Media, i)
 	}
 	for _, i := range documents {
-		switch v := i.(type) {
-		case *os.File:
-			d.Files = append(d.Files, v)
-			media = append(media, InputMediaDocument{Media: "attach://" + v.Name(), Type: "document"})
-		case string:
-			media = append(media, InputMediaDocument{Media: v, Type: "documents"})
+		err := i.setMediaAndType(&files)
+		if err != nil {
+			return nil, err
 		}
+		d.Media = append(d.Media, i)
 	}
 	for _, i := range audios {
-		switch v := i.(type) {
-		case *os.File:
-			d.Files = append(d.Files, v)
-			media = append(media, InputMediaAudio{Media: "attach://" + v.Name(), Type: "audio"})
-		case string:
-			media = append(media, InputMediaAudio{Media: v, Type: "audio"})
+		err := i.setMediaAndType(&files)
+		if err != nil {
+			return nil, err
 		}
+		d.Media = append(d.Media, i)
 	}
-	if media == nil {
-		return nil, errors.New("you did not pass any file, file_id or URL")
+	if d.Media == nil {
+		return nil, errors.New("you did not pass any media")
 	}
-	mediaToJson, _ := json.Marshal(media)
-	d.Media = string(mediaToJson)
+	d.Files = files
 	res, err := request("sendMediaGroup", b.Token, &d, optionalParams, &[]MessageResponse{})
 	return res.(*[]MessageResponse), err
 }
@@ -360,13 +350,13 @@ func (r *User) SetChatPermissions(b Bot, permissions ChatPermissions) (response 
 	return res.(*BooleanResponse), err
 }
 
-func (r *Chat) ExportChatInviteLink(b Bot) (response *StringResponse, err error) {
+func (r *Chat) ExportChatInviteLink(b Bot) (response *MapResponse, err error) {
 	type data struct {
 		ChatId int `json:"chat_id"`
 	}
 	d := data{ChatId: r.Id}
-	res, err := request("exportChatInviteLink", b.Token, &d, nil, &StringResponse{})
-	return res.(*StringResponse), err
+	res, err := request("exportChatInviteLink", b.Token, &d, nil, &MapResponse{})
+	return res.(*MapResponse), err
 }
 
 func (r *Chat) CreateChatInviteLink(b Bot,
@@ -571,7 +561,7 @@ func (b *Bot) GetMyCommands(
 }
 
 func EditMessageText(b Bot, text string,
-	optionalParams EditMessageTextOptionalParams) (response *StringResponse, err error) {
+	optionalParams EditMessageTextOptionalParams) (response *MapResponse, err error) {
 	type data struct {
 		Text string `json:"text"`
 	}
@@ -585,15 +575,15 @@ func EditMessageText(b Bot, text string,
 			" are empty. you need to set both ChatId and MessageId or InlineMessageId")
 	}
 	d := data{Text: text}
-	res, err := request("editMessageText", b.Token, &d, &optionalParams, &StringResponse{})
-	return res.(*StringResponse), err
+	res, err := request("editMessageText", b.Token, &d, &optionalParams, &MapResponse{})
+	return res.(*MapResponse), err
 }
 
 // EditMessageCaption edits captions of messages.
-// On success, if the edited message is not an inline message, StringResponse's Result is the
-// edited Message as a string, otherwise StringResponse's Result is True as a string.
+// On success, if the edited message is not an inline message, MapResponse's Result is the
+// edited Message as a string, otherwise MapResponse's Result is True as a string.
 func EditMessageCaption(b Bot,
-	optionalParams EditMessageCaptionOptionalParams) (response *StringResponse, err error) {
+	optionalParams EditMessageCaptionOptionalParams) (response *MapResponse, err error) {
 	if optionalParams.ChatId == 0 && optionalParams.MessageId == 0 && optionalParams.InlineMessageId == 0 {
 		return nil, errors.New("ChatId, MessageId and InlineMessageId of optionalParams" +
 			" are empty. You need to set both ChatId and MessageId, or InlineMessageId")
@@ -603,8 +593,8 @@ func EditMessageCaption(b Bot,
 		return nil, errors.New("ChatId or MessageId of optionalParams" +
 			" are empty. you need to set both ChatId and MessageId or InlineMessageId")
 	}
-	res, err := request("editMessageCaption", b.Token, nil, &optionalParams, &StringResponse{})
-	return res.(*StringResponse), err
+	res, err := request("editMessageCaption", b.Token, nil, &optionalParams, &MapResponse{})
+	return res.(*MapResponse), err
 }
 
 // EditMessageMedia edits animation, audio, document, photo, or video messages.
@@ -612,15 +602,46 @@ func EditMessageCaption(b Bot,
 // only to a document for document albums and to a photo or a video otherwise.
 // When an inline message is edited, a new file can't be uploaded; use a previously
 // uploaded file via its file_id or specify a URL.
-// On success, if the edited message is not an inline message, StringResponse's Result is the
-// edited Message as a string, otherwise StringResponse's Result is True as a string.
-func EditMessageMedia(b Bot, media interface{}, file *os.File,
-	optionalParams EditMessageMediaOptionalParams) (response *StringResponse, err error) {
-	switch media.(type) {
+// pass media a type of InputMediaAudio, InputMediaPhoto, InputMediaVideo or InputMediaDocument and make sure
+// Media field of them is not empty. Media field can be file_id, URL or file. if you are uploding a file
+//
+// On success, if the edited message is not an inline message, MapResponse's Result is the
+// edited Message as a string, otherwise MapResponse's Result is True as a string.
+func EditMessageMedia(b Bot, media interface{},
+	optionalParams EditMessageMediaOptionalParams) (response *MapResponse, err error) {
+	type data struct {
+		Media interface{} `json:"media"`
+		// at most there could be only one file but since setMediaAndType(files *[]*os.File) accepts slices
+		// File is a slice. Modifying setMediaAndType() breaks SendMediaGroup()
+		File []*os.File
+	}
+	d := data{}
+	var files []*os.File
+	switch v := media.(type) {
 	case InputMediaAudio:
+		err := v.setMediaAndType(&files)
+		if err != nil {
+			return nil, err
+		}
+		d.Media = v
 	case InputMediaPhoto:
+		err := v.setMediaAndType(&files)
+		if err != nil {
+			return nil, err
+		}
+		d.Media = v
 	case InputMediaVideo:
+		err := v.setMediaAndType(&files)
+		if err != nil {
+			return nil, err
+		}
+		d.Media = v
 	case InputMediaDocument:
+		err := v.setMediaAndType(&files)
+		if err != nil {
+			return nil, err
+		}
+		d.Media = v
 	default:
 		return nil, errors.New("pass media a type of InputMediaAudio, InputMediaPhoto, InputMediaVideo " +
 			"or InputMediaDocument not " + reflect.TypeOf(media).String())
@@ -634,10 +655,7 @@ func EditMessageMedia(b Bot, media interface{}, file *os.File,
 		return nil, errors.New("ChatId or MessageId of optionalParams" +
 			" are empty. you need to set both ChatId and MessageId or InlineMessageId")
 	}
-	type data struct {
-		File *os.File
-	}
-	d := data{File: file}
-	res, err := request("editMessageMedia", b.Token, &d, &optionalParams, &StringResponse{})
-	return res.(*StringResponse), err
+	d.File = files
+	res, err := request("editMessageMedia", b.Token, &d, &optionalParams, &MapResponse{})
+	return res.(*MapResponse), err
 }

@@ -64,14 +64,20 @@ func multipartSetter(s interface{}, w *multipart.Writer, tag string) error {
 		if err != nil {
 			return err
 		}
+	// use *os.File for methods like SendVideo() and SendPhoto() that
+	// the fieldName of CreateFormFile() can't be the name of the file.
 	case *os.File:
 		// some file fields are optional. below if statement makes sure program won't panic
 		// even if a file field of data structure is empty.
 		if j != nil {
+			// altering tag to v.Name() breaks some methods like SendPhoto()
+			// because SendPhoto's file's tag must "photo" not the name of the file.
 			file, _ := w.CreateFormFile(tag, j.Name())
 			_, _ = io.Copy(file, j)
 			_, _ = j.Seek(0, io.SeekStart)
 		}
+	// use []*os.File for methods like EditMessageMedia() and SendMediaGroup() that
+	// the fieldName of CreateFormFile() must be the name of the file.
 	case []*os.File:
 		for _, f := range j {
 			err := multipartSetter(f, w, f.Name())
@@ -81,7 +87,7 @@ func multipartSetter(s interface{}, w *multipart.Writer, tag string) error {
 		}
 	default:
 		Type := reflect.TypeOf(s).Kind()
-		if Type == reflect.Slice {
+		if Type == reflect.Slice || Type == reflect.Struct {
 			a, err := json.Marshal(j)
 			if err != nil {
 				return err
@@ -200,13 +206,23 @@ func request(method string, token string, data interface{},
 		}
 	}
 	if data != nil {
+		if reflect.ValueOf(data).Kind() != reflect.Ptr {
+			return responseType, errors.New("data parameter must be a pointer")
+		}
+		dataKind := reflect.Indirect(reflect.ValueOf(data)).Kind()
+		if dataKind != reflect.Struct {
+			return responseType, errors.New("data parameter must be a struct not " + dataKind.String())
+		}
 		err := structMultipartParser(data, w)
 		if err != nil {
 			return responseType, err
 		}
 		set = true
 	}
-	w.Close()
+	err := w.Close()
+	if err != nil {
+		return responseType, err
+	}
 	if set {
 		req.Header.Add("Content-Type", w.FormDataContentType())
 		req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
@@ -214,7 +230,7 @@ func request(method string, token string, data interface{},
 	res, _ := http.DefaultClient.Do(req)
 	defer res.Body.Close()
 	readRes, _ := ioutil.ReadAll(res.Body)
-	err := json.Unmarshal(readRes, responseType)
+	err = json.Unmarshal(readRes, responseType)
 	if err != nil {
 		return responseType, err
 	}
