@@ -308,15 +308,15 @@ type UserProfilePhotos struct {
 	Photos     [][]PhotoSize `json:"photos"`
 }
 
-type UserProfileResponse struct {
-	Ok     bool              `json:"ok"`
-	Result UserProfilePhotos `json:"result"`
-}
-
 type Response struct {
 	Ok          bool   `json:"ok"`
 	ErrorCode   int    `json:"error_code"`
 	Description string `json:"description"`
+}
+
+type UserProfileResponse struct {
+	Result UserProfilePhotos `json:"result"`
+	Response
 }
 
 type BooleanResponse struct {
@@ -334,7 +334,12 @@ type MapResponse struct {
 	Response
 }
 
-type GetMeResponse struct {
+type PollResponse struct {
+	Result Poll `json:"result"`
+	Response
+}
+
+type UserResponse struct {
 	Result User `json:"result"`
 	Response
 }

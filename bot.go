@@ -39,11 +39,11 @@ type Bot struct {
 
 // NewBot creates a Bot
 func NewBot(token string, handler func(message Update, bot Bot), debug bool) (Bot, error) {
-	res, err := request("getme", token, nil, nil, &GetMeResponse{})
+	res, err := request("getme", token, nil, nil, &UserResponse{})
 	if err != nil {
 		return Bot{}, err
 	}
-	getMeRes := res.(*GetMeResponse)
+	getMeRes := res.(*UserResponse)
 	if getMeRes.Ok == false {
 		return Bot{}, errors.New("error code: " + strconv.Itoa(getMeRes.ErrorCode) + " description: " + getMeRes.Description)
 	}

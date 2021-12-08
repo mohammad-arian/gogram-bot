@@ -330,6 +330,10 @@ type EditMessageCaptionOptionalParams struct {
 	InlineKeyboard
 }
 
+type StopPollOptionalParams struct {
+	InlineKeyboard
+}
+
 type EditMessageMediaOptionalParams struct {
 	ChatId          int `json:"chat_id"`
 	MessageId       int `json:"message_id"`

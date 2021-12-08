@@ -659,3 +659,14 @@ func EditMessageMedia(b Bot, media interface{},
 	res, err := request("editMessageMedia", b.Token, &d, &optionalParams, &MapResponse{})
 	return res.(*MapResponse), err
 }
+
+func (r *Chat) StopPoll(b Bot, messageId int,
+	optionalParams EditMessageCaptionOptionalParams) (response *MapResponse, err error) {
+	type data struct {
+		ChatId    int `json:"chat_id"`
+		MessageId int `json:"message_id"`
+	}
+	d := data{ChatId: r.Id, MessageId: messageId}
+	res, err := request("stopPoll", b.Token, &d, &optionalParams, &MapResponse{})
+	return res.(*MapResponse), err
+}
