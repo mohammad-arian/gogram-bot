@@ -661,12 +661,49 @@ func EditMessageMedia(b Bot, media interface{},
 }
 
 func (r *Chat) StopPoll(b Bot, messageId int,
-	optionalParams EditMessageCaptionOptionalParams) (response *MapResponse, err error) {
+	optionalParams *StopPollOptionalParams) (response *PollResponse, err error) {
 	type data struct {
 		ChatId    int `json:"chat_id"`
 		MessageId int `json:"message_id"`
 	}
 	d := data{ChatId: r.Id, MessageId: messageId}
-	res, err := request("stopPoll", b.Token, &d, &optionalParams, &MapResponse{})
+	res, err := request("stopPoll", b.Token, &d, &optionalParams, &PollResponse{})
+	return res.(*PollResponse), err
+}
+
+// DeleteMessage deletes a message, including service messages, with the following limitations:
+//- A message can only be deleted if it was sent less than 48 hours ago.
+//- A dice message in a private chat can only be deleted if it was sent more than 24 hours ago.
+//- Bots can delete outgoing messages in private chats, groups, and supergroups.
+//- Bots can delete incoming messages in private chats.
+//- Bots granted can_post_messages permissions can delete outgoing messages in channels.
+//- If the bot is an administrator of a group, it can delete any message there.
+//- If the bot has can_delete_messages permission in a supergroup or a channel, it can delete any message there.
+// Returns True on success.
+func (r *Chat) DeleteMessage(b Bot, messageId int) (response *BooleanResponse, err error) {
+	type data struct {
+		ChatId    int `json:"chat_id"`
+		MessageId int `json:"message_id"`
+	}
+	d := data{ChatId: r.Id, MessageId: messageId}
+	res, err := request("deleteMessage", b.Token, &d, nil, &BooleanResponse{})
+	return res.(*BooleanResponse), err
+}
+
+// EditMessageReplyMarkup edits only the reply markup of messages.
+// On success, if the edited message is not an inline message, the edited Message is returned,
+// otherwise True is returned.
+func (r *Chat) EditMessageReplyMarkup(b Bot,
+	optionalParams EditMessageMediaOptionalParams) (response *MapResponse, err error) {
+	if optionalParams.ChatId == 0 && optionalParams.MessageId == 0 && optionalParams.InlineMessageId == 0 {
+		return nil, errors.New("ChatId, MessageId and InlineMessageId of optionalParams" +
+			" are empty. You need to set both ChatId and MessageId, or InlineMessageId")
+	}
+	if (optionalParams.ChatId == 0 && optionalParams.MessageId != 0) ||
+		(optionalParams.ChatId != 0 && optionalParams.MessageId == 0) {
+		return nil, errors.New("ChatId or MessageId of optionalParams" +
+			" are empty. you need to set both ChatId and MessageId or InlineMessageId")
+	}
+	res, err := request("editMessageReplyMarkup", b.Token, nil, nil, &MapResponse{})
 	return res.(*MapResponse), err
 }

@@ -1,5 +1,7 @@
 package gogram
 
+import "os"
+
 type InlineKeyboard struct {
 	inlineKeyboardMarkup
 }
@@ -339,6 +341,14 @@ type EditMessageMediaOptionalParams struct {
 	MessageId       int `json:"message_id"`
 	InlineMessageId int `json:"inline_message_id"`
 	InlineKeyboard
+}
+
+type SetWebhookOptionalParams struct {
+	Certificate        *os.File `json:"certificate"`
+	IpAddress          string   `json:"ip_address"`
+	MaxConnections     int      `json:"max_connections"`
+	AllowedUpdates     []string `json:"allowed_updates"`
+	DropPendingUpdates bool     `json:"drop_pending_updates"`
 }
 
 func (i *InlineKeyboard) AddInlineKeyboardButton(horizontal bool, a ...InlineKeyboardButton) {

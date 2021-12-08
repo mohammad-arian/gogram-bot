@@ -3,11 +3,9 @@ package gogram
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
 )
 
 // Bot represents a bot. you can create multiple bots
@@ -17,18 +15,19 @@ type Bot struct {
 	Token string
 	/*
 			MessageHandler invokes when webhook sends a new update.
-		    In the below example, we have a Bot variable called bot.
+		    In the below example, we have a Bot called bot.
 		    We passed a function of type func (message gogram.Update, bot gogram.Bot)
 			to our bot called handle.
-			When telegram server sends something, handle function is called.
-			Then we can use update parameter to send something back to user who sent bot a message;
-			or we can use another bot.
+			When telegram server sends something, this function is called.
+			Then we can use update.Message.User to send something back to user;
 
-			var bot = gogram.NewBot("<Token>", handle)
+			// create bot
+			var bot, _ = gogram.NewBot("<Token>", handle)
+			// start  listening to telegram
 			bot.Listener(<Port>)
-
+			// handler function
 			func handle(update gogram.Update, bot gogram.Bot) {
-				update.Message.User.SendText(bot, message.Text)
+				update.Message.User.SendText(bot, update.Message.Text, nil)
 			}
 	*/
 	MessageHandler func(message Update, bot Bot)
@@ -44,20 +43,28 @@ func NewBot(token string, handler func(message Update, bot Bot), debug bool) (Bo
 		return Bot{}, err
 	}
 	getMeRes := res.(*UserResponse)
-	if getMeRes.Ok == false {
-		return Bot{}, errors.New("error code: " + strconv.Itoa(getMeRes.ErrorCode) + " description: " + getMeRes.Description)
+	if getMeRes.Ok != true {
+		return Bot{}, errors.New("token is wrong")
 	}
 	var newBot = Bot{Token: token, MessageHandler: handler, Self: getMeRes.Result, Debug: debug}
 	return newBot, nil
 }
 
-// SetWebhook sets the webhook url
-// Telegram server sends updates to url
-func (b Bot) SetWebhook(url string) {
-	_, err := http.Get(fmt.Sprintf("https://api.telegram.org/bot%s/setWebhook?url=%s", b.Token, url))
-	if err != nil {
-		return
+// SetWebhook specifies an url and receive incoming updates via an outgoing webhook.
+// Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url,
+// containing a JSON-serialized Update.
+// In case of an unsuccessful request, we will give up after a reasonable amount of attempts.
+// Returns True on success.
+// If you'd like to make sure that the Webhook request comes from Telegram,
+// we recommend using a secret path in the URL, e.g. https://www.example.com/<token>.
+// Since nobody else knows your bot's token, you can be pretty sure it's us.
+func (b Bot) SetWebhook(url string, optionalParams *SetWebhookOptionalParams) (response *BooleanResponse, err error) {
+	type data struct {
+		Url string `json:"url"`
 	}
+	d := data{Url: url}
+	res, err := request("setWebhook", b.Token, &d, optionalParams, &BooleanResponse{})
+	return res.(*BooleanResponse), err
 }
 
 // Listener listens to upcoming webhook updates
@@ -79,6 +86,6 @@ func webhookHandler(r *http.Request, bot Bot) {
 	if bot.MessageHandler != nil {
 		bot.MessageHandler(update, bot)
 	} else {
-		log.Println("Warning: webhook just received something, but you have not added any handler to bot")
+		log.Println("Warning: Listener just received something, but you have not added any handler to bot")
 	}
 }
