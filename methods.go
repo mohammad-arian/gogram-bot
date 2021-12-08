@@ -656,7 +656,7 @@ func EditMessageMedia(b Bot, media interface{},
 			" are empty. you need to set both ChatId and MessageId or InlineMessageId")
 	}
 	d.File = files
-	res, err := request("editMessageMedia", b.Token, &d, &optionalParams, &MapResponse{})
+	res, err := request("editMessageMedia", b.Token, &d, optionalParams, &MapResponse{})
 	return res.(*MapResponse), err
 }
 
@@ -667,7 +667,7 @@ func (r *Chat) StopPoll(b Bot, messageId int,
 		MessageId int `json:"message_id"`
 	}
 	d := data{ChatId: r.Id, MessageId: messageId}
-	res, err := request("stopPoll", b.Token, &d, &optionalParams, &PollResponse{})
+	res, err := request("stopPoll", b.Token, &d, optionalParams, &PollResponse{})
 	return res.(*PollResponse), err
 }
 
