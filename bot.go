@@ -60,9 +60,7 @@ func NewBot(token string, handler func(message Update, bot Bot), simultaneous bo
 
 // Listener listens to upcoming webhook updates
 func (b Bot) Listener(port string) {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		go webhookHandler(r, b)
-	})
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { webhookHandler(r, b) })
 	_ = http.ListenAndServe(":"+port, nil)
 }
 
