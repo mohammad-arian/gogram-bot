@@ -351,6 +351,15 @@ type SetWebhookOptionalParams struct {
 	DropPendingUpdates bool     `json:"drop_pending_updates"`
 }
 
+type SendStickerOptionalParams struct {
+	DisableNotification      bool `json:"disableNotification"`
+	ReplyToMessageId         int  `json:"reply_To_Message_Id"`
+	AllowSendingWithoutReply bool `json:"allowSendingWithoutReply"`
+	InlineKeyboard
+	ReplyKeyboard
+	ForceReply
+}
+
 func (i *InlineKeyboard) AddInlineKeyboardButton(horizontal bool, a ...InlineKeyboardButton) {
 	if horizontal {
 		inlineKeyboardButtonRowAdder(i, a...)

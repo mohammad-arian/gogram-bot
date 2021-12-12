@@ -64,6 +64,17 @@ type PhotoSize struct {
 	FileSize     int    `json:"file_size"`
 }
 
+type File struct {
+	// fileId is Identifier for this file, which can be used to download or reuse the file
+	fileId string
+	// fileUniqueId isUnique identifier for this file, which is supposed to be the same over time and for different bots. Can't be used to download or reuse the file.
+	fileUniqueId string
+	// fileUniqueId is File size in bytes, if known. Optional
+	fileSize int
+	// filePath is File path. Use https://api.telegram.org/file/bot<token>/<file_path> to get the file. Optional
+	filePath string
+}
+
 type Message struct {
 	MessageId       int                  `json:"message_id"`
 	User            User                 `json:"from"`
@@ -129,6 +140,8 @@ type Chat struct {
 	Type                  string          `json:"type"`
 	Title                 string          `json:"title"`
 	Bio                   string          `json:"bio"`
+	Photo                 ChatPhoto       `json:"photo"`
+	Location              ChatLocation    `json:"location"`
 	Description           string          `json:"description"`
 	InviteLink            string          `json:"invite_link"`
 	PinnedMessage         *Message        `json:"pinned_message"`
@@ -139,6 +152,27 @@ type Chat struct {
 	CanSetStickerSet      bool            `json:"can_set_sticker_set"`
 	LinkedChatId          int             `json:"linked_chat_id"`
 	ReplyAble
+}
+
+type ChatPhoto struct {
+	SmallFileId       string `json:"small_file_id"`
+	SmallFileUniqueId string `json:"small_file_unique_id"`
+	BigFileId         string `json:"big_file_id"`
+	BigFileUniqueId   string `json:"big_file_unique_id"`
+}
+
+type Location struct {
+	Longitude            float64 `json:"longitude,omitempty"`
+	Latitude             float64 `json:"latitude,omitempty"`
+	HorizontalAccuracy   float64 `json:"horizontalAccuracy,omitempty"`
+	LivePeriod           int     `json:"livePeriod,omitempty"`
+	Heading              int     `json:"heading,omitempty"`
+	ProximityAlertRadius int     `json:"proximityAlertRadius,omitempty"`
+}
+
+type ChatLocation struct {
+	Address  string   `json:"address"`
+	Location Location `json:"location"`
 }
 
 type Animation struct {
@@ -356,6 +390,11 @@ type InviteLinkResponse struct {
 
 type ChatResponse struct {
 	Result Chat `json:"result"`
+	Response
+}
+
+type FileResponse struct {
+	Result File `json:"result"`
 	Response
 }
 

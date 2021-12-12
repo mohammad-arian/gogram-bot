@@ -287,6 +287,18 @@ func (r *ReplyAble) GetUserProfilePhotos(b Bot,
 	return res.(*UserProfileResponse), err
 }
 
+// GetFile gets basic info about a file and prepare it for downloading.
+// For the moment, bots can download files of up to 20 MB in size.
+// On success, a File object is returned. The file can then be downloaded via the link https://api.telegram.org/file/bot<token>/<file_path>, where <file_path> is taken from the response. It is guaranteed that the link will be valid for at least 1 hour. When the link expires, a new one can be requested by calling getFile again.
+func GetFile(b Bot, fileId string) (response *FileResponse, err error) {
+	type data struct {
+		FileId string `json:"file_id"`
+	}
+	d := data{FileId: fileId}
+	res, err := request("getFile", b.Token, &d, nil, &FileResponse{})
+	return res.(*FileResponse), err
+}
+
 // BanChatMember bans a user in a group, a supergroup or a channel.
 // In the case of supergroups and channels, the user will not be able
 // to return to the chat on their own using invite links, etc.,
@@ -723,4 +735,15 @@ func (r *Chat) EditMessageReplyMarkup(b Bot,
 	}
 	res, err := request("editMessageReplyMarkup", b.Token, nil, nil, &MapResponse{})
 	return res.(*MapResponse), err
+}
+
+func (r *ReplyAble) SendSticker(b Bot, sticker interface{},
+	optionalParams *SendStickerOptionalParams) (response *MessageResponse, err error) {
+	type data struct {
+		ChatId  int         `json:"chat_id"`
+		Sticker interface{} `json:"sticker"`
+	}
+	d := data{ChatId: r.Id, Sticker: sticker}
+	res, err := request("sendSticker", b.Token, &d, optionalParams, &MessageResponse{})
+	return res.(*MessageResponse), err
 }
