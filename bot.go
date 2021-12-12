@@ -73,6 +73,7 @@ func webhookHandler(r *http.Request, bot Bot) {
 		log.Println(string(res))
 	}
 	update := Update{}
+	log.Println("res is:" + string(res))
 	err := json.Unmarshal(res, &update)
 	if err != nil {
 		log.Fatalln(err)
