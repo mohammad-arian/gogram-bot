@@ -6,6 +6,23 @@ import (
 	"reflect"
 )
 
+// SetWebhook specifies an url and receive incoming updates via an outgoing webhook.
+// Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url,
+// containing a JSON-serialized Update.
+// In case of an unsuccessful request, we will give up after a reasonable amount of attempts.
+// Returns True on success.
+// If you'd like to make sure that the Webhook request comes from Telegram,
+// we recommend using a secret path in the URL, e.g. https://www.example.com/<token>.
+// Since nobody else knows your bot's token, you can be pretty sure it's us.
+func (b Bot) SetWebhook(url string, optionalParams *SetWebhookOptionalParams) (response *BooleanResponse, err error) {
+	type data struct {
+		Url string `json:"url"`
+	}
+	d := data{Url: url}
+	res, err := request("setWebhook", b.Token, &d, optionalParams, &BooleanResponse{})
+	return res.(*BooleanResponse), err
+}
+
 // SendText sends message to a User.
 // b Bot parameter indicated which bot to send
 // the message with. This way you can send messages with different bots
