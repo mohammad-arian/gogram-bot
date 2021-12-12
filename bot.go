@@ -79,7 +79,11 @@ func webhookHandler(r *http.Request, bot Bot) {
 		log.Println("Warning: Listener just received something, but you have not added a handler to bot." +
 			"add handler to bot by setting bot's Handler field to a function of type func(message Update, bot Bot) ")
 	} else if bot.Simultaneous {
+		// start each handler in a goroutine. since http.ListenAndServe() is a blocking function,
+		// we don't have to wait for goroutines to finish.
 		go bot.Handler(update, bot)
+		// webhookHandler returns so telegram won't wait for response. this improves
+		// performance and avoids errors such as request timeout.
 		return
 	} else {
 		bot.Handler(update, bot)
