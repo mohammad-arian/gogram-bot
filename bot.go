@@ -60,12 +60,11 @@ func NewBot(token string, handler func(message Update, bot Bot), simultaneous bo
 
 // Listener listens to upcoming webhook updates
 func (b Bot) Listener(port string) {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { go webhookHandler(r, b) })
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { webhookHandler(r, b) })
 	_ = http.ListenAndServe(":"+port, nil)
 }
 
 func webhookHandler(r *http.Request, bot Bot) {
-	log.Println("starting webhookHandler")
 	res, _ := ioutil.ReadAll(r.Body)
 	if bot.Debug {
 		log.Println(string(res))
