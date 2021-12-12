@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -191,6 +192,7 @@ func replyKeyboardButtonRowAdder(t *ReplyKeyboard, oneTimeKeyboard bool,
 
 func request(method string, token string, data interface{},
 	optionalParams interface{}, responseType interface{}) (response interface{}, error error) {
+	log.Println("starting request")
 	req, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/%s", token, method),
 		nil)
 	var body = &bytes.Buffer{}

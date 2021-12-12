@@ -44,7 +44,7 @@ type Bot struct {
 }
 
 // NewBot creates a Bot
-func NewBot(token string, handler func(message Update, bot Bot), debug bool) (Bot, error) {
+func NewBot(token string, handler func(message Update, bot Bot), simultaneous bool, debug bool) (Bot, error) {
 	res, err := request("getme", token, nil, nil, &UserResponse{})
 	if err != nil {
 		return Bot{}, err
@@ -53,7 +53,8 @@ func NewBot(token string, handler func(message Update, bot Bot), debug bool) (Bo
 	if getMeRes.Ok != true {
 		return Bot{}, errors.New("token is wrong")
 	}
-	var newBot = Bot{Token: token, Handler: handler, Self: getMeRes.Result, Debug: debug}
+	var newBot = Bot{Token: token, Handler: handler, Self: getMeRes.Result,
+		Simultaneous: simultaneous, Debug: debug}
 	return newBot, nil
 }
 
@@ -66,6 +67,7 @@ func (b Bot) Listener(port string) {
 }
 
 func webhookHandler(r *http.Request, bot Bot) {
+	log.Println("starting webhookHandler")
 	res, _ := ioutil.ReadAll(r.Body)
 	if bot.Debug {
 		log.Println(string(res))
