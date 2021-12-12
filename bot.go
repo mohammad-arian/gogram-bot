@@ -3,6 +3,7 @@ package gogram
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -17,7 +18,7 @@ type Bot struct {
 	/*
 			Handler invokes when webhook sends a new update.
 		    In the below example, we have a Bot called bot.
-		    We passed a function of type func (message gogram.Update, bot gogram.Bot)
+		    We passed a function of type func (message *gogram.Update)
 			to our bot called handle.
 			When telegram server sends something, this function is called.
 			Then we can use update.Message.User to send something back to user;
@@ -27,11 +28,11 @@ type Bot struct {
 			// start  listening to telegram
 			bot.Listener(<Port>)
 			// handler function
-			func handle(update gogram.Update, bot gogram.Bot) {
+			func handle(update *gogram.Update) {
 				update.Message.User.SendText(bot, update.Message.Text, nil)
 			}
 	*/
-	Handler func(message Update, bot Bot)
+	Handler func(message *Update)
 	// Self is some info about bot itself.
 	// This field is not mandatory
 	Self User `json:"result"`
@@ -44,7 +45,7 @@ type Bot struct {
 }
 
 // NewBot creates a Bot
-func NewBot(token string, handler func(message Update, bot Bot), simultaneous bool, debug bool) (Bot, error) {
+func NewBot(token string, handler func(message *Update), simultaneous bool, debug bool) (Bot, error) {
 	res, err := request("getme", token, nil, nil, &UserResponse{})
 	if err != nil {
 		return Bot{}, err
@@ -70,10 +71,9 @@ func webhookHandler(r *http.Request, bot Bot) {
 		log.Println(string(res))
 	}
 	update := Update{}
-	log.Printf("%+v\n", r)
 	err := json.Unmarshal(res, &update)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(fmt.Errorf("webhookHandler error: %w\n", err))
 	}
 	if bot.Handler == nil {
 		log.Println("Warning: Listener just received something, but you have not added a handler to bot." +
@@ -81,11 +81,11 @@ func webhookHandler(r *http.Request, bot Bot) {
 	} else if bot.Simultaneous {
 		// start each handler in a goroutine. since http.ListenAndServe() is a blocking function,
 		// we don't have to wait for goroutines to finish.
-		go bot.Handler(update, bot)
+		go bot.Handler(&update)
 		// webhookHandler returns so telegram won't wait for response. this improves
 		// performance and avoids errors such as request timeout.
 		return
 	} else {
-		bot.Handler(update, bot)
+		bot.Handler(&update)
 	}
 }
