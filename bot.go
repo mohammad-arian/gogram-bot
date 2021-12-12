@@ -32,7 +32,7 @@ type Bot struct {
 				update.Message.User.SendText(bot, update.Message.Text, nil)
 			}
 	*/
-	Handler func(message Update, bot Bot)
+	Handler func(message *Update, bot Bot)
 	// Self is some info about bot itself.
 	// This field is not mandatory
 	Self User `json:"result"`
@@ -45,7 +45,7 @@ type Bot struct {
 }
 
 // NewBot creates a Bot
-func NewBot(token string, handler func(message Update, bot Bot), simultaneous bool, debug bool) (Bot, error) {
+func NewBot(token string, handler func(message *Update, bot Bot), simultaneous bool, debug bool) (Bot, error) {
 	res, err := request("getme", token, nil, nil, &UserResponse{})
 	if err != nil {
 		return Bot{}, err
@@ -70,8 +70,8 @@ func webhookHandler(r *http.Request, bot Bot) {
 	if bot.Debug {
 		log.Println(string(res))
 	}
-	update := Update{}
-	err := json.Unmarshal(res, &update)
+	update := &Update{}
+	err := json.Unmarshal(res, update)
 	if err != nil {
 		log.Println(fmt.Errorf("webhookHandler error: %w\n", err))
 	}
