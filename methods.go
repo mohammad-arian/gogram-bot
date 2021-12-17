@@ -747,3 +747,83 @@ func (r *ReplyAble) SendSticker(b Bot, sticker interface{},
 	res, err := request("sendSticker", b.Token, &d, optionalParams, &MessageResponse{})
 	return res.(*MessageResponse), err
 }
+
+func GetStickerSet(b Bot, name string) (response *StickerSetResponse, err error) {
+	type data struct {
+		Name string `json:"name"`
+	}
+	d := data{Name: name}
+	res, err := request("getStickerSet", b.Token, &d, nil, &StickerSetResponse{})
+	return res.(*StickerSetResponse), err
+}
+
+func (r *User) UploadStickerFile(b Bot, pngSticker *os.File) (response *FileResponse, err error) {
+	type data struct {
+		UserId     int      `json:"user_id"`
+		PngSticker *os.File `json:"png_sticker"`
+	}
+	d := data{UserId: r.Id, PngSticker: pngSticker}
+	res, err := request("uploadStickerFile", b.Token, &d, nil, &FileResponse{})
+	return res.(*FileResponse), err
+}
+
+func (r *User) CreateNewStickerSet(b Bot, name string, title string,
+	emojis string, optionalParams *CreateNewStickerSetOptionalParams) (response *BooleanResponse, err error) {
+	type data struct {
+		UserId int    `json:"user_id"`
+		Name   string `json:"name"`
+		Title  string `json:"title"`
+		Emojis string `json:"emojis"`
+	}
+	d := data{UserId: r.Id, Name: name, Title: title, Emojis: emojis}
+	res, err := request("createNewStickerSet", b.Token, &d, optionalParams, &BooleanResponse{})
+	return res.(*BooleanResponse), err
+}
+
+// AddStickerToSet adds a new sticker to a set created by the bot.
+// You must use exactly one of the fields png_sticker or tgs_sticker of AddStickerToSetOptionalParams.
+// Animated stickers can be added to animated sticker sets and only to them.
+// Animated sticker sets can have up to 50 stickers.
+// Static sticker sets can have up to 120 stickers.
+// Returns True on success.
+func (r *User) AddStickerToSet(b Bot, name string,
+	emojis string, optionalParams AddStickerToSetOptionalParams) (response *BooleanResponse, err error) {
+	type data struct {
+		UserId int    `json:"user_id"`
+		Name   string `json:"name"`
+		Emojis string `json:"emojis"`
+	}
+	d := data{UserId: r.Id, Name: name, Emojis: emojis}
+	res, err := request("addStickerToSet", b.Token, &d, optionalParams, &BooleanResponse{})
+	return res.(*BooleanResponse), err
+}
+
+func SetStickerPositionInSet(b Bot, sticker string, position int) (response *BooleanResponse, err error) {
+	type data struct {
+		Sticker  string `json:"sticker"`
+		Position int    `json:"position"`
+	}
+	d := data{Sticker: sticker, Position: position}
+	res, err := request("setStickerPositionInSet", b.Token, &d, nil, &BooleanResponse{})
+	return res.(*BooleanResponse), err
+}
+
+func DeleteStickerFromSet(b Bot, sticker string) (response *BooleanResponse, err error) {
+	type data struct {
+		Sticker string `json:"sticker"`
+	}
+	d := data{Sticker: sticker}
+	res, err := request("deleteStickerFromSet", b.Token, &d, nil, &BooleanResponse{})
+	return res.(*BooleanResponse), err
+}
+
+func (r *User) SetStickerSetThumb(b Bot, name string,
+	optionalParams SetStickerSetThumbOptionalParams) (response *BooleanResponse, err error) {
+	type data struct {
+		UserId int    `json:"user_id"`
+		Name   string `json:"name"`
+	}
+	d := data{Name: name}
+	res, err := request("setStickerSetThumb", b.Token, &d, optionalParams, &BooleanResponse{})
+	return res.(*BooleanResponse), err
+}

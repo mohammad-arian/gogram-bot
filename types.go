@@ -327,6 +327,35 @@ func (i *InputMediaAnimation) setMediaAndType(files *[]*os.File) error {
 	return nil
 }
 
+type MaskPosition struct {
+	Point  string  `json:"point"`
+	YShift float64 `json:"YShift"`
+	XShift float64 `json:"XShift"`
+	Scale  float64 `json:"Scale"`
+}
+
+type Sticker struct {
+	FileId       string       `json:"fileId"`
+	FileUniqueId string       `json:"fileUniqueId"`
+	Width        int          `json:"width"`
+	Height       int          `json:"height"`
+	IsAnimated   bool         `json:"isAnimated"`
+	Thumb        PhotoSize    `json:"thumb"`
+	Emoji        string       `json:"emoji"`
+	SetName      string       `json:"setName"`
+	MaskPosition MaskPosition `json:"maskPosition"`
+	FileSize     int          `json:"fileSize"`
+}
+
+type StickerSet struct {
+	Name          string    `json:"name"`
+	Title         string    `json:"title"`
+	IsAnimated    bool      `json:"isAnimated"`
+	ContainsMasks bool      `json:"containsMasks"`
+	Stickers      []Sticker `json:"stickers"`
+	Thumb         PhotoSize `json:"thumb"`
+}
+
 type ChatInviteLink struct {
 	InviteLink  string `json:"invite_link"`
 	Creator     User   `json:"creator"`
@@ -400,6 +429,11 @@ type FileResponse struct {
 
 type ChatMemberResponse struct {
 	Result []ChatMember `json:"result"`
+	Response
+}
+
+type StickerSetResponse struct {
+	Result StickerSet `json:"result"`
 	Response
 }
 

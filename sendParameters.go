@@ -360,6 +360,23 @@ type SendStickerOptionalParams struct {
 	ForceReply
 }
 
+type CreateNewStickerSetOptionalParams struct {
+	PngSticker    interface{}  `json:"pngSticker"`
+	TgsSticker    *os.File     `json:"tgsSticker"`
+	ContainsMasks bool         `json:"containsMasks"`
+	MaskPosition  MaskPosition `json:"maskPosition"`
+}
+
+type AddStickerToSetOptionalParams struct {
+	PngSticker   interface{}  `json:"pngSticker"`
+	TgsSticker   *os.File     `json:"tgsSticker"`
+	MaskPosition MaskPosition `json:"maskPosition"`
+}
+
+type SetStickerSetThumbOptionalParams struct {
+	Thumb interface{} `json:"thumb"`
+}
+
 func (i *InlineKeyboard) AddInlineKeyboardButton(horizontal bool, a ...InlineKeyboardButton) {
 	if horizontal {
 		inlineKeyboardButtonRowAdder(i, a...)
