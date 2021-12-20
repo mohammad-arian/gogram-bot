@@ -146,9 +146,6 @@ func (i InlineQueryResultPhoto) checkQueryAnswer() error {
 	if i.Type != "photo" {
 		return errors.New("type must be `photo`")
 	}
-	if i.InputMessageContent == nil {
-		return errors.New("InputMessageContent is required")
-	}
 	if i.Id == "" {
 		return errors.New("id is required")
 	}
