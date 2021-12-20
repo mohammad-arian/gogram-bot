@@ -17,10 +17,10 @@ type ForceReply struct {
 	Selective             bool   `json:"selective"`
 }
 
-// TextOptionalParams represents optional parameters
+// TextOP represents optional parameters
 // that SendText function can use.
 // All fields are optional.
-type TextOptionalParams struct {
+type TextOP struct {
 	ParseMode                string          `json:"parse_mode"`
 	Entities                 []MessageEntity `json:"entities"`
 	DisableWebPagePreview    bool            `json:"disable_web_page_preview"`
@@ -32,7 +32,7 @@ type TextOptionalParams struct {
 	ForceReply
 }
 
-type PhotoOptionalParams struct {
+type PhotoOP struct {
 	ParseMode                string          `json:"parse_mode"`
 	Caption                  string          `json:"caption"`
 	CaptionEntities          []MessageEntity `json:"caption_entities"`
@@ -44,7 +44,7 @@ type PhotoOptionalParams struct {
 	ForceReply
 }
 
-type VideoOptionalParams struct {
+type VideoOP struct {
 	Duration                 int             `json:"duration"`
 	Width                    int             `json:"width"`
 	Height                   int             `json:"height"`
@@ -60,7 +60,7 @@ type VideoOptionalParams struct {
 	ForceReply
 }
 
-type AudioOptionalParams struct {
+type AudioOP struct {
 	Performer                string          `json:"performer"`
 	Title                    string          `json:"title"`
 	Duration                 int             `json:"duration"`
@@ -75,7 +75,7 @@ type AudioOptionalParams struct {
 	ForceReply
 }
 
-type DocumentOptionalParams struct {
+type DocumentOP struct {
 	Caption string `json:"caption"`
 	// Optional. Disables automatic server-side content type
 	// detection for files uploaded using multipart/form-data
@@ -90,7 +90,7 @@ type DocumentOptionalParams struct {
 	ForceReply
 }
 
-type VoiceOptionalParams struct {
+type VoiceOP struct {
 	Duration                 int             `json:"duration"`
 	Caption                  string          `json:"caption"`
 	ParseMode                string          `json:"parse_mode"`
@@ -103,7 +103,7 @@ type VoiceOptionalParams struct {
 	ForceReply
 }
 
-type AnimationOptionalParams struct {
+type AnimationOP struct {
 	Duration                 int             `json:"duration"`
 	Width                    int             `json:"width"`
 	Height                   int             `json:"height"`
@@ -118,7 +118,7 @@ type AnimationOptionalParams struct {
 	ForceReply
 }
 
-type PollOptionalParams struct {
+type PollOP struct {
 	IsAnonymous bool `json:"is_anonymous"`
 	// Poll type, “quiz” or “regular”, defaults to “regular”
 	Type string `json:"type"`
@@ -154,7 +154,7 @@ type PollOptionalParams struct {
 	ForceReply
 }
 
-type DiceOptionalParams struct {
+type DiceOP struct {
 	// Emoji on which the dice throw animation is based.
 	// Currently, must be one of “🎲”, “🎯”, “🏀”, “⚽”, “🎳”, or “🎰”.
 	// Dice can have values 1-6 for “🎲”, “🎯” and “🎳”,
@@ -169,7 +169,7 @@ type DiceOptionalParams struct {
 	ForceReply
 }
 
-type VideoNoteOptionalParams struct {
+type VideoNoteOP struct {
 	Duration                 int  `json:"duration"`
 	Length                   int  `json:"length"`
 	DisableNotification      bool `json:"disable_notification"`
@@ -180,7 +180,7 @@ type VideoNoteOptionalParams struct {
 	ForceReply
 }
 
-type LocationOptionalParams struct {
+type LocationOP struct {
 	HorizontalAccuracy       float64 `json:"horizontal_accuracy"`
 	LivePeriod               int     `json:"live_period"`
 	Heading                  int     `json:"heading"`
@@ -193,7 +193,7 @@ type LocationOptionalParams struct {
 	ForceReply
 }
 
-type ContactOptionalParams struct {
+type ContactOP struct {
 	LastName string `json:"last_name"`
 	// Additional data about the contact in the form of a vCard
 	Vcard                    string `json:"vcard"`
@@ -205,17 +205,17 @@ type ContactOptionalParams struct {
 	ForceReply
 }
 
-// MediaGroupOptionalParams represents an album.
-type MediaGroupOptionalParams struct {
+// MediaGroupOP represents an album.
+type MediaGroupOP struct {
 	ReplyToMessageId         int  `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool `json:"allow_sending_without_reply"`
 }
 
-type ForwardMessageOptionalParams struct {
+type ForwardMessageOP struct {
 	DisableNotification bool `json:"disable_notification"`
 }
 
-type CopyMessageOptionalParams struct {
+type CopyMessageOP struct {
 	Caption                  string          `json:"caption"`
 	ParseMode                string          `json:"parse_mode"`
 	CaptionEntities          []MessageEntity `json:"caption_entities"`
@@ -227,7 +227,7 @@ type CopyMessageOptionalParams struct {
 	ForceReply
 }
 
-type GetUserProfilePhotosOptionalParams struct {
+type GetUserProfilePhotosOP struct {
 	// Sequential number of the first photo to be returned.
 	// By default, all photos are returned.
 	Offset int `json:"offset"`
@@ -236,7 +236,7 @@ type GetUserProfilePhotosOptionalParams struct {
 	Limit int `json:"limit"`
 }
 
-type BanChatMemberOptionalParams struct {
+type BanChatMemberOP struct {
 	// Date when the user will be unbanned, unix time.
 	// If user is banned for more than 366 days or less
 	// than 30 seconds from the current time they are considered to be banned forever.
@@ -248,11 +248,11 @@ type BanChatMemberOptionalParams struct {
 	RevokeMessages bool `json:"revoke_messages"`
 }
 
-type RestrictChatMemberOptionalParams struct {
+type RestrictChatMemberOP struct {
 	UntilDate int `json:"until_date"`
 }
 
-type PromoteChatMemberOptionalParams struct {
+type PromoteChatMemberOP struct {
 	// Pass True, if the administrator's presence in the chat is hidden.
 	IsAnonymous bool `json:"is_anonymous"`
 	// Pass True, if the administrator can access the chat event log, chat statistics,
@@ -281,38 +281,38 @@ type PromoteChatMemberOptionalParams struct {
 	CanPinMessages bool `json:"can_pin_messages"`
 }
 
-type CreateChatInviteLinkOptionalParams struct {
+type CreateChatInviteLinkOP struct {
 	ExpireDate  int `json:"expire_date"`
 	MemberLimit int `json:"member_limit"`
 }
 
-type EditChatInviteLinkOptionalParams struct {
+type EditChatInviteLinkOP struct {
 	ExpireDate  int `json:"expire_date"`
 	MemberLimit int `json:"member_limit"`
 }
 
-type PinChatMessageOptionalParams struct {
+type PinChatMessageOP struct {
 	DisableNotification bool `json:"disable_notification"`
 }
 
-type UnpinChatMessageOptionalParams struct {
+type UnpinChatMessageOP struct {
 	MessageId int `json:"message_id"`
 }
 
-type AnswerCallbackQueryOptionalParams struct {
+type AnswerCallbackQueryOP struct {
 	text      string
 	showAlert bool
 	url       string
 	cacheTime string
 }
 
-type MyCommandsOptionalParams struct {
+type MyCommandsOP struct {
 	// Scope describing scope of users for which the commands are relevant. Defaults to "default".
 	Scope        BotCommandScope `json:"scope"`
 	LanguageCode string          `json:"language_code"`
 }
 
-type EditMessageTextOptionalParams struct {
+type EditMessageTextOP struct {
 	ChatId                int             `json:"chat_id"`
 	MessageId             int             `json:"message_id"`
 	InlineMessageId       int             `json:"inline_message_id"`
@@ -322,7 +322,7 @@ type EditMessageTextOptionalParams struct {
 	InlineKeyboard
 }
 
-type EditMessageCaptionOptionalParams struct {
+type EditMessageCaptionOP struct {
 	ChatId          int             `json:"chat_id"`
 	MessageId       int             `json:"message_id"`
 	InlineMessageId int             `json:"inline_message_id"`
@@ -332,18 +332,18 @@ type EditMessageCaptionOptionalParams struct {
 	InlineKeyboard
 }
 
-type StopPollOptionalParams struct {
+type StopPollOP struct {
 	InlineKeyboard
 }
 
-type EditMessageMediaOptionalParams struct {
+type EditMessageMediaOP struct {
 	ChatId          int `json:"chat_id"`
 	MessageId       int `json:"message_id"`
 	InlineMessageId int `json:"inline_message_id"`
 	InlineKeyboard
 }
 
-type SetWebhookOptionalParams struct {
+type SetWebhookOP struct {
 	Certificate        *os.File `json:"certificate"`
 	IpAddress          string   `json:"ip_address"`
 	MaxConnections     int      `json:"max_connections"`
@@ -351,7 +351,7 @@ type SetWebhookOptionalParams struct {
 	DropPendingUpdates bool     `json:"drop_pending_updates"`
 }
 
-type SendStickerOptionalParams struct {
+type SendStickerOP struct {
 	DisableNotification      bool `json:"disableNotification"`
 	ReplyToMessageId         int  `json:"reply_To_Message_Id"`
 	AllowSendingWithoutReply bool `json:"allowSendingWithoutReply"`
@@ -360,21 +360,29 @@ type SendStickerOptionalParams struct {
 	ForceReply
 }
 
-type CreateNewStickerSetOptionalParams struct {
+type CreateNewStickerSetOP struct {
 	PngSticker    interface{}  `json:"pngSticker"`
 	TgsSticker    *os.File     `json:"tgsSticker"`
 	ContainsMasks bool         `json:"containsMasks"`
 	MaskPosition  MaskPosition `json:"maskPosition"`
 }
 
-type AddStickerToSetOptionalParams struct {
+type AddStickerToSetOP struct {
 	PngSticker   interface{}  `json:"pngSticker"`
 	TgsSticker   *os.File     `json:"tgsSticker"`
 	MaskPosition MaskPosition `json:"maskPosition"`
 }
 
-type SetStickerSetThumbOptionalParams struct {
+type SetStickerSetThumbOP struct {
 	Thumb interface{} `json:"thumb"`
+}
+
+type AnswerInlineQueryOP struct {
+	CacheTime         int    `json:"cacheTime"`
+	IsPersonal        bool   `json:"isPersonal"`
+	NextOffset        string `json:"nextOffset"`
+	SwitchPmText      string `json:"switchPmText"`
+	SwitchPmParameter string `json:"switchPmParameter"`
 }
 
 func (i *InlineKeyboard) AddInlineKeyboardButton(horizontal bool, a ...InlineKeyboardButton) {

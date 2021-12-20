@@ -10,6 +10,7 @@ import (
 type Update struct {
 	UpdateId      int           `json:"update_id"`
 	Message       Message       `json:"message"`
+	InlineQuery   InlineQuery   `json:"inlineQuery"`
 	CallbackQuery CallbackQuery `json:"callback_query"`
 	Poll          Poll          `json:"poll"`
 }
@@ -32,23 +33,23 @@ type MessageEntity struct {
 }
 
 type Poll struct {
-	Id              string       `json:"id,omitempty"`
-	Question        string       `json:"question,omitempty"`
-	Options         []PollOption `json:"options,omitempty"`
-	TotalVoterCount int          `json:"total_voter_count,omitempty"`
-	IsAnonymous     bool         `json:"is_anonymous,omitempty"`
-	CloseDate       int          `json:"close_date,omitempty"`
+	Id              string       `json:"id"`
+	Question        string       `json:"question"`
+	Options         []PollOption `json:"options"`
+	TotalVoterCount int          `json:"total_voter_count"`
+	IsAnonymous     bool         `json:"is_anonymous,"`
+	CloseDate       int          `json:"close_date"`
 	// Pass True, if the poll needs to be immediately closed.
 	// This can be useful for poll preview.
-	IsClosed                 bool            `json:"is_closed,omitempty"`
-	Type                     string          `json:"type,omitempty"`
-	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply,omitempty"`
-	CorrectOptionId          int             `json:"correct_option_id,omitempty"`
-	Explanation              string          `json:"explanation,omitempty"`
-	ExplanationEntities      []MessageEntity `json:"explanation_entities,omitempty"`
+	IsClosed                 bool            `json:"is_closed"`
+	Type                     string          `json:"type"`
+	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
+	CorrectOptionId          int             `json:"correct_option_id"`
+	Explanation              string          `json:"explanation"`
+	ExplanationEntities      []MessageEntity `json:"explanation_entities"`
 	// Amount of time in seconds the poll will be active after
 	// creation, 5-600. Can't be used together with close_date.
-	OpenPeriod int `json:"open_period,omitempty"`
+	OpenPeriod int `json:"open_period"`
 }
 
 type PollOption struct {
@@ -162,12 +163,22 @@ type ChatPhoto struct {
 }
 
 type Location struct {
-	Longitude            float64 `json:"longitude,omitempty"`
-	Latitude             float64 `json:"latitude,omitempty"`
-	HorizontalAccuracy   float64 `json:"horizontalAccuracy,omitempty"`
-	LivePeriod           int     `json:"livePeriod,omitempty"`
-	Heading              int     `json:"heading,omitempty"`
-	ProximityAlertRadius int     `json:"proximityAlertRadius,omitempty"`
+	Longitude            float64 `json:"longitude"`
+	Latitude             float64 `json:"latitude"`
+	HorizontalAccuracy   float64 `json:"horizontalAccuracy"`
+	LivePeriod           int     `json:"livePeriod"`
+	Heading              int     `json:"heading"`
+	ProximityAlertRadius int     `json:"proximityAlertRadius"`
+}
+
+type Venue struct {
+	Location
+	Title           string `json:"title"`
+	Address         string `json:"address"`
+	FoursquareId    string `json:"foursquareId"`
+	FoursquareType  string `json:"foursquareType"`
+	GooglePlaceId   string `json:"googlePlaceId"`
+	GooglePlaceType string `json:"googlePlaceType"`
 }
 
 type ChatLocation struct {
@@ -363,6 +374,11 @@ type ChatInviteLink struct {
 	IsRevoked   bool   `json:"is_revoked"`
 	ExpireDate  int    `json:"expire_date"`
 	MemberLimit int    `json:"member_limit"`
+}
+
+type LabeledPrice struct {
+	Label  string `json:"label"`
+	Amount int    `json:"amount"`
 }
 
 type UserProfilePhotos struct {

@@ -14,7 +14,7 @@ import (
 // If you'd like to make sure that the Webhook request comes from Telegram,
 // we recommend using a secret path in the URL, e.g. https://www.example.com/<token>.
 // Since nobody else knows your bot's token, you can be pretty sure it's us.
-func (b Bot) SetWebhook(url string, optionalParams *SetWebhookOptionalParams) (response *BooleanResponse, err error) {
+func (b Bot) SetWebhook(url string, optionalParams *SetWebhookOP) (response *BooleanResponse, err error) {
 	type data struct {
 		Url string `json:"url"`
 	}
@@ -29,7 +29,7 @@ func (b Bot) SetWebhook(url string, optionalParams *SetWebhookOptionalParams) (r
 // text is the message that will be sent
 // pass nil or *TextOptionalParams struct to optionalParams to add optional
 // parameters to request
-func (r *ReplyAble) SendText(b Bot, text string, optionalParams *TextOptionalParams) (response *MessageResponse, err error) {
+func (r *ReplyAble) SendText(b Bot, text string, optionalParams *TextOP) (response *MessageResponse, err error) {
 	type data struct {
 		ChatId int    `json:"chat_id"`
 		Text   string `json:"text"`
@@ -40,7 +40,7 @@ func (r *ReplyAble) SendText(b Bot, text string, optionalParams *TextOptionalPar
 }
 
 func (r *ReplyAble) SendPhoto(b Bot, photo interface{},
-	optionalParams *PhotoOptionalParams) (response *MessageResponse, err error) {
+	optionalParams *PhotoOP) (response *MessageResponse, err error) {
 	type data struct {
 		ChatId int         `json:"chat_id"`
 		Photo  interface{} `json:"photo"`
@@ -51,7 +51,7 @@ func (r *ReplyAble) SendPhoto(b Bot, photo interface{},
 }
 
 func (r *ReplyAble) SendVideo(b Bot, video interface{},
-	optionalParams *VideoOptionalParams) (response *MessageResponse, err error) {
+	optionalParams *VideoOP) (response *MessageResponse, err error) {
 	type data struct {
 		ChatId int         `json:"chat_id"`
 		Video  interface{} `json:"video"`
@@ -66,7 +66,7 @@ func (r *ReplyAble) SendVideo(b Bot, video interface{},
 // On success, the sent Message is returned.
 // Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
 func (r *ReplyAble) SendAudio(b Bot, audio interface{},
-	optionalParams *AudioOptionalParams) (response *MessageResponse, err error) {
+	optionalParams *AudioOP) (response *MessageResponse, err error) {
 	type data struct {
 		ChatId int         `json:"chat_id"`
 		Audio  interface{} `json:"audio"`
@@ -77,7 +77,7 @@ func (r *ReplyAble) SendAudio(b Bot, audio interface{},
 }
 
 func (r *ReplyAble) SendDocument(b Bot, document interface{},
-	optionalParams *DocumentOptionalParams) (response *MessageResponse, err error) {
+	optionalParams *DocumentOP) (response *MessageResponse, err error) {
 	type data struct {
 		ChatId   int         `json:"chat_id"`
 		Document interface{} `json:"document"`
@@ -93,7 +93,7 @@ func (r *ReplyAble) SendDocument(b Bot, document interface{},
 // On success, the sent Message is returned.
 // Bots can currently send voice messages of up to 50 MB in size, this limit may be changed in the future.
 func (r *ReplyAble) SendVoice(b Bot, voice interface{},
-	optionalParams *VoiceOptionalParams) (response *MessageResponse, err error) {
+	optionalParams *VoiceOP) (response *MessageResponse, err error) {
 	type data struct {
 		ChatId int         `json:"chat_id"`
 		Voice  interface{} `json:"voice"`
@@ -104,7 +104,7 @@ func (r *ReplyAble) SendVoice(b Bot, voice interface{},
 }
 
 func (r *ReplyAble) SendAnimation(b Bot, animation interface{},
-	optionalParams *AnimationOptionalParams) (response *MessageResponse, err error) {
+	optionalParams *AnimationOP) (response *MessageResponse, err error) {
 	type data struct {
 		ChatId    int         `json:"chat_id"`
 		Animation interface{} `json:"animation"`
@@ -114,7 +114,7 @@ func (r *ReplyAble) SendAnimation(b Bot, animation interface{},
 	return res.(*MessageResponse), err
 }
 
-func (r *ReplyAble) SendDice(b Bot, optionalParams *DiceOptionalParams) (response *MessageResponse, err error) {
+func (r *ReplyAble) SendDice(b Bot, optionalParams *DiceOP) (response *MessageResponse, err error) {
 	type data struct {
 		ChatId int `json:"chat_id"`
 	}
@@ -124,7 +124,7 @@ func (r *ReplyAble) SendDice(b Bot, optionalParams *DiceOptionalParams) (respons
 }
 
 func (r *ReplyAble) SendVideoNote(b Bot, videoNote interface{},
-	optionalParams *VideoNoteOptionalParams) (response *MessageResponse, err error) {
+	optionalParams *VideoNoteOP) (response *MessageResponse, err error) {
 	type data struct {
 		ChatId    int         `json:"chat_id"`
 		VideoNote interface{} `json:"videoNote"`
@@ -135,7 +135,7 @@ func (r *ReplyAble) SendVideoNote(b Bot, videoNote interface{},
 }
 
 func (r *ReplyAble) SendPoll(b Bot, question string, options []string,
-	optionalParams *PollOptionalParams) (response *MessageResponse, err error) {
+	optionalParams *PollOP) (response *MessageResponse, err error) {
 	if options == nil {
 		return nil, errors.New("options slice is empty")
 	}
@@ -155,7 +155,7 @@ func (r *ReplyAble) SendPoll(b Bot, question string, options []string,
 // You can add file_ids as string to send a media that exists on the Telegram servers (recommended),
 // HTTP URLs as string for Telegram to get a media from the Internet, or a file of type *os.File to
 // photos, videos, documents and audios slices.
-func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOptionalParams, photos []InputMediaPhoto,
+func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOP, photos []InputMediaPhoto,
 	videos []InputMediaVideo, documents []InputMediaDocument, audios []InputMediaAudio) (response *[]MessageResponse, err error) {
 	type data struct {
 		ChatId int           `json:"chat_id"`
@@ -201,7 +201,7 @@ func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOptionalPara
 }
 
 func (r *ReplyAble) SendLocation(b Bot, latitude float64, longitude float64,
-	optionalParams *LocationOptionalParams) (response *MessageResponse, err error) {
+	optionalParams *LocationOP) (response *MessageResponse, err error) {
 	type data struct {
 		ChatId    int     `json:"chat_id"`
 		Latitude  float64 `json:"latitude"`
@@ -213,7 +213,7 @@ func (r *ReplyAble) SendLocation(b Bot, latitude float64, longitude float64,
 }
 
 func (r *ReplyAble) SendContact(b Bot, phoneNumber string, firstName string,
-	optionalParams *ContactOptionalParams) (response *MessageResponse, err error) {
+	optionalParams *ContactOP) (response *MessageResponse, err error) {
 	type data struct {
 		ChatId      int    `json:"chat_id"`
 		PhoneNumber string `json:"phone_number"`
@@ -249,7 +249,7 @@ func (r *ReplyAble) SendChatAction(b Bot, action string) (response *BooleanRespo
 }
 
 func (r *ReplyAble) ForwardMessage(b Bot, targetChatId int, messageId int,
-	optionalParams *ForwardMessageOptionalParams) (response *MessageResponse, err error) {
+	optionalParams *ForwardMessageOP) (response *MessageResponse, err error) {
 	type data struct {
 		ChatId     int `json:"chat_id"`
 		FromChatId int `json:"from_chat_id"`
@@ -266,7 +266,7 @@ func (r *ReplyAble) ForwardMessage(b Bot, targetChatId int, messageId int,
 // but the copied message doesn't have a link to the original
 // message. Returns the MessageId of the sent message on success.
 func (r *ReplyAble) CopyMessage(b Bot, targetChatId int, messageId int,
-	optionalParams *CopyMessageOptionalParams) (response *MessageResponse, err error) {
+	optionalParams *CopyMessageOP) (response *MessageResponse, err error) {
 	type data struct {
 		ChatId     int `json:"chat_id"`
 		FromChatId int `json:"from_chat_id"`
@@ -278,7 +278,7 @@ func (r *ReplyAble) CopyMessage(b Bot, targetChatId int, messageId int,
 }
 
 func (r *ReplyAble) GetUserProfilePhotos(b Bot,
-	optionalParams *GetUserProfilePhotosOptionalParams) (response *UserProfileResponse, err error) {
+	optionalParams *GetUserProfilePhotosOP) (response *UserProfileResponse, err error) {
 	type data struct {
 		UserId int `json:"user_id"`
 	}
@@ -306,7 +306,7 @@ func GetFile(b Bot, fileId string) (response *FileResponse, err error) {
 // The bot must be an administrator in the chat for this to work and must
 // have the appropriate admin rights.
 func (r *User) BanChatMember(b Bot, chatId int,
-	optionalParams *BanChatMemberOptionalParams) (response *BooleanResponse, err error) {
+	optionalParams *BanChatMemberOP) (response *BooleanResponse, err error) {
 	type data struct {
 		ChatId int `json:"chat_id"`
 		UserId int `json:"user_id"`
@@ -335,7 +335,7 @@ func (r *User) UnbanChatMember(b Bot, chatId int, onlyIfBanned bool) (response *
 }
 
 func (r *User) RestrictChatMember(b Bot, chatId int, permissions ChatPermissions,
-	optionalParams *RestrictChatMemberOptionalParams) (response *BooleanResponse, err error) {
+	optionalParams *RestrictChatMemberOP) (response *BooleanResponse, err error) {
 	type data struct {
 		ChatId      int             `json:"chat_id"`
 		UserId      int             `json:"user_id"`
@@ -347,7 +347,7 @@ func (r *User) RestrictChatMember(b Bot, chatId int, permissions ChatPermissions
 }
 
 func (r *User) PromoteChatMember(b Bot, chatId int,
-	optionalParams *PromoteChatMemberOptionalParams) (response *BooleanResponse, err error) {
+	optionalParams *PromoteChatMemberOP) (response *BooleanResponse, err error) {
 	type data struct {
 		ChatId int `json:"chat_id"`
 		UserId int `json:"user_id"`
@@ -389,7 +389,7 @@ func (r *Chat) ExportChatInviteLink(b Bot) (response *MapResponse, err error) {
 }
 
 func (r *Chat) CreateChatInviteLink(b Bot,
-	optionalParams *CreateChatInviteLinkOptionalParams) (response *InviteLinkResponse, err error) {
+	optionalParams *CreateChatInviteLinkOP) (response *InviteLinkResponse, err error) {
 	type data struct {
 		ChatId int `json:"chat_id"`
 	}
@@ -399,7 +399,7 @@ func (r *Chat) CreateChatInviteLink(b Bot,
 }
 
 func (r *Chat) EditChatInviteLink(b Bot, inviteLink string,
-	optionalParams *EditChatInviteLinkOptionalParams) (response *InviteLinkResponse, err error) {
+	optionalParams *EditChatInviteLinkOP) (response *InviteLinkResponse, err error) {
 	type data struct {
 		ChatId     int    `json:"chat_id"`
 		InviteLink string `json:"invite_link"`
@@ -459,7 +459,7 @@ func (r *Chat) SetChatDescription(b Bot, description string) (response *BooleanR
 }
 
 func (r *Chat) PinChatMessage(b Bot, messageId int,
-	optionalParams *PinChatMessageOptionalParams) (response *BooleanResponse, err error) {
+	optionalParams *PinChatMessageOP) (response *BooleanResponse, err error) {
 	type data struct {
 		ChatId    int `json:"chat_id"`
 		MessageId int `json:"message_id"`
@@ -470,7 +470,7 @@ func (r *Chat) PinChatMessage(b Bot, messageId int,
 }
 
 func (r *Chat) UnpinChatMessage(b Bot,
-	optionalParams *UnpinChatMessageOptionalParams) (response *BooleanResponse, err error) {
+	optionalParams *UnpinChatMessageOP) (response *BooleanResponse, err error) {
 	type data struct {
 		ChatId int `json:"chat_id"`
 	}
@@ -558,7 +558,7 @@ func (r *Chat) DeleteChatStickerSet(b Bot) (response *BooleanResponse, err error
 }
 
 func (r *ReplyAble) AnswerCallbackQuery(b Bot, callbackQueryId string,
-	optionalParams *AnswerCallbackQueryOptionalParams) (response *BooleanResponse, err error) {
+	optionalParams *AnswerCallbackQueryOP) (response *BooleanResponse, err error) {
 	type data struct {
 		CallbackQueryId string `json:"callback_query_id"`
 	}
@@ -568,7 +568,7 @@ func (r *ReplyAble) AnswerCallbackQuery(b Bot, callbackQueryId string,
 }
 
 func (b *Bot) SetMyCommands(commands []BotCommand,
-	optionalParams *MyCommandsOptionalParams) (response *BooleanResponse, err error) {
+	optionalParams *MyCommandsOP) (response *BooleanResponse, err error) {
 	type data struct {
 		Commands []BotCommand `json:"commands"`
 	}
@@ -578,19 +578,19 @@ func (b *Bot) SetMyCommands(commands []BotCommand,
 }
 
 func (b *Bot) DeleteMyCommands(
-	optionalParams *MyCommandsOptionalParams) (response *BooleanResponse, err error) {
+	optionalParams *MyCommandsOP) (response *BooleanResponse, err error) {
 	res, err := request("deleteMyCommands", b.Token, nil, optionalParams, &BooleanResponse{})
 	return res.(*BooleanResponse), err
 }
 
 func (b *Bot) GetMyCommands(
-	optionalParams *MyCommandsOptionalParams) (response *BotCommandResponse, err error) {
+	optionalParams *MyCommandsOP) (response *BotCommandResponse, err error) {
 	res, err := request("getMyCommands", b.Token, nil, optionalParams, &BotCommandResponse{})
 	return res.(*BotCommandResponse), err
 }
 
 func EditMessageText(b Bot, text string,
-	optionalParams EditMessageTextOptionalParams) (response *MapResponse, err error) {
+	optionalParams EditMessageTextOP) (response *MapResponse, err error) {
 	type data struct {
 		Text string `json:"text"`
 	}
@@ -612,7 +612,7 @@ func EditMessageText(b Bot, text string,
 // On success, if the edited message is not an inline message, MapResponse's Result is the
 // edited Message as a string, otherwise MapResponse's Result is True as a string.
 func EditMessageCaption(b Bot,
-	optionalParams EditMessageCaptionOptionalParams) (response *MapResponse, err error) {
+	optionalParams EditMessageCaptionOP) (response *MapResponse, err error) {
 	if optionalParams.ChatId == 0 && optionalParams.MessageId == 0 && optionalParams.InlineMessageId == 0 {
 		return nil, errors.New("ChatId, MessageId and InlineMessageId of optionalParams" +
 			" are empty. You need to set both ChatId and MessageId, or InlineMessageId")
@@ -637,7 +637,7 @@ func EditMessageCaption(b Bot,
 // On success, if the edited message is not an inline message, MapResponse's Result is the
 // edited Message as a string, otherwise MapResponse's Result is True as a string.
 func EditMessageMedia(b Bot, media interface{},
-	optionalParams EditMessageMediaOptionalParams) (response *MapResponse, err error) {
+	optionalParams EditMessageMediaOP) (response *MapResponse, err error) {
 	type data struct {
 		Media interface{} `json:"media"`
 		// at most there could be only one file but since setMediaAndType(files *[]*os.File) accepts slices
@@ -690,7 +690,7 @@ func EditMessageMedia(b Bot, media interface{},
 }
 
 func (r *Chat) StopPoll(b Bot, messageId int,
-	optionalParams *StopPollOptionalParams) (response *PollResponse, err error) {
+	optionalParams *StopPollOP) (response *PollResponse, err error) {
 	type data struct {
 		ChatId    int `json:"chat_id"`
 		MessageId int `json:"message_id"`
@@ -723,7 +723,7 @@ func (r *Chat) DeleteMessage(b Bot, messageId int) (response *BooleanResponse, e
 // On success, if the edited message is not an inline message, the edited Message is returned,
 // otherwise True is returned.
 func (r *Chat) EditMessageReplyMarkup(b Bot,
-	optionalParams EditMessageMediaOptionalParams) (response *MapResponse, err error) {
+	optionalParams EditMessageMediaOP) (response *MapResponse, err error) {
 	if optionalParams.ChatId == 0 && optionalParams.MessageId == 0 && optionalParams.InlineMessageId == 0 {
 		return nil, errors.New("ChatId, MessageId and InlineMessageId of optionalParams" +
 			" are empty. You need to set both ChatId and MessageId, or InlineMessageId")
@@ -738,7 +738,7 @@ func (r *Chat) EditMessageReplyMarkup(b Bot,
 }
 
 func (r *ReplyAble) SendSticker(b Bot, sticker interface{},
-	optionalParams *SendStickerOptionalParams) (response *MessageResponse, err error) {
+	optionalParams *SendStickerOP) (response *MessageResponse, err error) {
 	type data struct {
 		ChatId  int         `json:"chat_id"`
 		Sticker interface{} `json:"sticker"`
@@ -768,7 +768,7 @@ func (r *User) UploadStickerFile(b Bot, pngSticker *os.File) (response *FileResp
 }
 
 func (r *User) CreateNewStickerSet(b Bot, name string, title string,
-	emojis string, optionalParams *CreateNewStickerSetOptionalParams) (response *BooleanResponse, err error) {
+	emojis string, optionalParams *CreateNewStickerSetOP) (response *BooleanResponse, err error) {
 	type data struct {
 		UserId int    `json:"user_id"`
 		Name   string `json:"name"`
@@ -787,7 +787,7 @@ func (r *User) CreateNewStickerSet(b Bot, name string, title string,
 // Static sticker sets can have up to 120 stickers.
 // Returns True on success.
 func (r *User) AddStickerToSet(b Bot, name string,
-	emojis string, optionalParams AddStickerToSetOptionalParams) (response *BooleanResponse, err error) {
+	emojis string, optionalParams AddStickerToSetOP) (response *BooleanResponse, err error) {
 	type data struct {
 		UserId int    `json:"user_id"`
 		Name   string `json:"name"`
@@ -818,7 +818,7 @@ func DeleteStickerFromSet(b Bot, sticker string) (response *BooleanResponse, err
 }
 
 func (r *User) SetStickerSetThumb(b Bot, name string,
-	optionalParams SetStickerSetThumbOptionalParams) (response *BooleanResponse, err error) {
+	optionalParams SetStickerSetThumbOP) (response *BooleanResponse, err error) {
 	type data struct {
 		UserId int    `json:"user_id"`
 		Name   string `json:"name"`
