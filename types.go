@@ -10,7 +10,7 @@ import (
 type Update struct {
 	UpdateId      int           `json:"update_id"`
 	Message       Message       `json:"message"`
-	InlineQuery   InlineQuery   `json:"inlineQuery"`
+	InlineQuery   InlineQuery   `json:"inline_query"`
 	CallbackQuery CallbackQuery `json:"callback_query"`
 	Poll          Poll          `json:"poll"`
 }
