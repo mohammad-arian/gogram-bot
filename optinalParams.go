@@ -300,10 +300,10 @@ type UnpinChatMessageOP struct {
 }
 
 type AnswerCallbackQueryOP struct {
-	text      string
-	showAlert bool
-	url       string
-	cacheTime string
+	Text      string `json:"text"`
+	ShowAlert bool   `json:"show_alert"`
+	Url       string `json:"url"`
+	CacheTime string `json:"cache_time"`
 }
 
 type MyCommandsOP struct {
@@ -352,25 +352,25 @@ type SetWebhookOP struct {
 }
 
 type SendStickerOP struct {
-	DisableNotification      bool `json:"disableNotification"`
+	DisableNotification      bool `json:"disable_notification"`
 	ReplyToMessageId         int  `json:"reply_To_Message_Id"`
-	AllowSendingWithoutReply bool `json:"allowSendingWithoutReply"`
+	AllowSendingWithoutReply bool `json:"allow_sending_without_reply"`
 	InlineKeyboard
 	ReplyKeyboard
 	ForceReply
 }
 
 type CreateNewStickerSetOP struct {
-	PngSticker    interface{}  `json:"pngSticker"`
-	TgsSticker    *os.File     `json:"tgsSticker"`
-	ContainsMasks bool         `json:"containsMasks"`
-	MaskPosition  MaskPosition `json:"maskPosition"`
+	PngSticker    interface{}  `json:"png_sticker"`
+	TgsSticker    *os.File     `json:"tgs_sticker"`
+	ContainsMasks bool         `json:"contains_masks"`
+	MaskPosition  MaskPosition `json:"mask_position"`
 }
 
 type AddStickerToSetOP struct {
-	PngSticker   interface{}  `json:"pngSticker"`
-	TgsSticker   *os.File     `json:"tgsSticker"`
-	MaskPosition MaskPosition `json:"maskPosition"`
+	PngSticker   interface{}  `json:"png_sticker"`
+	TgsSticker   *os.File     `json:"tgs_sticker"`
+	MaskPosition MaskPosition `json:"mask_position"`
 }
 
 type SetStickerSetThumbOP struct {
@@ -378,11 +378,11 @@ type SetStickerSetThumbOP struct {
 }
 
 type AnswerInlineQueryOP struct {
-	CacheTime         int    `json:"cacheTime"`
-	IsPersonal        bool   `json:"isPersonal"`
-	NextOffset        string `json:"nextOffset"`
-	SwitchPmText      string `json:"switchPmText"`
-	SwitchPmParameter string `json:"switchPmParameter"`
+	CacheTime         int    `json:"cache_time"`
+	IsPersonal        bool   `json:"is_personal"`
+	NextOffset        string `json:"next_offset"`
+	SwitchPmText      string `json:"switch_pm_text"`
+	SwitchPmParameter string `json:"switch_pm_parameter"`
 }
 
 func (i *InlineKeyboard) AddInlineKeyboardButton(horizontal bool, a ...InlineKeyboardButton) {

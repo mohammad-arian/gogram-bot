@@ -165,20 +165,20 @@ type ChatPhoto struct {
 type Location struct {
 	Longitude            float64 `json:"longitude"`
 	Latitude             float64 `json:"latitude"`
-	HorizontalAccuracy   float64 `json:"horizontalAccuracy"`
-	LivePeriod           int     `json:"livePeriod"`
+	HorizontalAccuracy   float64 `json:"horizontal_accuracy"`
+	LivePeriod           int     `json:"live_period"`
 	Heading              int     `json:"heading"`
-	ProximityAlertRadius int     `json:"proximityAlertRadius"`
+	ProximityAlertRadius int     `json:"proximity_alert_radius"`
 }
 
 type Venue struct {
 	Location
 	Title           string `json:"title"`
 	Address         string `json:"address"`
-	FoursquareId    string `json:"foursquareId"`
-	FoursquareType  string `json:"foursquareType"`
-	GooglePlaceId   string `json:"googlePlaceId"`
-	GooglePlaceType string `json:"googlePlaceType"`
+	FoursquareId    string `json:"foursquare_id"`
+	FoursquareType  string `json:"foursquare_type"`
+	GooglePlaceId   string `json:"google_place_id"`
+	GooglePlaceType string `json:"google_place_type"`
 }
 
 type ChatLocation struct {
@@ -340,29 +340,29 @@ func (i *InputMediaAnimation) setMediaAndType(files *[]*os.File) error {
 
 type MaskPosition struct {
 	Point  string  `json:"point"`
-	YShift float64 `json:"YShift"`
-	XShift float64 `json:"XShift"`
-	Scale  float64 `json:"Scale"`
+	YShift float64 `json:"y_shift"`
+	XShift float64 `json:"x_shift"`
+	Scale  float64 `json:"scale"`
 }
 
 type Sticker struct {
-	FileId       string       `json:"fileId"`
-	FileUniqueId string       `json:"fileUniqueId"`
+	FileId       string       `json:"file_id"`
+	FileUniqueId string       `json:"file_unique_id"`
 	Width        int          `json:"width"`
 	Height       int          `json:"height"`
-	IsAnimated   bool         `json:"isAnimated"`
+	IsAnimated   bool         `json:"is_animated"`
 	Thumb        PhotoSize    `json:"thumb"`
 	Emoji        string       `json:"emoji"`
-	SetName      string       `json:"setName"`
-	MaskPosition MaskPosition `json:"maskPosition"`
-	FileSize     int          `json:"fileSize"`
+	SetName      string       `json:"set_name"`
+	MaskPosition MaskPosition `json:"mask_position"`
+	FileSize     int          `json:"file_size"`
 }
 
 type StickerSet struct {
 	Name          string    `json:"name"`
 	Title         string    `json:"title"`
-	IsAnimated    bool      `json:"isAnimated"`
-	ContainsMasks bool      `json:"containsMasks"`
+	IsAnimated    bool      `json:"is_animated"`
+	ContainsMasks bool      `json:"contains_masks"`
 	Stickers      []Sticker `json:"stickers"`
 	Thumb         PhotoSize `json:"thumb"`
 }
