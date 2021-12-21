@@ -160,7 +160,7 @@ func (i *InlineQueryResultPhoto) checkQueryAnswer() error {
 	if i.Id == "" {
 		return errors.New("id is required")
 	}
-	if i.PhotoUrl == "" || i.PhotoId == "" {
+	if i.PhotoUrl == "" && i.PhotoId == "" {
 		return errors.New("photo_url or photo_id is required")
 	}
 	if i.ThumbUrl == "" {

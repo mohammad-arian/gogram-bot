@@ -92,6 +92,13 @@ type Message struct {
 	DeleteChatPhoto bool                 `json:"delete_chat_photo"`
 }
 
+const (
+	TypeText            = "text"
+	TypePhoto           = "photo"
+	TypeAnimation       = "animation"
+	TypeDeleteChatPhoto = "deleteChatPhoto"
+)
+
 // TypeIndicator function returns the type of message
 // This make it easier to know which fields are empty and which aren't
 // TypeIndicator may return "Text", "Animation", "Photo" and etc
@@ -99,7 +106,7 @@ func (m Message) TypeIndicator() string {
 	switch {
 	case m.Text != "":
 		return "Text"
-	case m.Animation != Animation{}:
+	case m.Animation == Animation{}:
 		return "Animation"
 	case m.Photo != nil:
 		return "Photo"
