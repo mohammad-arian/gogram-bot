@@ -19,6 +19,13 @@ type MessageContent interface {
 	checkMessageContent() error
 }
 
+type InputEmptyContent struct {
+}
+
+func (i InputEmptyContent) checkMessageContent() error {
+	return nil
+}
+
 type InputTextMessageContent struct {
 	MessageText           string          `json:"message_text"`
 	ParseMode             string          `json:"parse_mode"`
@@ -108,7 +115,7 @@ type InlineQueryResultArticle struct {
 	inlineKeyboardMarkup
 }
 
-func (i InlineQueryResultArticle) checkQueryAnswer() error {
+func (i *InlineQueryResultArticle) checkQueryAnswer() error {
 	if i.Type != "article" {
 		return errors.New("type must be `article`")
 	}
@@ -123,6 +130,9 @@ func (i InlineQueryResultArticle) checkQueryAnswer() error {
 	if i.Id == "" {
 		return errors.New("id is required")
 	}
+	if i.Title == "" {
+		return errors.New("title is required")
+	}
 	return nil
 }
 
@@ -130,6 +140,7 @@ type InlineQueryResultPhoto struct {
 	Type                string          `json:"type"`
 	Id                  string          `json:"id"`
 	PhotoUrl            string          `json:"photo_url"`
+	PhotoId             string          `json:"photo_id"`
 	ThumbUrl            string          `json:"thumb_url"`
 	PhotoWidth          int             `json:"photo_width"`
 	PhotoHeight         int             `json:"photo_height"`
@@ -142,18 +153,26 @@ type InlineQueryResultPhoto struct {
 	inlineKeyboardMarkup
 }
 
-func (i InlineQueryResultPhoto) checkQueryAnswer() error {
+func (i *InlineQueryResultPhoto) checkQueryAnswer() error {
 	if i.Type != "photo" {
 		return errors.New("type must be `photo`")
 	}
 	if i.Id == "" {
 		return errors.New("id is required")
 	}
-	if i.PhotoUrl == "" {
-		return errors.New("PhotoUrl is required")
+	if i.PhotoUrl == "" || i.PhotoId == "" {
+		return errors.New("photo_url or photo_id is required")
 	}
 	if i.ThumbUrl == "" {
 		return errors.New("ThumbUrl is required")
+	}
+	if i.InputMessageContent == nil {
+		i.InputMessageContent = InputEmptyContent{}
+	} else {
+		e := i.InputMessageContent.checkMessageContent()
+		if e != nil {
+			return e
+		}
 	}
 	return nil
 }
@@ -175,7 +194,7 @@ type InlineQueryResultGif struct {
 	inlineKeyboardMarkup
 }
 
-func (i InlineQueryResultGif) checkQueryAnswer() error {
+func (i *InlineQueryResultGif) checkQueryAnswer() error {
 	if i.Type != "gif" {
 		return errors.New("type must be `gif`")
 	}
@@ -187,6 +206,14 @@ func (i InlineQueryResultGif) checkQueryAnswer() error {
 	}
 	if i.ThumbUrl == "" {
 		return errors.New("ThumbUrl is required")
+	}
+	if i.InputMessageContent == nil {
+		i.InputMessageContent = InputEmptyContent{}
+	} else {
+		e := i.InputMessageContent.checkMessageContent()
+		if e != nil {
+			return e
+		}
 	}
 	return nil
 }
@@ -208,7 +235,7 @@ type InlineQueryResultMpeg4Gif struct {
 	inlineKeyboardMarkup
 }
 
-func (i InlineQueryResultMpeg4Gif) checkQueryAnswer() error {
+func (i *InlineQueryResultMpeg4Gif) checkQueryAnswer() error {
 	if i.Type != "mpeg4_gif" {
 		return errors.New("type must be `mpeg4_gif`")
 	}
@@ -220,6 +247,14 @@ func (i InlineQueryResultMpeg4Gif) checkQueryAnswer() error {
 	}
 	if i.ThumbUrl == "" {
 		return errors.New("ThumbUrl is required")
+	}
+	if i.InputMessageContent == nil {
+		i.InputMessageContent = InputEmptyContent{}
+	} else {
+		e := i.InputMessageContent.checkMessageContent()
+		if e != nil {
+			return e
+		}
 	}
 	return nil
 }
@@ -242,7 +277,7 @@ type InlineQueryResultVideo struct {
 	inlineKeyboardMarkup
 }
 
-func (i InlineQueryResultVideo) checkQueryAnswer() error {
+func (i *InlineQueryResultVideo) checkQueryAnswer() error {
 	if i.Type != "video" {
 		return errors.New("type must be `video`")
 	}
@@ -257,6 +292,17 @@ func (i InlineQueryResultVideo) checkQueryAnswer() error {
 	}
 	if i.ThumbUrl == "" {
 		return errors.New("ThumbUrl is required")
+	}
+	if i.Title == "" {
+		return errors.New("title is required")
+	}
+	if i.InputMessageContent == nil {
+		i.InputMessageContent = InputEmptyContent{}
+	} else {
+		e := i.InputMessageContent.checkMessageContent()
+		if e != nil {
+			return e
+		}
 	}
 	return nil
 }
@@ -275,7 +321,7 @@ type InlineQueryResultAudio struct {
 	inlineKeyboardMarkup
 }
 
-func (i InlineQueryResultAudio) checkQueryAnswer() error {
+func (i *InlineQueryResultAudio) checkQueryAnswer() error {
 	if i.Type != "audio" {
 		return errors.New("type must be `audio`")
 	}
@@ -284,6 +330,17 @@ func (i InlineQueryResultAudio) checkQueryAnswer() error {
 	}
 	if i.AudioUrl == "" {
 		return errors.New("AudioUrl is required")
+	}
+	if i.Title == "" {
+		return errors.New("title is required")
+	}
+	if i.InputMessageContent == nil {
+		i.InputMessageContent = InputEmptyContent{}
+	} else {
+		e := i.InputMessageContent.checkMessageContent()
+		if e != nil {
+			return e
+		}
 	}
 	return nil
 }
@@ -301,7 +358,7 @@ type InlineQueryResultVoice struct {
 	inlineKeyboardMarkup
 }
 
-func (i InlineQueryResultVoice) checkQueryAnswer() error {
+func (i *InlineQueryResultVoice) checkQueryAnswer() error {
 	if i.Type != "voice" {
 		return errors.New("type must be `voice`")
 	}
@@ -310,6 +367,17 @@ func (i InlineQueryResultVoice) checkQueryAnswer() error {
 	}
 	if i.VoiceUrl == "" {
 		return errors.New("VoiceUrl is required")
+	}
+	if i.Title == "" {
+		return errors.New("title is required")
+	}
+	if i.InputMessageContent == nil {
+		i.InputMessageContent = InputEmptyContent{}
+	} else {
+		e := i.InputMessageContent.checkMessageContent()
+		if e != nil {
+			return e
+		}
 	}
 	return nil
 }
@@ -331,7 +399,7 @@ type InlineQueryResultDocument struct {
 	inlineKeyboardMarkup
 }
 
-func (i InlineQueryResultDocument) checkQueryAnswer() error {
+func (i *InlineQueryResultDocument) checkQueryAnswer() error {
 	if i.Type != "document" {
 		return errors.New("type must be `document`")
 	}
@@ -344,27 +412,49 @@ func (i InlineQueryResultDocument) checkQueryAnswer() error {
 	if i.MimeType == "" {
 		return errors.New("MimeType is required")
 	}
+	if i.Title == "" {
+		return errors.New("title is required")
+	}
+	if i.InputMessageContent == nil {
+		i.InputMessageContent = InputEmptyContent{}
+	} else {
+		e := i.InputMessageContent.checkMessageContent()
+		if e != nil {
+			return e
+		}
+	}
 	return nil
 }
 
 type InlineQueryResultLocation struct {
-	Type string `json:"type"`
-	Id   string `json:"id"`
-	Location
+	Type                string         `json:"type"`
+	Id                  string         `json:"id"`
 	Title               string         `json:"title"`
 	InputMessageContent MessageContent `json:"input_message_content"`
 	ThumbUrl            string         `json:"thumb_url"`
 	ThumbWidth          int            `json:"thumb_width"`
 	ThumbHeight         int            `json:"thumb_height"`
+	Location
 	inlineKeyboardMarkup
 }
 
-func (i InlineQueryResultLocation) checkQueryAnswer() error {
+func (i *InlineQueryResultLocation) checkQueryAnswer() error {
 	if i.Type != "location" {
 		return errors.New("type must be `location`")
 	}
 	if i.Id == "" {
 		return errors.New("id is required")
+	}
+	if i.Title == "" {
+		return errors.New("title is required")
+	}
+	if i.InputMessageContent == nil {
+		i.InputMessageContent = InputEmptyContent{}
+	} else {
+		e := i.InputMessageContent.checkMessageContent()
+		if e != nil {
+			return e
+		}
 	}
 	return nil
 }
@@ -387,12 +477,26 @@ type InlineQueryResultVenue struct {
 	inlineKeyboardMarkup
 }
 
-func (i InlineQueryResultVenue) checkQueryAnswer() error {
+func (i *InlineQueryResultVenue) checkQueryAnswer() error {
 	if i.Type != "venue" {
 		return errors.New("type must be `venue`")
 	}
 	if i.Id == "" {
 		return errors.New("id is required")
+	}
+	if i.Address == "" {
+		return errors.New("address is required")
+	}
+	if i.Title == "" {
+		return errors.New("title is required")
+	}
+	if i.InputMessageContent == nil {
+		i.InputMessageContent = InputEmptyContent{}
+	} else {
+		e := i.InputMessageContent.checkMessageContent()
+		if e != nil {
+			return e
+		}
 	}
 	return nil
 }
@@ -411,12 +515,23 @@ type InlineQueryResultContact struct {
 	inlineKeyboardMarkup
 }
 
-func (i InlineQueryResultContact) checkQueryAnswer() error {
+func (i *InlineQueryResultContact) checkQueryAnswer() error {
 	if i.Type != "contact" {
 		return errors.New("type must be `contact`")
 	}
 	if i.Id == "" {
 		return errors.New("id is required")
+	}
+	if i.FirstName == "" {
+		return errors.New("first_name is required")
+	}
+	if i.InputMessageContent == nil {
+		i.InputMessageContent = InputEmptyContent{}
+	} else {
+		e := i.InputMessageContent.checkMessageContent()
+		if e != nil {
+			return e
+		}
 	}
 	return nil
 }
@@ -428,12 +543,15 @@ type InlineQueryResultGame struct {
 	inlineKeyboardMarkup
 }
 
-func (i InlineQueryResultGame) checkQueryAnswer() error {
+func (i *InlineQueryResultGame) checkQueryAnswer() error {
 	if i.Type != "game" {
 		return errors.New("type must be `game`")
 	}
 	if i.Id == "" {
 		return errors.New("id is required")
+	}
+	if i.GameShortName == "" {
+		return errors.New("game_short_name is required")
 	}
 	return nil
 }
