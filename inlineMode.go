@@ -140,7 +140,7 @@ type InlineQueryResultPhoto struct {
 	Type                string          `json:"type"`
 	Id                  string          `json:"id"`
 	PhotoUrl            string          `json:"photo_url"`
-	PhotoId             string          `json:"photo_id"`
+	PhotoFileId         string          `json:"photo_file_id"`
 	ThumbUrl            string          `json:"thumb_url"`
 	PhotoWidth          int             `json:"photo_width"`
 	PhotoHeight         int             `json:"photo_height"`
@@ -160,10 +160,10 @@ func (i *InlineQueryResultPhoto) checkQueryAnswer() error {
 	if i.Id == "" {
 		return errors.New("id is required")
 	}
-	if i.PhotoUrl == "" && i.PhotoId == "" {
-		return errors.New("photo_url or photo_id is required")
+	if i.PhotoUrl == "" && i.PhotoFileId == "" {
+		return errors.New("photo_url or photo_file_id is required")
 	}
-	if i.ThumbUrl == "" {
+	if i.ThumbUrl == "" && i.PhotoUrl != "" {
 		return errors.New("ThumbUrl is required")
 	}
 	if i.InputMessageContent == nil {
