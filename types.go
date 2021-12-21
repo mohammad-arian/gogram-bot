@@ -97,23 +97,23 @@ const (
 	TypePhoto           = "photo"
 	TypeAnimation       = "animation"
 	TypeDeleteChatPhoto = "deleteChatPhoto"
+	TypeNewChatPhoto    = "NewChatPhoto"
 )
 
-// TypeIndicator function returns the type of message
-// This make it easier to know which fields are empty and which aren't
-// TypeIndicator may return "Text", "Animation", "Photo" and etc
+// TypeIndicator function returns the type of message.
+// This make it easier to know which fields are empty and which aren't.
 func (m Message) TypeIndicator() string {
 	switch {
 	case m.Text != "":
-		return "Text"
-	case m.Animation == Animation{}:
-		return "Animation"
+		return TypeText
+	case m.Animation != Animation{}:
+		return TypeAnimation
 	case m.Photo != nil:
-		return "Photo"
+		return TypePhoto
 	case m.DeleteChatPhoto == true:
-		return "DeleteChatPhoto"
+		return TypeDeleteChatPhoto
 	case m.NewChatPhoto != nil:
-		return "NewChatPhoto"
+		return TypeNewChatPhoto
 	default:
 		return "Unknown"
 	}
