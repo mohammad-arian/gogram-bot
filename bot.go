@@ -76,6 +76,10 @@ func (b *Bot) VerifyBot() error {
 // Listener listens to upcoming webhook updates
 func (b Bot) Listener(port string, ip ...string) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { webhookHandler(r, b) })
+	address := ":" + port
+	if len(ip) != 0 {
+		address = ip[0] + address
+	}
 	fmt.Println(http.ListenAndServe(ip[0]+":"+port, nil))
 }
 
