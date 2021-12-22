@@ -189,9 +189,9 @@ func replyKeyboardButtonRowAdder(t *ReplyKeyboard, oneTimeKeyboard bool,
 	}
 }
 
-func request(method string, token string, data interface{},
+func request(method string, bot Bot, data interface{},
 	optionalParams interface{}, responseType interface{}) (response interface{}, error error) {
-	req, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/%s", token, method),
+	req, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/%s", bot.Token, method),
 		nil)
 	var body = &bytes.Buffer{}
 	var set bool

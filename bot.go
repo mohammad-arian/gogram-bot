@@ -7,7 +7,12 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 )
+
+func init() {
+
+}
 
 // Bot represents a bot. you can create multiple bots
 // Token is required; but Handler and Self are optional
@@ -39,30 +44,39 @@ type Bot struct {
 	// Simultaneous if set to true, Handler functions run Simultaneously.
 	// This field is not mandatory
 	Simultaneous bool
+	Proxy        *url.URL
 	// Debug if set to true, every time Listener receives something, it will be printed.
 	// This field is not mandatory
 	Debug bool
 }
 
-// NewBot creates a Bot
-func NewBot(token string, handler func(message *Update, bot Bot), simultaneous bool, debug bool) (Bot, error) {
-	res, err := request("getme", token, nil, nil, &UserResponse{})
+func (b Bot) ActivateProxy() error {
+	if b.Proxy == nil {
+		return errors.New("proxy field of the bot is empty")
+	}
+	http.DefaultTransport = &http.Transport{Proxy: http.ProxyURL(b.Proxy)}
+	fmt.Println("added")
+	return nil
+}
+
+// VerifyBot verifies the token and sets the Self field of bot if token is valid.
+func (b *Bot) VerifyBot() error {
+	res, err := request("getme", *b, nil, nil, &UserResponse{})
 	if err != nil {
-		return Bot{}, err
+		return err
 	}
 	getMeRes := res.(*UserResponse)
 	if getMeRes.Ok != true {
-		return Bot{}, errors.New("token is wrong")
+		return errors.New("token is wrong")
 	}
-	var newBot = Bot{Token: token, Handler: handler, Self: getMeRes.Result,
-		Simultaneous: simultaneous, Debug: debug}
-	return newBot, nil
+	b.Self = getMeRes.Result
+	return nil
 }
 
 // Listener listens to upcoming webhook updates
-func (b Bot) Listener(port string) {
+func (b Bot) Listener(port string, ip ...string) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { webhookHandler(r, b) })
-	_ = http.ListenAndServe(":"+port, nil)
+	fmt.Println(http.ListenAndServe(ip[0]+":"+port, nil))
 }
 
 func webhookHandler(r *http.Request, bot Bot) {
