@@ -80,7 +80,7 @@ func (b Bot) Listener(port string, ip ...string) {
 	if len(ip) != 0 {
 		address = ip[0] + address
 	}
-	fmt.Println(http.ListenAndServe(ip[0]+":"+port, nil))
+	fmt.Println(http.ListenAndServe(address, nil))
 }
 
 func webhookHandler(r *http.Request, bot Bot) {
