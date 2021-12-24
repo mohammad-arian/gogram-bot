@@ -313,9 +313,6 @@ type MyCommandsOP struct {
 }
 
 type EditMessageTextOP struct {
-	ChatId                int             `json:"chat_id"`
-	MessageId             int             `json:"message_id"`
-	InlineMessageId       int             `json:"inline_message_id"`
 	ParseMode             string          `json:"parse_mode"`
 	Entities              []MessageEntity `json:"entities"`
 	DisableWebPagePreview bool            `json:"disable_web_page_preview"`
@@ -323,9 +320,6 @@ type EditMessageTextOP struct {
 }
 
 type EditMessageCaptionOP struct {
-	ChatId          int             `json:"chat_id"`
-	MessageId       int             `json:"message_id"`
-	InlineMessageId int             `json:"inline_message_id"`
 	Caption         string          `json:"caption"`
 	ParseMode       string          `json:"parse_mode"`
 	CaptionEntities []MessageEntity `json:"caption_entities"`
@@ -337,9 +331,6 @@ type StopPollOP struct {
 }
 
 type EditMessageMediaOP struct {
-	ChatId          int `json:"chat_id"`
-	MessageId       int `json:"message_id"`
-	InlineMessageId int `json:"inline_message_id"`
 	InlineKeyboard
 }
 

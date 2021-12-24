@@ -70,20 +70,13 @@ func multipartSetter(s interface{}, w *multipart.Writer, tag string) error {
 		// some file fields are optional. below if statement makes sure program won't panic
 		// even if a file field of data structure is empty.
 		if j != nil {
-			// altering tag to v.Name() breaks some methods like SendPhoto()
-			// because SendPhoto's file's tag must "photo" not the name of the file.
-			file, _ := w.CreateFormFile(tag, j.Name())
+			name := tag
+			if name == "" {
+				name = j.Name()
+			}
+			file, _ := w.CreateFormFile(name, j.Name())
 			_, _ = io.Copy(file, j)
 			_, _ = j.Seek(0, io.SeekStart)
-		}
-	// use []*os.File for methods like EditMessageMedia() and SendMediaGroup() that
-	// the fieldName of CreateFormFile() must be the name of the file.
-	case []*os.File:
-		for _, f := range j {
-			err := multipartSetter(f, w, f.Name())
-			if err != nil {
-				return err
-			}
 		}
 	default:
 		Type := reflect.TypeOf(s).Kind()

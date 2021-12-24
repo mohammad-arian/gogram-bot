@@ -10,10 +10,6 @@ import (
 	"net/url"
 )
 
-func init() {
-
-}
-
 // Bot represents a bot. you can create multiple bots
 // Token is required; but Handler and Self are optional
 type Bot struct {
@@ -71,6 +67,45 @@ func (b *Bot) VerifyBot() error {
 	}
 	b.Self = getMeRes.Result
 	return nil
+}
+
+// SetWebhook specifies an url and receive incoming updates via an outgoing webhook.
+// Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url,
+// containing a JSON-serialized Update.
+// In case of an unsuccessful request, we will give up after a reasonable amount of attempts.
+// Returns True on success.
+// If you'd like to make sure that the Webhook request comes from Telegram,
+// we recommend using a secret path in the URL, e.g. https://www.example.com/<token>.
+// Since nobody else knows your bot's token, you can be pretty sure it's us.
+func (b Bot) SetWebhook(url string, optionalParams *SetWebhookOP) (response *BooleanResponse, err error) {
+	type data struct {
+		Url string `json:"url"`
+	}
+	d := data{Url: url}
+	res, err := request("setWebhook", b, &d, optionalParams, &BooleanResponse{})
+	return res.(*BooleanResponse), err
+}
+
+func (b Bot) SetMyCommands(commands []BotCommand,
+	optionalParams *MyCommandsOP) (response *BooleanResponse, err error) {
+	type data struct {
+		Commands []BotCommand `json:"commands"`
+	}
+	d := data{Commands: commands}
+	res, err := request("setMyCommands", b, &d, optionalParams, &BooleanResponse{})
+	return res.(*BooleanResponse), err
+}
+
+func (b Bot) DeleteMyCommands(
+	optionalParams *MyCommandsOP) (response *BooleanResponse, err error) {
+	res, err := request("deleteMyCommands", b, nil, optionalParams, &BooleanResponse{})
+	return res.(*BooleanResponse), err
+}
+
+func (b Bot) GetMyCommands(
+	optionalParams *MyCommandsOP) (response *BotCommandResponse, err error) {
+	res, err := request("getMyCommands", b, nil, optionalParams, &BotCommandResponse{})
+	return res.(*BotCommandResponse), err
 }
 
 // Listener listens to upcoming webhook updates

@@ -3,25 +3,7 @@ package gogram
 import (
 	"errors"
 	"os"
-	"reflect"
 )
-
-// SetWebhook specifies an url and receive incoming updates via an outgoing webhook.
-// Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url,
-// containing a JSON-serialized Update.
-// In case of an unsuccessful request, we will give up after a reasonable amount of attempts.
-// Returns True on success.
-// If you'd like to make sure that the Webhook request comes from Telegram,
-// we recommend using a secret path in the URL, e.g. https://www.example.com/<token>.
-// Since nobody else knows your bot's token, you can be pretty sure it's us.
-func (b Bot) SetWebhook(url string, optionalParams *SetWebhookOP) (response *BooleanResponse, err error) {
-	type data struct {
-		Url string `json:"url"`
-	}
-	d := data{Url: url}
-	res, err := request("setWebhook", b, &d, optionalParams, &BooleanResponse{})
-	return res.(*BooleanResponse), err
-}
 
 // SendText sends message to a User.
 // b Bot parameter indicated which bot to send
@@ -155,47 +137,22 @@ func (r *ReplyAble) SendPoll(b Bot, question string, options []string,
 // You can add file_ids as string to send a media that exists on the Telegram servers (recommended),
 // HTTP URLs as string for Telegram to get a media from the Internet, or a file of type *os.File to
 // photos, videos, documents and audios slices.
-func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOP, photos []InputMediaPhoto,
-	videos []InputMediaVideo, documents []InputMediaDocument, audios []InputMediaAudio) (response *[]MessageResponse, err error) {
+func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOP,
+	media []InputMedia) (response *[]MessageResponse, err error) {
+	if len(media) == 0 {
+		return &[]MessageResponse{}, errors.New("media slice is empty. pass media a slice of structs of type " +
+			"InputMediaPhoto, InputMediaVideo, InputMediaDocument, InputMediaAudio or InputMediaAnimation")
+	}
+	for _, j := range media {
+		if j.checkInputMedia() != nil {
+			return &[]MessageResponse{}, err
+		}
+	}
 	type data struct {
-		ChatId int           `json:"chat_id"`
-		Media  []interface{} `json:"media"`
-		Files  []*os.File
+		ChatId int          `json:"chat_id"`
+		Media  []InputMedia `json:"media"`
 	}
-	d := data{ChatId: r.Id}
-	var files []*os.File
-	for _, i := range photos {
-		err := i.setMediaAndType(&files)
-		if err != nil {
-			return nil, err
-		}
-		d.Media = append(d.Media, i)
-	}
-	for _, i := range videos {
-		err := i.setMediaAndType(&files)
-		if err != nil {
-			return nil, err
-		}
-		d.Media = append(d.Media, i)
-	}
-	for _, i := range documents {
-		err := i.setMediaAndType(&files)
-		if err != nil {
-			return nil, err
-		}
-		d.Media = append(d.Media, i)
-	}
-	for _, i := range audios {
-		err := i.setMediaAndType(&files)
-		if err != nil {
-			return nil, err
-		}
-		d.Media = append(d.Media, i)
-	}
-	if d.Media == nil {
-		return nil, errors.New("you did not pass any media")
-	}
-	d.Files = files
+	d := data{ChatId: r.Id, Media: media}
 	res, err := request("sendMediaGroup", b, &d, optionalParams, &[]MessageResponse{})
 	return res.(*[]MessageResponse), err
 }
@@ -290,7 +247,7 @@ func (r *ReplyAble) GetUserProfilePhotos(b Bot,
 // GetFile gets basic info about a file and prepare it for downloading.
 // For the moment, bots can download files of up to 20 MB in size.
 // On success, a File object is returned. The file can then be downloaded via the link https://api.telegram.org/file/bot<token>/<file_path>, where <file_path> is taken from the response. It is guaranteed that the link will be valid for at least 1 hour. When the link expires, a new one can be requested by calling getFile again.
-func GetFile(b Bot, fileId string) (response *FileResponse, err error) {
+func (f *File) GetFile(b Bot, fileId string) (response *FileResponse, err error) {
 	type data struct {
 		FileId string `json:"file_id"`
 	}
@@ -567,43 +524,25 @@ func (r *ReplyAble) AnswerCallbackQuery(b Bot, callbackQueryId string,
 	return res.(*BooleanResponse), err
 }
 
-func (b Bot) SetMyCommands(commands []BotCommand,
-	optionalParams *MyCommandsOP) (response *BooleanResponse, err error) {
+func (m *Message) EditMessageText(b Bot, text string,
+	optionalParams *EditMessageTextOP) (response *MapResponse, err error) {
 	type data struct {
-		Commands []BotCommand `json:"commands"`
+		Text      string `json:"text"`
+		ChatId    int    `json:"chat_id"`
+		MessageId int    `json:"message_id"`
 	}
-	d := data{Commands: commands}
-	res, err := request("setMyCommands", b, &d, optionalParams, &BooleanResponse{})
-	return res.(*BooleanResponse), err
+	d := data{Text: text, ChatId: m.Chat.Id, MessageId: m.MessageId}
+	res, err := request("editMessageText", b, &d, &optionalParams, &MapResponse{})
+	return res.(*MapResponse), err
 }
 
-func (b Bot) DeleteMyCommands(
-	optionalParams *MyCommandsOP) (response *BooleanResponse, err error) {
-	res, err := request("deleteMyCommands", b, nil, optionalParams, &BooleanResponse{})
-	return res.(*BooleanResponse), err
-}
-
-func (b Bot) GetMyCommands(
-	optionalParams *MyCommandsOP) (response *BotCommandResponse, err error) {
-	res, err := request("getMyCommands", b, nil, optionalParams, &BotCommandResponse{})
-	return res.(*BotCommandResponse), err
-}
-
-func EditMessageText(b Bot, text string,
-	optionalParams EditMessageTextOP) (response *MapResponse, err error) {
+func (c *CallbackQuery) EditMessageText(b Bot, text string,
+	optionalParams *EditMessageTextOP) (response *MapResponse, err error) {
 	type data struct {
-		Text string `json:"text"`
+		Text            string `json:"text"`
+		InlineMessageId string `json:"inline_message_id"`
 	}
-	if optionalParams.ChatId == 0 && optionalParams.MessageId == 0 && optionalParams.InlineMessageId == 0 {
-		return nil, errors.New("ChatId, MessageId and InlineMessageId of optionalParams" +
-			" are empty. You need to set both ChatId and MessageId, or InlineMessageId")
-	}
-	if (optionalParams.ChatId == 0 && optionalParams.MessageId != 0) ||
-		(optionalParams.ChatId != 0 && optionalParams.MessageId == 0) {
-		return nil, errors.New("ChatId or MessageId of optionalParams" +
-			" are empty. you need to set both ChatId and MessageId or InlineMessageId")
-	}
-	d := data{Text: text}
+	d := data{Text: text, InlineMessageId: c.InlineMessageId}
 	res, err := request("editMessageText", b, &d, &optionalParams, &MapResponse{})
 	return res.(*MapResponse), err
 }
@@ -611,18 +550,27 @@ func EditMessageText(b Bot, text string,
 // EditMessageCaption edits captions of messages.
 // On success, if the edited message is not an inline message, MapResponse's Result is the
 // edited Message as a string, otherwise MapResponse's Result is True as a string.
-func EditMessageCaption(b Bot,
-	optionalParams EditMessageCaptionOP) (response *MapResponse, err error) {
-	if optionalParams.ChatId == 0 && optionalParams.MessageId == 0 && optionalParams.InlineMessageId == 0 {
-		return nil, errors.New("ChatId, MessageId and InlineMessageId of optionalParams" +
-			" are empty. You need to set both ChatId and MessageId, or InlineMessageId")
+func (m *Message) EditMessageCaption(b Bot,
+	optionalParams *EditMessageCaptionOP) (response *MapResponse, err error) {
+	type data struct {
+		ChatId    int `json:"chat_id"`
+		MessageId int `json:"message_id"`
 	}
-	if (optionalParams.ChatId == 0 && optionalParams.MessageId != 0) ||
-		(optionalParams.ChatId != 0 && optionalParams.MessageId == 0) {
-		return nil, errors.New("ChatId or MessageId of optionalParams" +
-			" are empty. you need to set both ChatId and MessageId or InlineMessageId")
+	d := data{ChatId: m.Chat.Id, MessageId: m.MessageId}
+	res, err := request("editMessageCaption", b, &d, &optionalParams, &MapResponse{})
+	return res.(*MapResponse), err
+}
+
+// EditMessageCaption edits captions of messages.
+// On success, if the edited message is not an inline message, MapResponse's Result is the
+// edited Message as a string, otherwise MapResponse's Result is True as a string.
+func (c *CallbackQuery) EditMessageCaption(b Bot,
+	optionalParams *EditMessageCaptionOP) (response *MapResponse, err error) {
+	type data struct {
+		InlineMessageId string `json:"inline_message_id"`
 	}
-	res, err := request("editMessageCaption", b, nil, &optionalParams, &MapResponse{})
+	d := data{InlineMessageId: c.InlineMessageId}
+	res, err := request("editMessageCaption", b, &d, &optionalParams, &MapResponse{})
 	return res.(*MapResponse), err
 }
 
@@ -632,60 +580,80 @@ func EditMessageCaption(b Bot,
 // When an inline message is edited, a new file can't be uploaded; use a previously
 // uploaded file via its file_id or specify a URL.
 // pass media a type of InputMediaAudio, InputMediaPhoto, InputMediaVideo or InputMediaDocument and make sure
-// Media field of them is not empty. Media field can be file_id, URL or file. if you are uploding a file
-//
+// Media field of them is not empty. Media field can be file_id, URL or file.
 // On success, if the edited message is not an inline message, MapResponse's Result is the
 // edited Message as a string, otherwise MapResponse's Result is True as a string.
-func EditMessageMedia(b Bot, media interface{},
-	optionalParams EditMessageMediaOP) (response *MapResponse, err error) {
+func (m *Message) EditMessageMedia(b Bot, media InputMedia,
+	optionalParams *EditMessageMediaOP) (response *MapResponse, err error) {
+	if media == nil {
+		return &MapResponse{}, errors.New("media is nil. pass media a struct of type " +
+			"InputMediaPhoto, InputMediaVideo, InputMediaDocument, InputMediaAudio or InputMediaAnimation")
+	}
 	type data struct {
-		Media interface{} `json:"media"`
-		// at most there could be only one file but since setMediaAndType(files *[]*os.File) accepts slices
-		// File is a slice. Modifying setMediaAndType() breaks SendMediaGroup()
-		File []*os.File
+		ChatId    int        `json:"chat_id"`
+		MessageId int        `json:"message_id"`
+		Media     InputMedia `json:"media"`
 	}
-	d := data{}
-	var files []*os.File
-	switch v := media.(type) {
-	case InputMediaAudio:
-		err := v.setMediaAndType(&files)
-		if err != nil {
-			return nil, err
-		}
-		d.Media = v
-	case InputMediaPhoto:
-		err := v.setMediaAndType(&files)
-		if err != nil {
-			return nil, err
-		}
-		d.Media = v
-	case InputMediaVideo:
-		err := v.setMediaAndType(&files)
-		if err != nil {
-			return nil, err
-		}
-		d.Media = v
-	case InputMediaDocument:
-		err := v.setMediaAndType(&files)
-		if err != nil {
-			return nil, err
-		}
-		d.Media = v
-	default:
-		return nil, errors.New("pass media a type of InputMediaAudio, InputMediaPhoto, InputMediaVideo " +
-			"or InputMediaDocument not " + reflect.TypeOf(media).String())
+	if media.checkInputMedia() != nil {
+		return &MapResponse{}, err
 	}
-	if optionalParams.ChatId == 0 && optionalParams.MessageId == 0 && optionalParams.InlineMessageId == 0 {
-		return nil, errors.New("ChatId, MessageId and InlineMessageId of optionalParams" +
-			" are empty. You need to set both ChatId and MessageId, or InlineMessageId")
-	}
-	if (optionalParams.ChatId == 0 && optionalParams.MessageId != 0) ||
-		(optionalParams.ChatId != 0 && optionalParams.MessageId == 0) {
-		return nil, errors.New("ChatId or MessageId of optionalParams" +
-			" are empty. you need to set both ChatId and MessageId or InlineMessageId")
-	}
-	d.File = files
+	d := data{ChatId: m.Chat.Id, MessageId: m.MessageId, Media: media}
 	res, err := request("editMessageMedia", b, &d, optionalParams, &MapResponse{})
+	return res.(*MapResponse), err
+}
+
+// EditMessageMedia edits animation, audio, document, photo, or video messages.
+// If a message is part of a message album, then it can be edited only to an audio for audio albums,
+// only to a document for document albums and to a photo or a video otherwise.
+// When an inline message is edited, a new file can't be uploaded; use a previously
+// uploaded file via its file_id or specify a URL.
+// pass media a type of InputMediaAudio, InputMediaPhoto, InputMediaVideo or InputMediaDocument and make sure
+// Media field of them is not empty. Media field can be file_id, URL or file.
+// On success, if the edited message is not an inline message, MapResponse's Result is the
+// edited Message as a string, otherwise MapResponse's Result is True as a string.
+func (c *CallbackQuery) EditMessageMedia(b Bot, media InputMedia,
+	optionalParams *EditMessageMediaOP) (response *MapResponse, err error) {
+	if media == nil {
+		return &MapResponse{}, errors.New("media is nil. pass media a struct of type " +
+			"InputMediaPhoto, InputMediaVideo, InputMediaDocument, InputMediaAudio or InputMediaAnimation")
+	}
+	type data struct {
+		InlineMessageId string     `json:"inline_message_id"`
+		Media           InputMedia `json:"media"`
+	}
+	if media.checkInputMedia() != nil {
+		return &MapResponse{}, err
+	}
+	d := data{InlineMessageId: c.InlineMessageId, Media: media}
+	res, err := request("editMessageMedia", b, &d, optionalParams, &MapResponse{})
+	return res.(*MapResponse), err
+}
+
+// EditMessageReplyMarkup edits only the reply markup of messages.
+// On success, if the edited message is not an inline message, the edited Message is returned,
+// otherwise True is returned.
+func (m *Message) EditMessageReplyMarkup(b Bot,
+	optionalParams *EditMessageMediaOP) (response *MapResponse, err error) {
+	type data struct {
+		ChatId    int `json:"chat_id"`
+		MessageId int `json:"message_id"`
+	}
+	d := data{ChatId: m.Chat.Id, MessageId: m.MessageId}
+	res, err := request("editMessageReplyMarkup", b, &d, optionalParams, &MapResponse{})
+	return res.(*MapResponse), err
+}
+
+// EditMessageReplyMarkup edits only the reply markup of messages.
+// On success, if the edited message is not an inline message, the edited Message is returned,
+// otherwise True is returned.
+func (c *CallbackQuery) EditMessageReplyMarkup(b Bot,
+	optionalParams *EditMessageMediaOP) (response *MapResponse, err error) {
+	type data struct {
+		InlineMessageId string     `json:"inline_message_id"`
+		Media           InputMedia `json:"media"`
+	}
+	d := data{InlineMessageId: c.InlineMessageId}
+	res, err := request("editMessageReplyMarkup", b, &d, optionalParams, &MapResponse{})
 	return res.(*MapResponse), err
 }
 
@@ -709,32 +677,14 @@ func (r *Chat) StopPoll(b Bot, messageId int,
 //- If the bot is an administrator of a group, it can delete any message there.
 //- If the bot has can_delete_messages permission in a supergroup or a channel, it can delete any message there.
 // Returns True on success.
-func (r *Chat) DeleteMessage(b Bot, messageId int) (response *BooleanResponse, err error) {
+func (m *Message) DeleteMessage(b Bot, chatId int) (response *BooleanResponse, err error) {
 	type data struct {
 		ChatId    int `json:"chat_id"`
 		MessageId int `json:"message_id"`
 	}
-	d := data{ChatId: r.Id, MessageId: messageId}
+	d := data{ChatId: chatId, MessageId: m.MessageId}
 	res, err := request("deleteMessage", b, &d, nil, &BooleanResponse{})
 	return res.(*BooleanResponse), err
-}
-
-// EditMessageReplyMarkup edits only the reply markup of messages.
-// On success, if the edited message is not an inline message, the edited Message is returned,
-// otherwise True is returned.
-func (r *Chat) EditMessageReplyMarkup(b Bot,
-	optionalParams EditMessageMediaOP) (response *MapResponse, err error) {
-	if optionalParams.ChatId == 0 && optionalParams.MessageId == 0 && optionalParams.InlineMessageId == 0 {
-		return nil, errors.New("ChatId, MessageId and InlineMessageId of optionalParams" +
-			" are empty. You need to set both ChatId and MessageId, or InlineMessageId")
-	}
-	if (optionalParams.ChatId == 0 && optionalParams.MessageId != 0) ||
-		(optionalParams.ChatId != 0 && optionalParams.MessageId == 0) {
-		return nil, errors.New("ChatId or MessageId of optionalParams" +
-			" are empty. you need to set both ChatId and MessageId or InlineMessageId")
-	}
-	res, err := request("editMessageReplyMarkup", b, nil, nil, &MapResponse{})
-	return res.(*MapResponse), err
 }
 
 func (r *ReplyAble) SendSticker(b Bot, sticker interface{},
@@ -748,11 +698,11 @@ func (r *ReplyAble) SendSticker(b Bot, sticker interface{},
 	return res.(*MessageResponse), err
 }
 
-func GetStickerSet(b Bot, name string) (response *StickerSetResponse, err error) {
+func (s StickerSet) GetStickerSet(b Bot) (response *StickerSetResponse, err error) {
 	type data struct {
 		Name string `json:"name"`
 	}
-	d := data{Name: name}
+	d := data{Name: s.Name}
 	res, err := request("getStickerSet", b, &d, nil, &StickerSetResponse{})
 	return res.(*StickerSetResponse), err
 }
@@ -798,7 +748,7 @@ func (r *User) AddStickerToSet(b Bot, name string,
 	return res.(*BooleanResponse), err
 }
 
-func SetStickerPositionInSet(b Bot, sticker string, position int) (response *BooleanResponse, err error) {
+func (s Sticker) SetStickerPositionInSet(b Bot, sticker string, position int) (response *BooleanResponse, err error) {
 	type data struct {
 		Sticker  string `json:"sticker"`
 		Position int    `json:"position"`
@@ -808,7 +758,7 @@ func SetStickerPositionInSet(b Bot, sticker string, position int) (response *Boo
 	return res.(*BooleanResponse), err
 }
 
-func DeleteStickerFromSet(b Bot, sticker string) (response *BooleanResponse, err error) {
+func (s Sticker) DeleteStickerFromSet(b Bot, sticker string) (response *BooleanResponse, err error) {
 	type data struct {
 		Sticker string `json:"sticker"`
 	}
