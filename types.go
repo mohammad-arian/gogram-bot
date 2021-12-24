@@ -435,6 +435,11 @@ type MessageResponse struct {
 	Response
 }
 
+type SliceMessageResponse struct {
+	Result []Message `json:"result"`
+	Response
+}
+
 type InviteLinkResponse struct {
 	Result ChatInviteLink `json:"result"`
 	Response

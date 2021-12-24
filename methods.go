@@ -137,15 +137,15 @@ func (r *ReplyAble) SendPoll(b Bot, question string, options []string,
 // You can add file_ids as string to send a media that exists on the Telegram servers (recommended),
 // HTTP URLs as string for Telegram to get a media from the Internet, or a file of type *os.File to
 // photos, videos, documents and audios slices.
-func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOP,
-	media []InputMedia) (response *[]MessageResponse, err error) {
+func (r *ReplyAble) SendMediaGroup(b Bot, media []InputMedia,
+	optionalParams *MediaGroupOP) (response *SliceMessageResponse, err error) {
 	if len(media) == 0 {
-		return &[]MessageResponse{}, errors.New("media slice is empty. pass media a slice of structs of type " +
+		return &SliceMessageResponse{}, errors.New("media slice is empty. pass media a slice of structs of type " +
 			"InputMediaPhoto, InputMediaVideo, InputMediaDocument, InputMediaAudio or InputMediaAnimation")
 	}
 	for _, j := range media {
 		if j.checkInputMedia() != nil {
-			return &[]MessageResponse{}, err
+			return &SliceMessageResponse{}, err
 		}
 	}
 	type data struct {
@@ -153,8 +153,8 @@ func (r *ReplyAble) SendMediaGroup(b Bot, optionalParams *MediaGroupOP,
 		Media  []InputMedia `json:"media"`
 	}
 	d := data{ChatId: r.Id, Media: media}
-	res, err := request("sendMediaGroup", b, &d, optionalParams, &[]MessageResponse{})
-	return res.(*[]MessageResponse), err
+	res, err := request("sendMediaGroup", b, &d, optionalParams, &SliceMessageResponse{})
+	return res.(*SliceMessageResponse), err
 }
 
 func (r *ReplyAble) SendLocation(b Bot, latitude float64, longitude float64,
