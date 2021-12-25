@@ -199,7 +199,14 @@ type Animation struct {
 }
 
 type InputMedia interface {
-	checkInputMedia() error
+	// checkInputMedia checks InputMedias such as InputMediaPhoto, InputMediaDocument etc.
+	// If they have a file checkInputMedia adds it to f slice and sets Media field
+	// automatically to attach://<file name> so users won't have to deal with Media.
+	// Methods like ReplyAble.SendMediaGroup() add f to data so multipartSetter() could create a form file.
+	// this behavior is because multipartSetter() can't parse each value in slices, so if a slice
+	// has a file, it won't be added to http requests, moreover adding a feature to multipartSetter()
+	// to check every slice element and every struct field impacts performance.
+	checkInputMedia(f *[]*os.File) error
 }
 
 // InputMediaPhoto Represents a photo to be sent.
@@ -218,13 +225,14 @@ type InputMediaPhoto struct {
 	CaptionEntities []MessageEntity `json:"caption_entities"`
 }
 
-func (i *InputMediaPhoto) checkInputMedia() error {
+func (i *InputMediaPhoto) checkInputMedia(f *[]*os.File) error {
 	i.Type = "photo"
 	if i.Media == "" && i.File == nil {
 		return errors.New("both Media and File fields of InputMediaPhoto are empty")
 	}
 	if i.File != nil {
 		i.Media = "attach://" + i.File.Name()
+		*f = append(*f, i.File)
 	}
 	return nil
 }
@@ -248,13 +256,14 @@ type InputMediaVideo struct {
 	CaptionEntities   []MessageEntity `json:"caption_entities"`
 }
 
-func (i *InputMediaVideo) checkInputMedia() error {
+func (i *InputMediaVideo) checkInputMedia(f *[]*os.File) error {
 	i.Type = "video"
 	if i.Media == "" && i.File == nil {
 		return errors.New("both Media and File fields of InputMediaVideo are empty")
 	}
 	if i.File != nil {
 		i.Media = "attach://" + i.File.Name()
+		*f = append(*f, i.File)
 	}
 	return nil
 }
@@ -277,13 +286,14 @@ type InputMediaDocument struct {
 	DisableContentTypeDetection bool `json:"disable_content_type_detection"`
 }
 
-func (i *InputMediaDocument) checkInputMedia() error {
+func (i *InputMediaDocument) checkInputMedia(f *[]*os.File) error {
 	i.Type = "document"
 	if i.Media == "" && i.File == nil {
 		return errors.New("both Media and File fields of InputMediaDocument are empty")
 	}
 	if i.File != nil {
 		i.Media = "attach://" + i.File.Name()
+		*f = append(*f, i.File)
 	}
 	return nil
 }
@@ -306,13 +316,14 @@ type InputMediaAudio struct {
 	Tile            string          `json:"tile"`
 }
 
-func (i *InputMediaAudio) checkInputMedia() error {
+func (i *InputMediaAudio) checkInputMedia(f *[]*os.File) error {
 	i.Type = "audio"
 	if i.Media == "" && i.File == nil {
 		return errors.New("both Media and File fields of InputMediaAudio are empty")
 	}
 	if i.File != nil {
 		i.Media = "attach://" + i.File.Name()
+		*f = append(*f, i.File)
 	}
 	return nil
 }
@@ -334,13 +345,14 @@ type InputMediaAnimation struct {
 	Height          int             `json:"height"`
 }
 
-func (i *InputMediaAnimation) checkInputMedia() error {
+func (i *InputMediaAnimation) checkInputMedia(f *[]*os.File) error {
 	i.Type = "animation"
 	if i.Media == "" && i.File == nil {
 		return errors.New("both Media and File fields of InputMediaAnimation are empty")
 	}
 	if i.File != nil {
 		i.Media = "attach://" + i.File.Name()
+		*f = append(*f, i.File)
 	}
 	return nil
 }

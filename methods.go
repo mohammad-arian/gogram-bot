@@ -143,16 +143,17 @@ func (r *ReplyAble) SendMediaGroup(b Bot, media []InputMedia,
 		return &SliceMessageResponse{}, errors.New("media slice is empty. pass media a slice of structs of type " +
 			"InputMediaPhoto, InputMediaVideo, InputMediaDocument, InputMediaAudio or InputMediaAnimation")
 	}
-	for _, j := range media {
-		if j.checkInputMedia() != nil {
-			return &SliceMessageResponse{}, err
-		}
-	}
 	type data struct {
 		ChatId int          `json:"chat_id"`
 		Media  []InputMedia `json:"media"`
+		File   []*os.File
 	}
 	d := data{ChatId: r.Id, Media: media}
+	for _, j := range media {
+		if j.checkInputMedia(&d.File) != nil {
+			return &SliceMessageResponse{}, err
+		}
+	}
 	res, err := request("sendMediaGroup", b, &d, optionalParams, &SliceMessageResponse{})
 	return res.(*SliceMessageResponse), err
 }
@@ -593,11 +594,12 @@ func (m *Message) EditMessageMedia(b Bot, media InputMedia,
 		ChatId    int        `json:"chat_id"`
 		MessageId int        `json:"message_id"`
 		Media     InputMedia `json:"media"`
-	}
-	if media.checkInputMedia() != nil {
-		return &MapResponse{}, err
+		File      []*os.File
 	}
 	d := data{ChatId: m.Chat.Id, MessageId: m.MessageId, Media: media}
+	if media.checkInputMedia(&d.File) != nil {
+		return &MapResponse{}, err
+	}
 	res, err := request("editMessageMedia", b, &d, optionalParams, &MapResponse{})
 	return res.(*MapResponse), err
 }
@@ -620,11 +622,12 @@ func (c *CallbackQuery) EditMessageMedia(b Bot, media InputMedia,
 	type data struct {
 		InlineMessageId string     `json:"inline_message_id"`
 		Media           InputMedia `json:"media"`
-	}
-	if media.checkInputMedia() != nil {
-		return &MapResponse{}, err
+		File            []*os.File
 	}
 	d := data{InlineMessageId: c.InlineMessageId, Media: media}
+	if media.checkInputMedia(&d.File) != nil {
+		return &MapResponse{}, err
+	}
 	res, err := request("editMessageMedia", b, &d, optionalParams, &MapResponse{})
 	return res.(*MapResponse), err
 }

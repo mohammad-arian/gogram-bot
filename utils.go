@@ -78,6 +78,13 @@ func multipartSetter(s interface{}, w *multipart.Writer, tag string) error {
 			_, _ = io.Copy(file, j)
 			_, _ = j.Seek(0, io.SeekStart)
 		}
+	case []*os.File:
+		for _, f := range j {
+			err := multipartSetter(f, w, "")
+			if err != nil {
+				return err
+			}
+		}
 	default:
 		Type := reflect.TypeOf(s).Kind()
 		if Type == reflect.Slice || Type == reflect.Struct {
