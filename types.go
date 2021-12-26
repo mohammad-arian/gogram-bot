@@ -25,19 +25,19 @@ type CallbackQuery struct {
 }
 
 type Message struct {
-	MessageId       int                  `json:"message_id"`
-	User            User                 `json:"from"`
-	Chat            Chat                 `json:"chat"`
-	Text            string               `json:"text"`
-	Animation       Animation            `json:"animation"`
-	Photo           []PhotoSize          `json:"photo"`
-	Date            int                  `json:"date"`
-	ReplyMarkup     inlineKeyboardMarkup `json:"reply_markup"`
-	Poll            Poll                 `json:"poll"`
-	NewChatPhoto    []PhotoSize          `json:"new_chat_photo"`
-	NewChatTitle    string               `json:"new_chat_title"`
-	NewChatMembers  []User               `json:"new_chat_members"`
-	DeleteChatPhoto bool                 `json:"delete_chat_photo"`
+	MessageId       int            `json:"message_id"`
+	User            User           `json:"from"`
+	Chat            Chat           `json:"chat"`
+	Text            string         `json:"text"`
+	Animation       Animation      `json:"animation"`
+	Photo           []PhotoSize    `json:"photo"`
+	Date            int            `json:"date"`
+	ReplyMarkup     InlineKeyboard `json:"reply_markup"`
+	Poll            Poll           `json:"poll"`
+	NewChatPhoto    []PhotoSize    `json:"new_chat_photo"`
+	NewChatTitle    string         `json:"new_chat_title"`
+	NewChatMembers  []User         `json:"new_chat_members"`
+	DeleteChatPhoto bool           `json:"delete_chat_photo"`
 }
 
 type MessageEntity struct {
@@ -232,6 +232,9 @@ func (i *InputMediaPhoto) checkInputMedia(f *[]*os.File) error {
 	}
 	if i.File != nil {
 		i.Media = "attach://" + i.File.Name()
+		if f == nil {
+			return errors.New("f slice is nil")
+		}
 		*f = append(*f, i.File)
 	}
 	return nil
@@ -263,6 +266,9 @@ func (i *InputMediaVideo) checkInputMedia(f *[]*os.File) error {
 	}
 	if i.File != nil {
 		i.Media = "attach://" + i.File.Name()
+		if f == nil {
+			return errors.New("f slice is nil")
+		}
 		*f = append(*f, i.File)
 	}
 	return nil
@@ -293,6 +299,9 @@ func (i *InputMediaDocument) checkInputMedia(f *[]*os.File) error {
 	}
 	if i.File != nil {
 		i.Media = "attach://" + i.File.Name()
+		if f == nil {
+			return errors.New("f slice is nil")
+		}
 		*f = append(*f, i.File)
 	}
 	return nil
@@ -323,6 +332,9 @@ func (i *InputMediaAudio) checkInputMedia(f *[]*os.File) error {
 	}
 	if i.File != nil {
 		i.Media = "attach://" + i.File.Name()
+		if f == nil {
+			return errors.New("f slice is nil")
+		}
 		*f = append(*f, i.File)
 	}
 	return nil
@@ -352,6 +364,9 @@ func (i *InputMediaAnimation) checkInputMedia(f *[]*os.File) error {
 	}
 	if i.File != nil {
 		i.Media = "attach://" + i.File.Name()
+		if f == nil {
+			return errors.New("f slice is nil")
+		}
 		*f = append(*f, i.File)
 	}
 	return nil
@@ -583,4 +598,158 @@ type BotCommandScope struct {
 	// UserId is unique identifier of the target user.
 	// Required only if Type is "chat_member"
 	UserId int `json:"user_id"`
+}
+
+type InlineKeyboard struct {
+	Buttons [][]InlineButton `json:"inline_keyboard"`
+}
+
+func (i *InlineKeyboard) AddInlineButtons(horizontal bool, a ...InlineButton) {
+	var buttons [][]InlineButton
+	if horizontal {
+		buttons = append(buttons, []InlineButton{})
+		for _, button := range a {
+			buttons[0] = append(buttons[0], button)
+		}
+	} else {
+		for _, button := range a {
+			buttons = append(buttons, []InlineButton{button})
+		}
+	}
+	if i.Buttons == nil {
+		i.Buttons = buttons
+	} else {
+		i.Buttons = append(i.Buttons, buttons...)
+	}
+}
+
+type ReplyKeyboard struct {
+	Keyboard              [][]ReplyButton `json:"keyboard"`
+	OneTimeKeyboard       bool            `json:"one_time_keyboard"`
+	ResizeKeyboard        bool            `json:"resize_keyboard"`
+	InputFieldPlaceholder string          `json:"input_field_placeholder"`
+	Selective             bool            `json:"selective"`
+}
+
+func (r *ReplyKeyboard) AddReplyButtons(optionalParams AddReplyKeyboardOP, a ...ReplyButton) {
+	r.OneTimeKeyboard = optionalParams.OneTimeKeyboard
+	r.Selective = optionalParams.Selective
+	r.InputFieldPlaceholder = optionalParams.InputFieldPlaceholder
+	r.ResizeKeyboard = optionalParams.ResizeKeyboard
+	var buttons [][]ReplyButton
+	if optionalParams.Horizontal {
+		buttons = append(buttons, []ReplyButton{})
+		for _, button := range a {
+			buttons[0] = append(buttons[0], button)
+		}
+	} else {
+		for _, button := range a {
+			buttons = append(buttons, []ReplyButton{button})
+		}
+	}
+	if r.Keyboard == nil {
+		r.Keyboard = buttons
+	} else {
+		r.Keyboard = append(r.Keyboard, buttons...)
+	}
+}
+
+type ReplyKeyboardRemove struct {
+	RemoveKeyboard bool `json:"remove_keyboard"`
+	Selective      bool `json:"selective"`
+}
+
+// Remove removes the reply keyboard.
+// Set selective to true if you want to remove the keyboard for specific users only.
+// Targets: 1) users that are @mentioned in the text of the Message object;
+//          2) if the bot's message is a reply (has reply_to_message_id), sender of the original message.
+// Example: A user votes in a poll, bot returns confirmation message in reply
+// to the vote and removes the keyboard for that user,
+// while still showing the keyboard with poll options to users who haven't voted yet.
+func (r *ReplyKeyboardRemove) Remove(selective bool) {
+	r.RemoveKeyboard = true
+	r.Selective = selective
+}
+
+type ForceReply struct {
+	IsForceReply          bool   `json:"force_reply"`
+	InputFieldPlaceholder string `json:"input_field_placeholder"`
+	Selective             bool   `json:"selective"`
+}
+
+func (t *ForceReply) SetForceReply(selective bool, inputFieldPlaceholder string) {
+	t.IsForceReply = true
+	t.Selective = selective
+	t.InputFieldPlaceholder = inputFieldPlaceholder
+}
+
+type Keyboard struct {
+	ReplyMarkup interface{} `json:"reply_markup"`
+}
+
+func (k *Keyboard) SetInlineKeyboard(horizontal bool, a ...InlineButton) {
+	i := InlineKeyboard{}
+	i.AddInlineButtons(horizontal, a...)
+	k.ReplyMarkup = i
+}
+
+func (k *Keyboard) SetReplyKeyboard(optionalParams AddReplyKeyboardOP, a ...ReplyButton) {
+	i := ReplyKeyboard{}
+	i.AddReplyButtons(optionalParams, a...)
+	k.ReplyMarkup = i
+}
+
+func (k *Keyboard) RemoveReplyKeyboard(selective bool) {
+	i := ReplyKeyboardRemove{}
+	i.Remove(selective)
+	k.ReplyMarkup = i
+}
+
+func (k *Keyboard) ForceReply(selective bool, inputFieldPlaceholder string) {
+	i := ForceReply{}
+	i.SetForceReply(selective, inputFieldPlaceholder)
+	k.ReplyMarkup = i
+}
+
+// InlineButton represents one button of an inline keyboard.
+// You must use exactly one of the optional fields.
+type InlineButton struct {
+	// Label text on the button
+	Text string `json:"text"`
+	// Optional. HTTP or tg:// url to be opened
+	// when button is pressed
+	Url string `json:"url"`
+	// Optional. Data to be sent in a callback query
+	// to the bot when button is pressed
+	CallbackData string `json:"callback_data"`
+	// Optional. If set, pressing the button will prompt the user to select one of their chats,
+	// open that chat and insert the bot's username and the specified inline query in the input field.
+	// Can be empty, in which case just the bot's username will be inserted.
+	// Note: This offers an easy way for users to start using your bot in inline mode
+	// when they are currently in a private chat with it.
+	// Especially useful when combined with switch_pm… actions – in this case the user will be
+	// automatically returned to the chat they switched from, skipping the chat selection screen.
+	SwitchInlineQuery string `json:"switch_inline_query"`
+	// Optional. If set, pressing the button will insert the bot's username and the specified
+	// inline query in the current chat's input field.
+	// Can be empty, in which case only the bot's username will be inserted.
+	// This offers a quick way for the user to open your bot in inline mode
+	// in the same chat – good for selecting something from multiple options.
+	SwitchInlineQueryCurrentChat string `json:"switch_inline_query_current_chat"`
+	// Optional. Specify True, to send a Pay button.
+	// NOTE: This type of button must always be the first button in the first row.
+	Pay bool `json:"pay"`
+}
+
+// ReplyButton represents one button of a reply keyboard.
+type ReplyButton struct {
+	// Text of the button. If none of the optional fields are used,
+	// it will be sent as a message when the button is pressed
+	Text string `json:"text"`
+	// Optional. If True, the user's phone number will be sent as a contact when the button is pressed.
+	// Available in private chats only
+	RequestContact bool `json:"request_contact"`
+	// Optional. If True, the user's current location will be sent when the button is pressed.
+	// Available in private chats only
+	RequestLocation bool `json:"request_location"`
 }

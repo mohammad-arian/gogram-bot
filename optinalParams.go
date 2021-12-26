@@ -2,21 +2,6 @@ package gogram
 
 import "os"
 
-type InlineKeyboard struct {
-	inlineKeyboardMarkup
-}
-
-type ReplyKeyboard struct {
-	replyKeyboardMarkup
-	replyKeyboardRemove
-}
-
-type ForceReply struct {
-	IsForceReply          bool   `json:"force_reply"`
-	InputFieldPlaceholder string `json:"input_field_placeholder"`
-	Selective             bool   `json:"selective"`
-}
-
 // TextOP represents optional parameters
 // that SendText function can use.
 // All fields are optional.
@@ -27,9 +12,7 @@ type TextOP struct {
 	DisableNotification      bool            `json:"disable_notification"`
 	ReplyToMessageId         int             `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
-	InlineKeyboard
-	ReplyKeyboard
-	ForceReply
+	Keyboard
 }
 
 type PhotoOP struct {
@@ -39,9 +22,7 @@ type PhotoOP struct {
 	DisableNotification      bool            `json:"disable_notification"`
 	ReplyToMessageId         int             `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
-	InlineKeyboard
-	ReplyKeyboard
-	ForceReply
+	Keyboard
 }
 
 type VideoOP struct {
@@ -55,9 +36,7 @@ type VideoOP struct {
 	DisableNotification      bool            `json:"disable_notification"`
 	ReplyToMessageId         int             `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
-	InlineKeyboard
-	ReplyKeyboard
-	ForceReply
+	Keyboard
 }
 
 type AudioOP struct {
@@ -70,9 +49,7 @@ type AudioOP struct {
 	DisableNotification      bool            `json:"disable_notification"`
 	ReplyToMessageId         int             `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
-	InlineKeyboard
-	ReplyKeyboard
-	ForceReply
+	Keyboard
 }
 
 type DocumentOP struct {
@@ -85,9 +62,7 @@ type DocumentOP struct {
 	DisableNotification         bool            `json:"disable_notification"`
 	ReplyToMessageId            int             `json:"reply_to_message_id"`
 	AllowSendingWithoutReply    bool            `json:"allow_sending_without_reply"`
-	InlineKeyboard
-	ReplyKeyboard
-	ForceReply
+	Keyboard
 }
 
 type VoiceOP struct {
@@ -98,9 +73,7 @@ type VoiceOP struct {
 	DisableNotification      bool            `json:"disable_notification"`
 	ReplyToMessageId         int             `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
-	InlineKeyboard
-	ReplyKeyboard
-	ForceReply
+	Keyboard
 }
 
 type AnimationOP struct {
@@ -113,9 +86,7 @@ type AnimationOP struct {
 	DisableNotification      bool            `json:"disable_notification"`
 	ReplyToMessageId         int             `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
-	InlineKeyboard
-	ReplyKeyboard
-	ForceReply
+	Keyboard
 }
 
 type PollOP struct {
@@ -149,9 +120,7 @@ type PollOP struct {
 	DisableNotification      bool `json:"disable_notification"`
 	ReplyToMessageId         int  `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool `json:"allow_sending_without_reply"`
-	InlineKeyboard
-	ReplyKeyboard
-	ForceReply
+	Keyboard
 }
 
 type DiceOP struct {
@@ -164,9 +133,7 @@ type DiceOP struct {
 	DisableNotification      bool   `json:"disable_notification"`
 	ReplyToMessageId         int    `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool   `json:"allow_sending_without_reply"`
-	InlineKeyboard
-	ReplyKeyboard
-	ForceReply
+	Keyboard
 }
 
 type VideoNoteOP struct {
@@ -175,9 +142,7 @@ type VideoNoteOP struct {
 	DisableNotification      bool `json:"disable_notification"`
 	ReplyToMessageId         int  `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool `json:"allow_sending_without_reply"`
-	InlineKeyboard
-	ReplyKeyboard
-	ForceReply
+	Keyboard
 }
 
 type LocationOP struct {
@@ -188,9 +153,7 @@ type LocationOP struct {
 	DisableNotification      bool    `json:"disable_notification"`
 	ReplyToMessageId         int     `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool    `json:"allow_sending_without_reply"`
-	InlineKeyboard
-	ReplyKeyboard
-	ForceReply
+	Keyboard
 }
 
 type ContactOP struct {
@@ -200,9 +163,7 @@ type ContactOP struct {
 	DisableNotification      bool   `json:"disable_notification"`
 	ReplyToMessageId         int    `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool   `json:"allow_sending_without_reply"`
-	InlineKeyboard
-	ReplyKeyboard
-	ForceReply
+	Keyboard
 }
 
 // MediaGroupOP represents an album.
@@ -222,9 +183,7 @@ type CopyMessageOP struct {
 	DisableNotification      bool            `json:"disable_notification"`
 	ReplyToMessageId         int             `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
-	InlineKeyboard
-	ReplyKeyboard
-	ForceReply
+	Keyboard
 }
 
 type GetUserProfilePhotosOP struct {
@@ -346,9 +305,7 @@ type SendStickerOP struct {
 	DisableNotification      bool `json:"disable_notification"`
 	ReplyToMessageId         int  `json:"reply_To_Message_Id"`
 	AllowSendingWithoutReply bool `json:"allow_sending_without_reply"`
-	InlineKeyboard
-	ReplyKeyboard
-	ForceReply
+	Keyboard
 }
 
 type CreateNewStickerSetOP struct {
@@ -376,103 +333,10 @@ type AnswerInlineQueryOP struct {
 	SwitchPmParameter string `json:"switch_pm_parameter"`
 }
 
-func (i *InlineKeyboard) AddInlineKeyboardButton(horizontal bool, a ...InlineKeyboardButton) {
-	if horizontal {
-		inlineKeyboardButtonRowAdder(i, a...)
-	} else {
-		inlineKeyboardButtonColumnAdder(i, a...)
-	}
-}
-
-func (r *ReplyKeyboard) AddReplyKeyboardButton(horizontal bool, oneTimeKeyboard bool,
-	resizeKeyboard bool, inputFieldPlaceholder string, selective bool, i ...ReplyKeyboardButton) {
-	if horizontal {
-		replyKeyboardButtonRowAdder(r, oneTimeKeyboard, resizeKeyboard, inputFieldPlaceholder, selective, i...)
-	} else {
-		replyKeyboardButtonColumnAdder(r, oneTimeKeyboard, resizeKeyboard, inputFieldPlaceholder, selective, i...)
-	}
-}
-
-// RemoveReplyKeyboard Removes the reply keyboard.
-// Set selective to true if you want to remove the keyboard for specific users only.
-// Targets: 1) users that are @mentioned in the text of the Message object;
-//          2) if the bot's message is a reply (has reply_to_message_id), sender of the original message.
-// Example: A user votes in a poll, bot returns confirmation message in reply
-// to the vote and removes the keyboard for that user,
-// while still showing the keyboard with poll options to users who haven't voted yet.
-func (r *ReplyKeyboard) RemoveReplyKeyboard(selective bool) {
-	r.replyKeyboardRemove = replyKeyboardRemove{RemoveKeyboard: true, Selective: selective}
-}
-
-// SetForceReply sends a request to telegram clients to display
-// a reply interface to the user (act as if the user has selected the bot's message and tapped 'Reply').
-// This can be extremely useful if you want to create user-friendly
-// step-by-step interfaces without having to sacrifice privacy mode.
-func (t *ForceReply) SetForceReply(selective bool, inputFieldPlaceholder string) {
-	t.IsForceReply = true
-	t.Selective = selective
-	t.InputFieldPlaceholder = inputFieldPlaceholder
-}
-
-type inlineKeyboardMarkup struct {
-	InlineKeyboardButtons [][]InlineKeyboardButton `json:"inline_keyboard"`
-}
-
-type replyKeyboardMarkup struct {
-	Keyboard              [][]ReplyKeyboardButton `json:"keyboard"`
-	OneTimeKeyboard       bool                    `json:"one_time_keyboard"`
-	ResizeKeyboard        bool                    `json:"resize_keyboard"`
-	InputFieldPlaceholder string                  `json:"input_field_placeholder"`
-	Selective             bool                    `json:"selective"`
-}
-
-// replyKeyboardRemove represents an object that if Telegram clients receive,
-// they will remove the current custom keyboard and display the default letter-keyboard.
-// By default, custom keyboards are displayed until a new keyboard is sent by a bot.
-type replyKeyboardRemove struct {
-	RemoveKeyboard bool `json:"remove_keyboard"`
-	Selective      bool `json:"selective"`
-}
-
-// InlineKeyboardButton represents one button of an inline keyboard.
-// You must use exactly one of the optional fields.
-type InlineKeyboardButton struct {
-	// Label text on the button
-	Text string `json:"text"`
-	// Optional. HTTP or tg:// url to be opened
-	// when button is pressed
-	Url string `json:"url"`
-	// Optional. Data to be sent in a callback query
-	// to the bot when button is pressed
-	CallbackData string `json:"callback_data"`
-	// Optional. If set, pressing the button will prompt the user to select one of their chats,
-	// open that chat and insert the bot's username and the specified inline query in the input field.
-	// Can be empty, in which case just the bot's username will be inserted.
-	// Note: This offers an easy way for users to start using your bot in inline mode
-	// when they are currently in a private chat with it.
-	// Especially useful when combined with switch_pm… actions – in this case the user will be
-	// automatically returned to the chat they switched from, skipping the chat selection screen.
-	SwitchInlineQuery string `json:"switch_inline_query"`
-	// Optional. If set, pressing the button will insert the bot's username and the specified
-	// inline query in the current chat's input field.
-	// Can be empty, in which case only the bot's username will be inserted.
-	// This offers a quick way for the user to open your bot in inline mode
-	// in the same chat – good for selecting something from multiple options.
-	SwitchInlineQueryCurrentChat string `json:"switch_inline_query_current_chat"`
-	// Optional. Specify True, to send a Pay button.
-	// NOTE: This type of button must always be the first button in the first row.
-	Pay bool `json:"pay"`
-}
-
-// ReplyKeyboardButton represents one button of a reply keyboard.
-type ReplyKeyboardButton struct {
-	// Text of the button. If none of the optional fields are used,
-	// it will be sent as a message when the button is pressed
-	Text string `json:"text"`
-	// Optional. If True, the user's phone number will be sent as a contact when the button is pressed.
-	// Available in private chats only
-	RequestContact bool `json:"request_contact"`
-	// Optional. If True, the user's current location will be sent when the button is pressed.
-	// Available in private chats only
-	RequestLocation bool `json:"request_location"`
+type AddReplyKeyboardOP struct {
+	Horizontal            bool   `json:"horizontal"`
+	OneTimeKeyboard       bool   `json:"one_time_keyboard"`
+	ResizeKeyboard        bool   `json:"resize_keyboard"`
+	InputFieldPlaceholder string `json:"input_field_placeholder"`
+	Selective             bool   `json:"selective"`
 }

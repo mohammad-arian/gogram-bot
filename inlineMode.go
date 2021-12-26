@@ -143,7 +143,7 @@ type InlineQueryResultArticle struct {
 	ThumbUrl            string         `json:"thumb_url"`
 	ThumbWidth          int            `json:"thumb_width"`
 	ThumbHeight         int            `json:"thumb_height"`
-	inlineKeyboardMarkup
+	InlineKeyboard
 }
 
 func (i *InlineQueryResultArticle) checkQueryAnswer() error {
@@ -180,7 +180,7 @@ type InlineQueryResultPhoto struct {
 	ParseMode           string          `json:"parse_mode"`
 	CaptionEntities     []MessageEntity `json:"caption_entities"`
 	InputMessageContent MessageContent  `json:"input_message_content"`
-	inlineKeyboardMarkup
+	InlineKeyboard
 }
 
 func (i *InlineQueryResultPhoto) checkQueryAnswer() error {
@@ -225,7 +225,7 @@ type InlineQueryResultGif struct {
 	ParseMode           string          `json:"parse_mode"`
 	CaptionEntities     []MessageEntity `json:"caption_entities"`
 	InputMessageContent MessageContent  `json:"input_message_content"`
-	inlineKeyboardMarkup
+	InlineKeyboard
 }
 
 func (i *InlineQueryResultGif) checkQueryAnswer() error {
@@ -269,7 +269,7 @@ type InlineQueryResultMpeg4Gif struct {
 	ParseMode           string          `json:"parse_mode"`
 	CaptionEntities     []MessageEntity `json:"caption_entities"`
 	InputMessageContent MessageContent  `json:"input_message_content"`
-	inlineKeyboardMarkup
+	InlineKeyboard
 }
 
 func (i *InlineQueryResultMpeg4Gif) checkQueryAnswer() error {
@@ -315,7 +315,7 @@ type InlineQueryResultVideo struct {
 	VideoDuration       int             `json:"video_duration"`
 	Description         string          `json:"description"`
 	InputMessageContent MessageContent  `json:"input_message_content"`
-	inlineKeyboardMarkup
+	InlineKeyboard
 }
 
 func (i *InlineQueryResultVideo) checkQueryAnswer() error {
@@ -364,7 +364,7 @@ type InlineQueryResultAudio struct {
 	Performer           string          `json:"performer"`
 	AudioDuration       int             `json:"audio_duration"`
 	InputMessageContent MessageContent  `json:"input_message_content"`
-	inlineKeyboardMarkup
+	InlineKeyboard
 }
 
 func (i *InlineQueryResultAudio) checkQueryAnswer() error {
@@ -404,7 +404,7 @@ type InlineQueryResultVoice struct {
 	CaptionEntities     []MessageEntity `json:"caption_entities"`
 	VoiceDuration       int             `json:"voice_duration"`
 	InputMessageContent MessageContent  `json:"input_message_content"`
-	inlineKeyboardMarkup
+	InlineKeyboard
 }
 
 func (i *InlineQueryResultVoice) checkQueryAnswer() error {
@@ -448,7 +448,7 @@ type InlineQueryResultDocument struct {
 	ThumbUrl            string          `json:"thumb_url"`
 	ThumbWidth          int             `json:"thumb_width"`
 	ThumbHeight         int             `json:"thumb_height"`
-	inlineKeyboardMarkup
+	InlineKeyboard
 }
 
 func (i *InlineQueryResultDocument) checkQueryAnswer() error {
@@ -491,7 +491,7 @@ type InlineQueryResultLocation struct {
 	ThumbWidth          int            `json:"thumb_width"`
 	ThumbHeight         int            `json:"thumb_height"`
 	Location
-	inlineKeyboardMarkup
+	InlineKeyboard
 }
 
 func (i *InlineQueryResultLocation) checkQueryAnswer() error {
@@ -528,7 +528,7 @@ type InlineQueryResultVenue struct {
 	ThumbUrl            string         `json:"thumb_url"`
 	ThumbWidth          int            `json:"thumb_width"`
 	ThumbHeight         int            `json:"thumb_height"`
-	inlineKeyboardMarkup
+	InlineKeyboard
 }
 
 func (i *InlineQueryResultVenue) checkQueryAnswer() error {
@@ -564,7 +564,7 @@ type InlineQueryResultContact struct {
 	ThumbUrl            string         `json:"thumb_url"`
 	ThumbWidth          int            `json:"thumb_width"`
 	ThumbHeight         int            `json:"thumb_height"`
-	inlineKeyboardMarkup
+	InlineKeyboard
 }
 
 func (i *InlineQueryResultContact) checkQueryAnswer() error {
@@ -590,7 +590,7 @@ type InlineQueryResultGame struct {
 	Type          string `json:"type"`
 	Id            string `json:"id"`
 	GameShortName string `json:"game_short_name"`
-	inlineKeyboardMarkup
+	InlineKeyboard
 }
 
 func (i *InlineQueryResultGame) checkQueryAnswer() error {
@@ -609,7 +609,7 @@ type InlineQueryResultSticker struct {
 	Id                  string         `json:"id"`
 	StickerFileId       string         `json:"sticker_file_id"`
 	InputMessageContent MessageContent `json:"input_message_content"`
-	inlineKeyboardMarkup
+	InlineKeyboard
 }
 
 func (i *InlineQueryResultSticker) checkQueryAnswer() error {
