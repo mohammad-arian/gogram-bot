@@ -34,16 +34,18 @@ func multipartSetter(s interface{}, w *multipart.Writer, tag string) error {
 		}
 	case nil:
 		return nil
-	// use *os.File for methods like SendVideo() and SendPhoto() that
+	// use *os.File is for methods like SendVideo() and SendPhoto() that
 	// the fieldName of CreateFormFile() can't be the name of the file.
 	case *os.File:
-		name := tag
-		if name == "" {
-			name = j.Name()
+		if j != nil {
+			name := tag
+			if name == "" {
+				name = j.Name()
+			}
+			file, _ := w.CreateFormFile(name, j.Name())
+			_, _ = io.Copy(file, j)
+			_, _ = j.Seek(0, io.SeekStart)
 		}
-		file, _ := w.CreateFormFile(name, j.Name())
-		_, _ = io.Copy(file, j)
-		_, _ = j.Seek(0, io.SeekStart)
 	case []*os.File:
 		for _, f := range j {
 			if err := multipartSetter(f, w, ""); err != nil {
