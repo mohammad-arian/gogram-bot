@@ -32,20 +32,18 @@ func multipartSetter(s interface{}, w *multipart.Writer, tag string) error {
 		if err := w.WriteField(tag, strconv.FormatBool(s.(bool))); err != nil {
 			return err
 		}
+	case nil:
+		return nil
 	// use *os.File for methods like SendVideo() and SendPhoto() that
 	// the fieldName of CreateFormFile() can't be the name of the file.
 	case *os.File:
-		// some file fields are optional. below if statement makes sure program won't panic
-		// even if a file field of data structure is empty.
-		if j != nil {
-			name := tag
-			if name == "" {
-				name = j.Name()
-			}
-			file, _ := w.CreateFormFile(name, j.Name())
-			_, _ = io.Copy(file, j)
-			_, _ = j.Seek(0, io.SeekStart)
+		name := tag
+		if name == "" {
+			name = j.Name()
 		}
+		file, _ := w.CreateFormFile(name, j.Name())
+		_, _ = io.Copy(file, j)
+		_, _ = j.Seek(0, io.SeekStart)
 	case []*os.File:
 		for _, f := range j {
 			if err := multipartSetter(f, w, ""); err != nil {
@@ -56,9 +54,7 @@ func multipartSetter(s interface{}, w *multipart.Writer, tag string) error {
 		Type := reflect.TypeOf(s).Kind()
 		if Type == reflect.Slice || Type == reflect.Struct {
 			if Type == reflect.Struct && tag == "" {
-				if err := structMultipartParser(j, w); err != nil {
-					return err
-				}
+				return structMultipartParser(j, w)
 			}
 			a, err := json.Marshal(j)
 			if err != nil {
@@ -78,8 +74,7 @@ func structMultipartParser(s interface{}, w *multipart.Writer) error {
 	for i := 0; i < reflect.ValueOf(s).NumField(); i++ {
 		tag := reflect.TypeOf(s).Field(i).Tag.Get("json")
 		value := reflect.ValueOf(s).Field(i).Interface()
-		err := multipartSetter(value, w, tag)
-		if err != nil {
+		if err := multipartSetter(value, w, tag); err != nil {
 			return err
 		}
 	}
