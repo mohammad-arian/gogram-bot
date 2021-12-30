@@ -623,23 +623,7 @@ func (i *InlineQueryResultSticker) checkQueryAnswer() error {
 	return nil
 }
 
-func (i *InlineQuery) Answer(b Bot, results []QueryAnswer,
-	optionalParams *AnswerInlineQueryOP) (response *BooleanResponse, err error) {
-	type data struct {
-		InlineQueryId string        `json:"inline_query_id"`
-		Results       []QueryAnswer `json:"results"`
-	}
-	if len(results) == 0 {
-		return &BooleanResponse{}, errors.New("results slice is empty. pass QueryAnswer structs such as " +
-			"InlineQueryResultArticle, InlineQueryResultPhoto and etc")
-	}
-	for _, j := range results {
-		e := j.checkQueryAnswer()
-		if e != nil {
-			return &BooleanResponse{}, e
-		}
-	}
-	d := data{i.Id, results}
-	res, err := request("answerInlineQuery", b, &d, optionalParams, &BooleanResponse{})
-	return res.(*BooleanResponse), err
+func (i *InlineQuery) Answer(b Bot, data AnswerInlineQueryData) (response *BooleanResponse, err error) {
+	data.InlineQueryId = i.Id
+	return data.Send(b)
 }

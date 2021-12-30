@@ -57,7 +57,7 @@ func (b Bot) ActivateProxy() error {
 
 // VerifyBot verifies the token and sets the Self field of bot if token is valid.
 func (b *Bot) VerifyBot() error {
-	res, err := request("getme", *b, nil, nil, &UserResponse{})
+	res, err := request("getme", *b, nil, &UserResponse{})
 	if err != nil {
 		return err
 	}
@@ -77,35 +77,20 @@ func (b *Bot) VerifyBot() error {
 // If you'd like to make sure that the Webhook request comes from Telegram,
 // we recommend using a secret path in the URL, e.g. https://www.example.com/<token>.
 // Since nobody else knows your bot's token, you can be pretty sure it's us.
-func (b Bot) SetWebhook(url string, optionalParams *SetWebhookOP) (response *BooleanResponse, err error) {
-	type data struct {
-		Url string `json:"url"`
-	}
-	d := data{Url: url}
-	res, err := request("setWebhook", b, &d, optionalParams, &BooleanResponse{})
-	return res.(*BooleanResponse), err
+func (b Bot) SetWebhook(data SetWebhookData) (response *BooleanResponse, err error) {
+	return data.Send(b)
 }
 
-func (b Bot) SetMyCommands(commands []BotCommand,
-	optionalParams *MyCommandsOP) (response *BooleanResponse, err error) {
-	type data struct {
-		Commands []BotCommand `json:"commands"`
-	}
-	d := data{Commands: commands}
-	res, err := request("setMyCommands", b, &d, optionalParams, &BooleanResponse{})
-	return res.(*BooleanResponse), err
+func (b Bot) SetMyCommands(data SetMyCommandsData) (response *BooleanResponse, err error) {
+	return data.Send(b)
 }
 
-func (b Bot) DeleteMyCommands(
-	optionalParams *MyCommandsOP) (response *BooleanResponse, err error) {
-	res, err := request("deleteMyCommands", b, nil, optionalParams, &BooleanResponse{})
-	return res.(*BooleanResponse), err
+func (b Bot) DeleteMyCommands(data DeleteMyCommandsData) (response *BooleanResponse, err error) {
+	return data.Send(b)
 }
 
-func (b Bot) GetMyCommands(
-	optionalParams *MyCommandsOP) (response *BotCommandResponse, err error) {
-	res, err := request("getMyCommands", b, nil, optionalParams, &BotCommandResponse{})
-	return res.(*BotCommandResponse), err
+func (b Bot) GetMyCommands(data GetMyCommandsData) (response *BotCommandResponse, err error) {
+	return data.Send(b)
 }
 
 // Listener listens to upcoming webhook updates

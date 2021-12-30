@@ -17,23 +17,19 @@ import (
 func multipartSetter(s interface{}, w *multipart.Writer, tag string) error {
 	switch j := s.(type) {
 	case string:
-		err := w.WriteField(tag, s.(string))
-		if err != nil {
+		if err := w.WriteField(tag, s.(string)); err != nil {
 			return err
 		}
 	case int:
-		err := w.WriteField(tag, strconv.Itoa(s.(int)))
-		if err != nil {
+		if err := w.WriteField(tag, strconv.Itoa(s.(int))); err != nil {
 			return err
 		}
 	case float64:
-		err := w.WriteField(tag, fmt.Sprintf("%v", s.(float64)))
-		if err != nil {
+		if err := w.WriteField(tag, fmt.Sprintf("%v", s.(float64))); err != nil {
 			return err
 		}
 	case bool:
-		err := w.WriteField(tag, strconv.FormatBool(s.(bool)))
-		if err != nil {
+		if err := w.WriteField(tag, strconv.FormatBool(s.(bool))); err != nil {
 			return err
 		}
 	// use *os.File for methods like SendVideo() and SendPhoto() that
@@ -52,20 +48,23 @@ func multipartSetter(s interface{}, w *multipart.Writer, tag string) error {
 		}
 	case []*os.File:
 		for _, f := range j {
-			err := multipartSetter(f, w, "")
-			if err != nil {
+			if err := multipartSetter(f, w, ""); err != nil {
 				return err
 			}
 		}
 	default:
 		Type := reflect.TypeOf(s).Kind()
 		if Type == reflect.Slice || Type == reflect.Struct {
+			if Type == reflect.Struct && tag == "" {
+				if err := structMultipartParser(j, w); err != nil {
+					return err
+				}
+			}
 			a, err := json.Marshal(j)
 			if err != nil {
 				return err
 			}
-			err = w.WriteField(tag, string(a))
-			if err != nil {
+			if err = w.WriteField(tag, string(a)); err != nil {
 				return err
 			}
 		} else {
@@ -76,9 +75,9 @@ func multipartSetter(s interface{}, w *multipart.Writer, tag string) error {
 }
 
 func structMultipartParser(s interface{}, w *multipart.Writer) error {
-	for i := 0; i < reflect.ValueOf(s).Elem().NumField(); i++ {
-		tag := reflect.TypeOf(s).Elem().Field(i).Tag.Get("json")
-		value := reflect.ValueOf(s).Elem().Field(i).Interface()
+	for i := 0; i < reflect.ValueOf(s).NumField(); i++ {
+		tag := reflect.TypeOf(s).Field(i).Tag.Get("json")
+		value := reflect.ValueOf(s).Field(i).Interface()
 		err := multipartSetter(value, w, tag)
 		if err != nil {
 			return err
@@ -87,40 +86,20 @@ func structMultipartParser(s interface{}, w *multipart.Writer) error {
 	return nil
 }
 
-func request(method string, bot Bot, data interface{},
-	optionalParams interface{}, responseType interface{}) (response interface{}, error error) {
+func request(method string, bot Bot, data interface{}, responseType interface{}) (response interface{}, error error) {
 	req, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/%s", bot.Token, method),
 		nil)
 	var body = &bytes.Buffer{}
 	var set bool
 	w := multipart.NewWriter(body)
-	if optionalParams != nil {
-		if !reflect.ValueOf(optionalParams).IsNil() {
-			err := structMultipartParser(optionalParams, w)
-			if err != nil {
-				return responseType, err
-			}
-			set = true
-		}
-	}
 	if data != nil {
-		if reflect.ValueOf(data).Kind() != reflect.Ptr {
-			return responseType, errors.New("data parameter must be a pointer")
-		}
-		dataKind := reflect.Indirect(reflect.ValueOf(data)).Kind()
-		if dataKind != reflect.Struct {
-			return responseType, errors.New("data parameter must be a struct not " + dataKind.String())
-		}
-		err := structMultipartParser(data, w)
-		if err != nil {
+		if err := structMultipartParser(data, w); err != nil {
+			w.Close()
 			return responseType, err
 		}
 		set = true
 	}
-	err := w.Close()
-	if err != nil {
-		return responseType, err
-	}
+	w.Close()
 	if set {
 		req.Header.Add("Content-Type", w.FormDataContentType())
 		req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
@@ -128,7 +107,7 @@ func request(method string, bot Bot, data interface{},
 	res, _ := http.DefaultClient.Do(req)
 	defer res.Body.Close()
 	readRes, _ := ioutil.ReadAll(res.Body)
-	err = json.Unmarshal(readRes, responseType)
+	err := json.Unmarshal(readRes, responseType)
 	if err != nil {
 		return responseType, err
 	}

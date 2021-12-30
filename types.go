@@ -616,11 +616,7 @@ func (i *InlineKeyboard) AddInlineButtons(horizontal bool, a ...InlineButton) {
 			buttons = append(buttons, []InlineButton{button})
 		}
 	}
-	if i.Buttons == nil {
-		i.Buttons = buttons
-	} else {
-		i.Buttons = append(i.Buttons, buttons...)
-	}
+	i.Buttons = buttons
 }
 
 type ReplyKeyboard struct {
@@ -631,7 +627,7 @@ type ReplyKeyboard struct {
 	Selective             bool            `json:"selective"`
 }
 
-func (r *ReplyKeyboard) AddReplyButtons(optionalParams AddReplyKeyboardOP, a ...ReplyButton) {
+func (r *ReplyKeyboard) AddReplyButtons(optionalParams AddReplyKeyboardData, a ...ReplyButton) {
 	r.OneTimeKeyboard = optionalParams.OneTimeKeyboard
 	r.Selective = optionalParams.Selective
 	r.InputFieldPlaceholder = optionalParams.InputFieldPlaceholder
@@ -647,11 +643,7 @@ func (r *ReplyKeyboard) AddReplyButtons(optionalParams AddReplyKeyboardOP, a ...
 			buttons = append(buttons, []ReplyButton{button})
 		}
 	}
-	if r.Keyboard == nil {
-		r.Keyboard = buttons
-	} else {
-		r.Keyboard = append(r.Keyboard, buttons...)
-	}
+	r.Keyboard = buttons
 }
 
 type ReplyKeyboardRemove struct {
@@ -693,7 +685,7 @@ func (k *Keyboard) SetInlineKeyboard(horizontal bool, a ...InlineButton) {
 	k.ReplyMarkup = i
 }
 
-func (k *Keyboard) SetReplyKeyboard(optionalParams AddReplyKeyboardOP, a ...ReplyButton) {
+func (k *Keyboard) SetReplyKeyboard(optionalParams AddReplyKeyboardData, a ...ReplyButton) {
 	i := ReplyKeyboard{}
 	i.AddReplyButtons(optionalParams, a...)
 	k.ReplyMarkup = i
