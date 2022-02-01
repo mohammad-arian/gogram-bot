@@ -325,11 +325,6 @@ func (c *CallbackQuery) EditMessageReplyMarkup(b Bot, data EditMessageReplyMarku
 	return data.Send(b)
 }
 
-func (c *Chat) StopPoll(b Bot, data StopPollData) (response *PollResponse, err error) {
-	data.ChatId = c.Id
-	return data.Send(b)
-}
-
 // DeleteMessage deletes a message, including service messages, with the following limitations:
 //- A message can only be deleted if it was sent less than 48 hours ago.
 //- A dice message in a private chat can only be deleted if it was sent more than 24 hours ago.
@@ -341,6 +336,16 @@ func (c *Chat) StopPoll(b Bot, data StopPollData) (response *PollResponse, err e
 // Returns True on success.
 func (m *Message) DeleteMessage(b Bot, data DeleteMessageData) (response *BooleanResponse, err error) {
 	data.MessageId = m.MessageId
+	return data.Send(b)
+}
+
+func (c *Chat) StopPoll(b Bot, data StopPollData) (response *PollResponse, err error) {
+	data.ChatId = c.Id
+	return data.Send(b)
+}
+
+func (c *CallbackQuery) AnswerCallbackQuery(b Bot, data AnswerCallbackQueryData) (response *BooleanResponse, err error) {
+	data.CallbackQueryId = c.Id
 	return data.Send(b)
 }
 

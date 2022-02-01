@@ -635,6 +635,9 @@ type AnswerCallbackQueryData struct {
 }
 
 func (a AnswerCallbackQueryData) Send(b Bot) (response *BooleanResponse, err error) {
+	if a.CallbackQueryId == "" {
+		return &BooleanResponse{}, errors.New("CallbackQueryId is empty")
+	}
 	res, err := request("answerCallbackQuery", b, a, &BooleanResponse{})
 	return res.(*BooleanResponse), err
 }
