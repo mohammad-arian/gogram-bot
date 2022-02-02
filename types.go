@@ -717,7 +717,7 @@ func (t *ForceReply) SetForceReply(selective bool, inputFieldPlaceholder string)
 }
 
 type Keyboard struct {
-	ReplyMarkup interface{} `json:"reply_markup,omitempty"`
+	ReplyMarkup interface{} `json:"reply_markup"`
 }
 
 func (k *Keyboard) SetInlineKeyboard(horizontal bool, a ...InlineButton) error {
