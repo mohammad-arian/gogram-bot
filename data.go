@@ -877,9 +877,9 @@ func (a AnswerInlineQueryData) Send(b Bot) (response *BooleanResponse, err error
 }
 
 type AddReplyKeyboardData struct {
-	Horizontal            bool   `json:"horizontal"`
-	OneTimeKeyboard       bool   `json:"one_time_keyboard"`
-	ResizeKeyboard        bool   `json:"resize_keyboard"`
-	InputFieldPlaceholder string `json:"input_field_placeholder"`
-	Selective             bool   `json:"selective"`
+	Horizontal            bool   `json:"horizontal,omitempty"`
+	OneTimeKeyboard       bool   `json:"one_time_keyboard,omitempty"`
+	ResizeKeyboard        bool   `json:"resize_keyboard,omitempty"`
+	InputFieldPlaceholder string `json:"input_field_placeholder,omitempty"`
+	Selective             bool   `json:"selective,omitempty"`
 }

@@ -34,9 +34,6 @@ type Bot struct {
 			}
 	*/
 	Handler func(message *Update, bot Bot)
-	// Self is some info about bot itself.
-	// This field is not mandatory
-	Self User `json:"result"`
 	// Simultaneous if set to true, Handler functions run Simultaneously.
 	// This field is not mandatory
 	Simultaneous bool
@@ -51,11 +48,10 @@ func (b Bot) ActivateProxy() error {
 		return errors.New("proxy field of the bot is empty")
 	}
 	http.DefaultTransport = &http.Transport{Proxy: http.ProxyURL(b.Proxy)}
-	fmt.Println("added")
 	return nil
 }
 
-// VerifyBot verifies the token and sets the Self field of bot if token is valid.
+// VerifyBot verifies the token
 func (b *Bot) VerifyBot() error {
 	res, err := request("getme", *b, nil, &UserResponse{})
 	if err != nil {
@@ -65,7 +61,6 @@ func (b *Bot) VerifyBot() error {
 	if getMeRes.Ok != true {
 		return errors.New("token is wrong")
 	}
-	b.Self = getMeRes.Result
 	return nil
 }
 

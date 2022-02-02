@@ -372,6 +372,33 @@ func (i *InputMediaAnimation) checkInputMedia(f *[]*os.File) error {
 	return nil
 }
 
+type LoginUrl struct {
+	Url                string `json:"url"`
+	ForwardText        string `json:"forward_text"`
+	BotUsername        string `json:"bot_username"`
+	RequestWriteAccess bool   `json:"request_write_access"`
+}
+
+func (i LoginUrl) check() error {
+	if i.Url == "" {
+		return errors.New("url of LoginUrl is empty")
+	}
+	return nil
+}
+
+// CallbackGame is a placeholder, currently holds no information. Use BotFather to set up your game and set
+// Active to true.
+type CallbackGame struct {
+	Active bool
+}
+
+type KeyboardButtonPollType struct {
+	// Optional. If quiz is passed, the user will be allowed to create only polls in the quiz mode.
+	// If regular is passed, only regular polls will be allowed.
+	// Otherwise, the user will be allowed to create a poll of any type.
+	Type string `json:"type,omitempty"`
+}
+
 type MaskPosition struct {
 	Point  string  `json:"point"`
 	YShift float64 `json:"y_shift"`
@@ -634,7 +661,7 @@ type ReplyKeyboard struct {
 	Selective             bool            `json:"selective"`
 }
 
-func (r *ReplyKeyboard) AddReplyButtons(optionalParams AddReplyKeyboardData, a ...ReplyButton) {
+func (r *ReplyKeyboard) AddReplyButtons(optionalParams AddReplyKeyboardData, a ...ReplyButton) error {
 	r.OneTimeKeyboard = optionalParams.OneTimeKeyboard
 	r.Selective = optionalParams.Selective
 	r.InputFieldPlaceholder = optionalParams.InputFieldPlaceholder
@@ -643,14 +670,21 @@ func (r *ReplyKeyboard) AddReplyButtons(optionalParams AddReplyKeyboardData, a .
 	if optionalParams.Horizontal {
 		buttons = append(buttons, []ReplyButton{})
 		for _, button := range a {
+			if err := button.check(); err != nil {
+				return err
+			}
 			buttons[0] = append(buttons[0], button)
 		}
 	} else {
 		for _, button := range a {
+			if err := button.check(); err != nil {
+				return err
+			}
 			buttons = append(buttons, []ReplyButton{button})
 		}
 	}
-	r.Keyboard = buttons
+	r.Keyboard = append(r.Keyboard, buttons...)
+	return nil
 }
 
 type ReplyKeyboardRemove struct {
@@ -703,10 +737,23 @@ func (k *Keyboard) SetInlineKeyboard(horizontal bool, a ...InlineButton) error {
 	return nil
 }
 
-func (k *Keyboard) SetReplyKeyboard(optionalParams AddReplyKeyboardData, a ...ReplyButton) {
-	i := ReplyKeyboard{}
-	i.AddReplyButtons(optionalParams, a...)
-	k.ReplyMarkup = i
+// SetReplyKeyboard adds reply keyboard to massage. optionalParams is optional and you can pass
+// an empty AddReplyKeyboardData
+func (k *Keyboard) SetReplyKeyboard(optionalParams AddReplyKeyboardData, a ...ReplyButton) error {
+	replyKeyboard, ok := (k.ReplyMarkup).(ReplyKeyboard)
+	if ok {
+		if err := replyKeyboard.AddReplyButtons(optionalParams, a...); err != nil {
+			return err
+		}
+		k.ReplyMarkup = replyKeyboard
+		return nil
+	}
+	r := ReplyKeyboard{}
+	if err := r.AddReplyButtons(optionalParams, a...); err != nil {
+		return err
+	}
+	k.ReplyMarkup = r
+	return nil
 }
 
 func (k *Keyboard) RemoveReplyKeyboard(selective bool) {
@@ -719,25 +766,6 @@ func (k *Keyboard) ForceReply(selective bool, inputFieldPlaceholder string) {
 	i := ForceReply{}
 	i.SetForceReply(selective, inputFieldPlaceholder)
 	k.ReplyMarkup = i
-}
-
-type LoginUrl struct {
-	Url                string `json:"url"`
-	ForwardText        string `json:"forward_text"`
-	BotUsername        string `json:"bot_username"`
-	RequestWriteAccess bool   `json:"request_write_access"`
-}
-
-func (i LoginUrl) check() error {
-	if i.Url == "" {
-		return errors.New("url of LoginUrl is empty")
-	}
-	return nil
-}
-
-// CallbackGame is a placeholder, currently holds no information. Use BotFather to set up your game.
-type CallbackGame struct {
-	Active bool
 }
 
 // InlineButton represents one button of an inline keyboard.
@@ -815,4 +843,14 @@ type ReplyButton struct {
 	// Optional. If True, the user's current location will be sent when the button is pressed.
 	// Available in private chats only
 	RequestLocation bool `json:"request_location"`
+	// Optional. If specified, the user will be asked to create a poll and send it to the bot
+	// when the button is pressed. Available in private chats only
+	RequestPoll KeyboardButtonPollType `json:"request_poll"`
+}
+
+func (i ReplyButton) check() error {
+	if i.Text == "" {
+		return errors.New("text of ReplyButton is empty")
+	}
+	return nil
 }
