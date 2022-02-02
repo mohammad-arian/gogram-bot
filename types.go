@@ -604,19 +604,26 @@ type InlineKeyboard struct {
 	Buttons [][]InlineButton `json:"inline_keyboard"`
 }
 
-func (i *InlineKeyboard) AddInlineButtons(horizontal bool, a ...InlineButton) {
+func (i *InlineKeyboard) AddInlineButtons(horizontal bool, a ...InlineButton) error {
 	var buttons [][]InlineButton
 	if horizontal {
 		buttons = append(buttons, []InlineButton{})
 		for _, button := range a {
+			if err := button.check(); err != nil {
+				return err
+			}
 			buttons[0] = append(buttons[0], button)
 		}
 	} else {
 		for _, button := range a {
+			if err := button.check(); err != nil {
+				return err
+			}
 			buttons = append(buttons, []InlineButton{button})
 		}
 	}
-	i.Buttons = buttons
+	i.Buttons = append(i.Buttons, buttons...)
+	return nil
 }
 
 type ReplyKeyboard struct {
@@ -679,10 +686,20 @@ type Keyboard struct {
 	ReplyMarkup interface{} `json:"reply_markup"`
 }
 
-func (k *Keyboard) SetInlineKeyboard(horizontal bool, a ...InlineButton) {
+func (k *Keyboard) SetInlineKeyboard(horizontal bool, a ...InlineButton) error {
+	inlineKeyboard, ok := (k.ReplyMarkup).(InlineKeyboard)
+	if ok {
+		if err := inlineKeyboard.AddInlineButtons(horizontal, a...); err != nil {
+			return err
+		}
+		return nil
+	}
 	i := InlineKeyboard{}
-	i.AddInlineButtons(horizontal, a...)
+	if err := i.AddInlineButtons(horizontal, a...); err != nil {
+		return err
+	}
 	k.ReplyMarkup = i
+	return nil
 }
 
 func (k *Keyboard) SetReplyKeyboard(optionalParams AddReplyKeyboardData, a ...ReplyButton) {
@@ -703,6 +720,25 @@ func (k *Keyboard) ForceReply(selective bool, inputFieldPlaceholder string) {
 	k.ReplyMarkup = i
 }
 
+type LoginUrl struct {
+	Url                string `json:"url"`
+	ForwardText        string `json:"forward_text"`
+	BotUsername        string `json:"bot_username"`
+	RequestWriteAccess bool   `json:"request_write_access"`
+}
+
+func (i LoginUrl) check() error {
+	if i.Url == "" {
+		return errors.New("url of LoginUrl is empty")
+	}
+	return nil
+}
+
+// CallbackGame is a placeholder, currently holds no information. Use BotFather to set up your game.
+type CallbackGame struct {
+	active bool
+}
+
 // InlineButton represents one button of an inline keyboard.
 // You must use exactly one of the optional fields.
 type InlineButton struct {
@@ -710,7 +746,8 @@ type InlineButton struct {
 	Text string `json:"text"`
 	// Optional. HTTP or tg:// url to be opened
 	// when button is pressed
-	Url string `json:"url"`
+	Url      string   `json:"url"`
+	LoginUrl LoginUrl `json:"login_url"`
 	// Optional. Data to be sent in a callback query
 	// to the bot when button is pressed
 	CallbackData string `json:"callback_data"`
@@ -727,10 +764,43 @@ type InlineButton struct {
 	// Can be empty, in which case only the bot's username will be inserted.
 	// This offers a quick way for the user to open your bot in inline mode
 	// in the same chat – good for selecting something from multiple options.
-	SwitchInlineQueryCurrentChat string `json:"switch_inline_query_current_chat"`
+	SwitchInlineQueryCurrentChat string       `json:"switch_inline_query_current_chat"`
+	CallbackGame                 CallbackGame `json:"callback_game"`
 	// Optional. Specify True, to send a Pay button.
 	// NOTE: This type of button must always be the first button in the first row.
 	Pay bool `json:"pay"`
+}
+
+func (i InlineButton) check() error {
+	if i.Text == "" {
+		return errors.New("text of InlineButton is empty")
+	}
+	notEmpty := 0
+	if i.Url != "" {
+		notEmpty += 1
+	}
+	if i.Pay == true {
+		notEmpty += 1
+	}
+	if i.CallbackData != "" {
+		notEmpty += 1
+	}
+	if i.SwitchInlineQuery != "" {
+		notEmpty += 1
+	}
+	if i.SwitchInlineQueryCurrentChat != "" {
+		notEmpty += 1
+	}
+	if i.LoginUrl.check() == nil {
+		notEmpty += 1
+	}
+	if i.CallbackGame.active == true {
+		notEmpty += 1
+	}
+	if notEmpty != 1 {
+		return errors.New("you must set exactly one of the optional fields of InlineButton.")
+	}
+	return nil
 }
 
 // ReplyButton represents one button of a reply keyboard.
