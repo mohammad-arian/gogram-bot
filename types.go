@@ -396,7 +396,7 @@ type KeyboardButtonPollType struct {
 	// Optional. If quiz is passed, the user will be allowed to create only polls in the quiz mode.
 	// If regular is passed, only regular polls will be allowed.
 	// Otherwise, the user will be allowed to create a poll of any type.
-	Type string `json:"type,omitempty"`
+	Type string `json:"type"`
 }
 
 type MaskPosition struct {
@@ -426,6 +426,14 @@ type StickerSet struct {
 	ContainsMasks bool      `json:"contains_masks"`
 	Stickers      []Sticker `json:"stickers"`
 	Thumb         PhotoSize `json:"thumb"`
+}
+
+type ReplyKeyboardOP struct {
+	Horizontal            bool   `json:"horizontal"`
+	OneTimeKeyboard       bool   `json:"one_time_keyboard"`
+	ResizeKeyboard        bool   `json:"resize_keyboard"`
+	InputFieldPlaceholder string `json:"input_field_placeholder"`
+	Selective             bool   `json:"selective"`
 }
 
 type ChatInviteLink struct {
@@ -661,7 +669,7 @@ type ReplyKeyboard struct {
 	Selective             bool            `json:"selective"`
 }
 
-func (r *ReplyKeyboard) AddReplyButtons(optionalParams AddReplyKeyboardData, a ...ReplyButton) error {
+func (r *ReplyKeyboard) AddReplyButtons(optionalParams ReplyKeyboardOP, a ...ReplyButton) error {
 	r.OneTimeKeyboard = optionalParams.OneTimeKeyboard
 	r.Selective = optionalParams.Selective
 	r.InputFieldPlaceholder = optionalParams.InputFieldPlaceholder
@@ -738,8 +746,8 @@ func (k *Keyboard) SetInlineKeyboard(horizontal bool, a ...InlineButton) error {
 }
 
 // SetReplyKeyboard adds reply keyboard to massage. optionalParams is optional and you can pass
-// an empty AddReplyKeyboardData
-func (k *Keyboard) SetReplyKeyboard(optionalParams AddReplyKeyboardData, a ...ReplyButton) error {
+// an empty ReplyKeyboardOP
+func (k *Keyboard) SetReplyKeyboard(optionalParams ReplyKeyboardOP, a ...ReplyButton) error {
 	replyKeyboard, ok := (k.ReplyMarkup).(ReplyKeyboard)
 	if ok {
 		if err := replyKeyboard.AddReplyButtons(optionalParams, a...); err != nil {

@@ -31,6 +31,7 @@ type PhotoData struct {
 	DisableNotification      bool            `json:"disable_notification"`
 	ReplyToMessageId         int             `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
+	Keyboard
 }
 
 func (p PhotoData) Send(b Bot) (response *MessageResponse, err error) {
@@ -51,6 +52,7 @@ type VideoData struct {
 	DisableNotification      bool            `json:"disable_notification"`
 	ReplyToMessageId         int             `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
+	Keyboard
 }
 
 func (v VideoData) Send(b Bot) (response *MessageResponse, err error) {
@@ -70,6 +72,7 @@ type AudioData struct {
 	DisableNotification      bool            `json:"disable_notification"`
 	ReplyToMessageId         int             `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
+	Keyboard
 }
 
 func (a AudioData) Send(b Bot) (response *MessageResponse, err error) {
@@ -89,6 +92,7 @@ type DocumentData struct {
 	DisableNotification         bool            `json:"disable_notification"`
 	ReplyToMessageId            int             `json:"reply_to_message_id"`
 	AllowSendingWithoutReply    bool            `json:"allow_sending_without_reply"`
+	Keyboard
 }
 
 func (d DocumentData) Send(b Bot) (response *MessageResponse, err error) {
@@ -106,6 +110,7 @@ type VoiceData struct {
 	DisableNotification      bool            `json:"disable_notification"`
 	ReplyToMessageId         int             `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply"`
+	Keyboard
 }
 
 func (v VoiceData) Send(b Bot) (response *MessageResponse, err error) {
@@ -167,6 +172,7 @@ type PollData struct {
 	DisableNotification      bool `json:"disable_notification"`
 	ReplyToMessageId         int  `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool `json:"allow_sending_without_reply"`
+	Keyboard
 }
 
 func (p PollData) Send(b Bot) (response *MessageResponse, err error) {
@@ -201,6 +207,7 @@ type VideoNoteData struct {
 	DisableNotification      bool        `json:"disable_notification"`
 	ReplyToMessageId         int         `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool        `json:"allow_sending_without_reply"`
+	Keyboard
 }
 
 func (v VideoNoteData) Send(b Bot) (response *MessageResponse, err error) {
@@ -219,6 +226,7 @@ type LocationData struct {
 	DisableNotification      bool    `json:"disable_notification"`
 	ReplyToMessageId         int     `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool    `json:"allow_sending_without_reply"`
+	Keyboard
 }
 
 func (l LocationData) Send(b Bot) (response *MessageResponse, err error) {
@@ -684,6 +692,7 @@ type EditMessageTextData struct {
 	ParseMode             string          `json:"parse_mode"`
 	Entities              []MessageEntity `json:"entities"`
 	DisableWebPagePreview bool            `json:"disable_web_page_preview"`
+	InlineKeyboard
 }
 
 func (e EditMessageTextData) Send(b Bot) (response *MapResponse, err error) {
@@ -698,6 +707,7 @@ type EditMessageCaptionData struct {
 	Caption         string          `json:"caption"`
 	ParseMode       string          `json:"parse_mode"`
 	CaptionEntities []MessageEntity `json:"caption_entities"`
+	InlineKeyboard
 }
 
 func (e EditMessageCaptionData) Send(b Bot) (response *MapResponse, err error) {
@@ -709,6 +719,7 @@ type EditMessageReplyMarkupData struct {
 	ChatId          int    `json:"chat_id"`
 	MessageId       int    `json:"message_id"`
 	InlineMessageId string `json:"inline_message_id"`
+	InlineKeyboard
 }
 
 func (e EditMessageReplyMarkupData) Send(b Bot) (response *MapResponse, err error) {
@@ -719,6 +730,7 @@ func (e EditMessageReplyMarkupData) Send(b Bot) (response *MapResponse, err erro
 type StopPollData struct {
 	ChatId    int `json:"chat_id"`
 	MessageId int `json:"message_id"`
+	InlineKeyboard
 }
 
 func (s StopPollData) Send(b Bot) (response *PollResponse, err error) {
@@ -732,6 +744,7 @@ type EditMessageMediaData struct {
 	ChatId          int        `json:"chat_id"`
 	MessageId       int        `json:"message_id"`
 	File            []*os.File
+	InlineKeyboard
 }
 
 func (e EditMessageMediaData) Send(b Bot) (response *MapResponse, err error) {
@@ -766,6 +779,7 @@ type SendStickerData struct {
 	DisableNotification      bool        `json:"disable_notification"`
 	ReplyToMessageId         int         `json:"reply_To_Message_Id"`
 	AllowSendingWithoutReply bool        `json:"allow_sending_without_reply"`
+	Keyboard
 }
 
 func (s SendStickerData) Send(b Bot) (response *MessageResponse, err error) {
@@ -874,12 +888,4 @@ func (a AnswerInlineQueryData) Send(b Bot) (response *BooleanResponse, err error
 	}
 	res, err := request("answerInlineQuery", b, a, &BooleanResponse{})
 	return res.(*BooleanResponse), err
-}
-
-type AddReplyKeyboardData struct {
-	Horizontal            bool   `json:"horizontal,omitempty"`
-	OneTimeKeyboard       bool   `json:"one_time_keyboard,omitempty"`
-	ResizeKeyboard        bool   `json:"resize_keyboard,omitempty"`
-	InputFieldPlaceholder string `json:"input_field_placeholder,omitempty"`
-	Selective             bool   `json:"selective,omitempty"`
 }
