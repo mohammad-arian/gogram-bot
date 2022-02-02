@@ -692,6 +692,7 @@ func (k *Keyboard) SetInlineKeyboard(horizontal bool, a ...InlineButton) error {
 		if err := inlineKeyboard.AddInlineButtons(horizontal, a...); err != nil {
 			return err
 		}
+		k.ReplyMarkup = inlineKeyboard
 		return nil
 	}
 	i := InlineKeyboard{}
@@ -736,7 +737,7 @@ func (i LoginUrl) check() error {
 
 // CallbackGame is a placeholder, currently holds no information. Use BotFather to set up your game.
 type CallbackGame struct {
-	active bool
+	Active bool
 }
 
 // InlineButton represents one button of an inline keyboard.
@@ -794,7 +795,7 @@ func (i InlineButton) check() error {
 	if i.LoginUrl.check() == nil {
 		notEmpty += 1
 	}
-	if i.CallbackGame.active == true {
+	if i.CallbackGame.Active == true {
 		notEmpty += 1
 	}
 	if notEmpty != 1 {
