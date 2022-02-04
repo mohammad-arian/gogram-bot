@@ -219,7 +219,7 @@ const (
 // TypeIndicator function returns the type of message.
 func (m Message) TypeIndicator() string {
 	switch {
-	case m.Text != "" && m.Sticker == Sticker{}:
+	case m.Text != "":
 		return TypeText
 	case m.Animation != Animation{}:
 		return TypeAnimation
