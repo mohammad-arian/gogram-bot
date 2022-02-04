@@ -231,7 +231,7 @@ func (m Message) TypeIndicator() string {
 		return TypeNewChatPhoto
 	case m.ForwardFrom != User{}:
 		return TypeForwardFrom
-	case m.ReplyToMessage != &Message{}:
+	case m.ReplyToMessage.MessageId != 0:
 		return TypeReply
 	case m.Audio != Audio{}:
 		return TypeAudio
