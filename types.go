@@ -219,7 +219,7 @@ const (
 // TypeIndicator function returns the type of message.
 func (m Message) TypeIndicator() string {
 	switch {
-	case m.Text != "":
+	case m.Text != "" && m.Sticker == Sticker{}:
 		return TypeText
 	case m.Animation != Animation{}:
 		return TypeAnimation
@@ -231,7 +231,7 @@ func (m Message) TypeIndicator() string {
 		return TypeNewChatPhoto
 	case m.ForwardFrom != User{}:
 		return TypeForwardFrom
-	case m.ReplyToMessage.MessageId != 0:
+	case m.ReplyToMessage != nil:
 		return TypeReply
 	case m.Audio != Audio{}:
 		return TypeAudio
@@ -271,7 +271,7 @@ func (m Message) TypeIndicator() string {
 		return TypeMigrateToChatId
 	case m.MigrateFromChatId != 0:
 		return TypeMigrateFromChatId
-	case m.PinnedMessage.MessageId != 0:
+	case m.PinnedMessage != nil:
 		return TypePinnedMessage
 	case m.Invoice != Invoice{}:
 		return TypeInvoice
