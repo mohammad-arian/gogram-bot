@@ -24,20 +24,262 @@ type CallbackQuery struct {
 	GameShortName   string  `json:"game_short_name"`
 }
 
+type Audio struct {
+	FileId       string    `json:"file_Id"`
+	FileUniqueId string    `json:"file_unique_id"`
+	Duration     int       `json:"duration"`
+	Performer    string    `json:"performer"`
+	Title        string    `json:"title"`
+	FileName     string    `json:"file_name"`
+	MimeType     string    `json:"mime_type"`
+	FileSize     int       `json:"file_size"`
+	Thumb        PhotoSize `json:"thumb"`
+}
+
+type Document struct {
+	FileId       string    `json:"file_Id"`
+	FileUniqueId string    `json:"file_unique_id"`
+	Thumb        PhotoSize `json:"thumb"`
+	FileName     string    `json:"file_name"`
+	MimeType     string    `json:"mime_type"`
+	FileSize     int       `json:"file_size"`
+}
+
+type Video struct {
+	FileId       string    `json:"file_Id"`
+	FileUniqueId string    `json:"file_unique_id"`
+	Duration     int       `json:"duration"`
+	Width        int       `json:"width"`
+	Height       int       `json:"height"`
+	Thumb        PhotoSize `json:"thumb"`
+	FileName     string    `json:"file_name"`
+	MimeType     string    `json:"mime_type"`
+	FileSize     int       `json:"file_size"`
+}
+
+type VideoNote struct {
+	FileId       string    `json:"file_Id"`
+	FileUniqueId string    `json:"file_unique_id"`
+	Length       int       `json:"length"`
+	Duration     int       `json:"duration"`
+	Thumb        PhotoSize `json:"thumb"`
+	FileSize     int       `json:"file_size"`
+}
+
+type Voice struct {
+	FileId       string `json:"file_Id"`
+	FileUniqueId string `json:"file_unique_id"`
+	Duration     int    `json:"duration"`
+	MimeType     string `json:"mime_type"`
+	FileSize     int    `json:"file_size"`
+}
+
+type Contact struct {
+	PhoneNumber string `json:"phone_number"`
+	FirstName   string `json:"first_name"`
+	LastName    string `json:"last_name"`
+	UserId      int    `json:"user_id"`
+	Vcard       string `json:"vcard"`
+}
+
+type Dice struct {
+	Emoji string `json:"emoji"`
+	Value int    `json:"value"`
+}
+
+type Game struct {
+	Title        string          `json:"title"`
+	Description  string          `json:"description"`
+	Photo        []PhotoSize     `json:"photo"`
+	Text         string          `json:"text"`
+	TextEntities []MessageEntity `json:"text_entities"`
+	Animation    Animation       `json:"animation"`
+}
+
+type Invoice struct {
+	Title          string `json:"title"`
+	Description    string `json:"description"`
+	StartParameter string `json:"start_parameter"`
+	Currency       string `json:"currency"`
+	TotalAmount    int    `json:"total_amount"`
+}
+
+type ShippingAddress struct {
+	CountryCode string `json:"country_code"`
+	State       string `json:"state"`
+	City        string `json:"city"`
+	StreetLine1 string `json:"street_line1"`
+	StreetLine2 string `json:"street_line2"`
+	PostCode    string `json:"post_code"`
+}
+
+type OrderInfo struct {
+	Name            string          `json:"name"`
+	PhoneNumber     string          `json:"phone_number"`
+	Email           string          `json:"email"`
+	ShippingAddress ShippingAddress `json:"shipping_address"`
+}
+
+type SuccessfulPayment struct {
+	Currency                string    `json:"currency"`
+	TotalAmount             int       `json:"total_amount"`
+	InvoicePayload          string    `json:"invoice_payload"`
+	ShippingOptionId        string    `json:"shipping_option_id"`
+	OrderInfo               OrderInfo `json:"order_info"`
+	TelegramPaymentChargeId string    `json:"telegram_payment_charge_id"`
+	ProviderPaymentChargeId string    `json:"provider_payment_charge_id"`
+}
+
 type Message struct {
-	MessageId       int            `json:"message_id"`
-	User            User           `json:"from"`
-	Chat            Chat           `json:"chat"`
-	Text            string         `json:"text"`
-	Animation       Animation      `json:"animation"`
-	Photo           []PhotoSize    `json:"photo"`
-	Date            int            `json:"date"`
-	ReplyMarkup     InlineKeyboard `json:"reply_markup"`
-	Poll            Poll           `json:"poll"`
-	NewChatPhoto    []PhotoSize    `json:"new_chat_photo"`
-	NewChatTitle    string         `json:"new_chat_title"`
-	NewChatMembers  []User         `json:"new_chat_members"`
-	DeleteChatPhoto bool           `json:"delete_chat_photo"`
+	MessageId             int               `json:"message_id"`
+	User                  User              `json:"from"`
+	Chat                  Chat              `json:"chat"`
+	SenderChat            Chat              `json:"sender_chat"`
+	ForwardFrom           User              `json:"forward_from"`
+	ForwardFromChat       Chat              `json:"forward_from_chat"`
+	ForwardSignature      string            `json:"forward_signature"`
+	ForwardSenderName     string            `json:"forward_sender_name"`
+	ForwardDate           int               `json:"forward_date"`
+	IsAutomaticForward    bool              `json:"is_automatic_forward"`
+	ReplyToMessage        *Message          `json:"reply_to_message"`
+	ViaBot                User              `json:"via_bot"`
+	EditDate              int               `json:"edit_date"`
+	HasProtectedContent   bool              `json:"has_protected_content"`
+	MediaGroupId          string            `json:"media_group_id"`
+	AuthorSignature       string            `json:"author_signature"`
+	Text                  string            `json:"text"`
+	Entities              []MessageEntity   `json:"entities"`
+	Animation             Animation         `json:"animation"`
+	Photo                 []PhotoSize       `json:"photo"`
+	Audio                 Audio             `json:"audio"`
+	Document              Document          `json:"document"`
+	Sticker               Sticker           `json:"sticker"`
+	Video                 Video             `json:"video"`
+	VideoNote             VideoNote         `json:"video_note"`
+	Voice                 Voice             `json:"voice"`
+	Caption               string            `json:"caption"`
+	CaptionEntities       []MessageEntity   `json:"caption_entities"`
+	Contact               Contact           `json:"contact"`
+	Dice                  Dice              `json:"dice"`
+	Game                  Game              `json:"game"`
+	Date                  int               `json:"date"`
+	ReplyMarkup           InlineKeyboard    `json:"reply_markup"`
+	Poll                  Poll              `json:"poll"`
+	Venue                 Venue             `json:"venue"`
+	Location              Location          `json:"location"`
+	LeftChatMember        User              `json:"left_chat_member"`
+	NewChatPhoto          []PhotoSize       `json:"new_chat_photo"`
+	NewChatTitle          string            `json:"new_chat_title"`
+	NewChatMembers        []User            `json:"new_chat_members"`
+	DeleteChatPhoto       bool              `json:"delete_chat_photo"`
+	GroupChatCreated      bool              `json:"group_chat_created"`
+	SupergroupChatCreated bool              `json:"supergroup_chat_created"`
+	ChannelChatCreated    bool              `json:"channel_chat_created"`
+	MigrateToChatId       int               `json:"migrate_to_chat_id"`
+	MigrateFromChatId     int               `json:"migrate_from_chat_id"`
+	PinnedMessage         *Message          `json:"pinned_message"`
+	Invoice               Invoice           `json:"invoice"`
+	SuccessfulPayment     SuccessfulPayment `json:"successful_payment"`
+	ConnectedWebsite      string            `json:"connected_website"`
+}
+
+const (
+	TypeText              = "Text"
+	TypePhoto             = "Photo"
+	TypeAnimation         = "Animation"
+	TypeForwardFrom       = "ForwardFrom"
+	TypeReply             = "Reply"
+	TypeAudio             = "Audio"
+	TypeDocument          = "Document"
+	TypeSticker           = "Sticker"
+	TypeVideo             = "Video"
+	TypeVideoNote         = "VideoNote"
+	TypeVoice             = "Voice"
+	TypeContact           = "Contact"
+	TypeDice              = "Dice"
+	TypeGame              = "Game"
+	TypePoll              = "Poll"
+	TypeVenue             = "Venue"
+	TypeLocation          = "Location"
+	TypeMemberLeftChat    = "MemberLeftChat"
+	TypeNewChatTitle      = "NewChatTitle"
+	TypeNewChatPhoto      = "NewChatPhoto"
+	TypeDeleteChatPhoto   = "DeleteChatPhoto"
+	TypeGroupCreated      = "GroupCreated"
+	TypeSuperGroupCreated = "SuperGroupCreated"
+	TypeChannelCreated    = "ChannelCreated"
+	TypeMigrateToChatId   = "MigrateToChatId"
+	TypeMigrateFromChatId = "MigrateFromChatId"
+	TypePinnedMessage     = "PinnedMessage"
+	TypeInvoice           = "Invoice"
+	TypeSuccessfulPayment = "SuccessfulPayment"
+	TypeUnknown
+)
+
+// TypeIndicator function returns the type of message.
+func (m Message) TypeIndicator() string {
+	switch {
+	case m.Text != "":
+		return TypeText
+	case m.Animation != Animation{}:
+		return TypeAnimation
+	case m.Photo != nil:
+		return TypePhoto
+	case m.DeleteChatPhoto == true:
+		return TypeDeleteChatPhoto
+	case m.NewChatPhoto != nil:
+		return TypeNewChatPhoto
+	case m.ForwardFrom != User{}:
+		return TypeForwardFrom
+	case m.ReplyToMessage != &Message{}:
+		return TypeReply
+	case m.Audio != Audio{}:
+		return TypeAudio
+	case m.Sticker != Sticker{}:
+		return TypeSticker
+	case m.Document != Document{}:
+		return TypeDocument
+	case m.Location != Location{}:
+		return TypeLocation
+	case m.Video != Video{}:
+		return TypeVideo
+	case m.VideoNote != VideoNote{}:
+		return TypeVideoNote
+	case m.Voice != Voice{}:
+		return TypeVoice
+	case m.Contact != Contact{}:
+		return TypeContact
+	case m.Dice != Dice{}:
+		return TypeDice
+	case m.Game.Title != "":
+		return TypeGame
+	case m.Poll.Id != "":
+		return TypePoll
+	case m.Venue != Venue{}:
+		return TypeVenue
+	case m.LeftChatMember != User{}:
+		return TypeMemberLeftChat
+	case m.NewChatTitle != "":
+		return TypeNewChatTitle
+	case m.GroupChatCreated == true:
+		return TypeGroupCreated
+	case m.SupergroupChatCreated == true:
+		return TypeSuperGroupCreated
+	case m.ChannelChatCreated == true:
+		return TypeChannelCreated
+	case m.MigrateToChatId != 0:
+		return TypeMigrateToChatId
+	case m.MigrateFromChatId != 0:
+		return TypeMigrateFromChatId
+	case m.PinnedMessage.MessageId != 0:
+		return TypePinnedMessage
+	case m.Invoice != Invoice{}:
+		return TypeInvoice
+	case m.SuccessfulPayment != SuccessfulPayment{}:
+		return TypeSuccessfulPayment
+	default:
+		return TypeUnknown
+	}
 }
 
 type MessageEntity struct {
@@ -91,33 +333,6 @@ type File struct {
 	fileSize int
 	// filePath is File path. Use https://api.telegram.org/file/bot<token>/<file_path> to get the file. Optional
 	filePath string
-}
-
-const (
-	TypeText            = "text"
-	TypePhoto           = "photo"
-	TypeAnimation       = "animation"
-	TypeDeleteChatPhoto = "deleteChatPhoto"
-	TypeNewChatPhoto    = "NewChatPhoto"
-)
-
-// TypeIndicator function returns the type of message.
-// This make it easier to know which fields are empty and which aren't.
-func (m Message) TypeIndicator() string {
-	switch {
-	case m.Text != "":
-		return TypeText
-	case m.Animation != Animation{}:
-		return TypeAnimation
-	case m.Photo != nil:
-		return TypePhoto
-	case m.DeleteChatPhoto == true:
-		return TypeDeleteChatPhoto
-	case m.NewChatPhoto != nil:
-		return TypeNewChatPhoto
-	default:
-		return "Unknown"
-	}
 }
 
 type ReplyAble struct {
@@ -745,7 +960,7 @@ func (k *Keyboard) SetInlineKeyboard(horizontal bool, a ...InlineButton) error {
 	return nil
 }
 
-// SetReplyKeyboard adds reply keyboard to massage. optionalParams is optional and you can pass
+// SetReplyKeyboard adds reply keyboard to message. optionalParams is optional and you can pass
 // an empty ReplyKeyboardOP
 func (k *Keyboard) SetReplyKeyboard(optionalParams ReplyKeyboardOP, a ...ReplyButton) error {
 	replyKeyboard, ok := (k.ReplyMarkup).(ReplyKeyboard)
