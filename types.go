@@ -339,7 +339,7 @@ func (m Message) String() string {
 	case m.LeftChatMember != User{}:
 		return fmt.Sprintf("LeftChatMember: %+v\n", m.LeftChatMember)
 	case m.NewChatTitle != "":
-		return fmt.Sprintf("NewChatTitle: %+v\n", m.NewTypeUnknownChatTitle)
+		return fmt.Sprintf("NewChatTitle: %+v\n", m.NewChatTitle)
 	case m.GroupChatCreated == true:
 		return fmt.Sprintf("GroupChatCreated: %+v\n", m.GroupChatCreated)
 	case m.SupergroupChatCreated == true:
