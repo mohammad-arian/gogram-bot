@@ -18,6 +18,9 @@ type TextData struct {
 }
 
 func (t TextData) Send(b Bot) (response *MessageResponse, err error) {
+	if err := globalEmptyFieldChecker(map[string]interface{}{"Text": t.Text, "ChatId": t.ChatId}); err != nil {
+		return &MessageResponse{}, err
+	}
 	res, err := request("sendMessage", b, t, &MessageResponse{})
 	return res.(*MessageResponse), err
 }
@@ -35,6 +38,9 @@ type PhotoData struct {
 }
 
 func (p PhotoData) Send(b Bot) (response *MessageResponse, err error) {
+	if err := globalEmptyFieldChecker(map[string]interface{}{"Photo": p.Photo, "ChatId": p.ChatId}); err != nil {
+		return &MessageResponse{}, err
+	}
 	res, err := request("sendPhoto", b, p, &MessageResponse{})
 	return res.(*MessageResponse), err
 }

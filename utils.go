@@ -112,3 +112,44 @@ func request(method string, bot Bot, data interface{}, responseType interface{})
 	}
 	return responseType, nil
 }
+
+func globalEmptyFieldChecker(a map[string]interface{}) error {
+	for i, j := range a {
+		switch v := j.(type) {
+		case string:
+			if v == "" {
+				return errors.New(i + " is empty")
+			}
+		case int:
+			if v == 0 {
+				return errors.New(i + " is empty")
+			}
+		case float64:
+			if v == 0 {
+				return errors.New(i + " is empty")
+			}
+		case bool:
+			if v == false {
+				return errors.New(i + " is false")
+			}
+		case nil:
+			return errors.New(i + " is false")
+		case *os.File:
+			if j == nil {
+				return errors.New(i + " is empty")
+			}
+		case []*os.File:
+			if j == nil {
+				return errors.New(i + " is empty")
+			}
+		default:
+			Type := reflect.TypeOf(v)
+			if Type.Kind() == reflect.Slice {
+				if Type.Len() == 0 {
+					return errors.New(i + " is empty")
+				}
+			}
+		}
+	}
+	return nil
+}
