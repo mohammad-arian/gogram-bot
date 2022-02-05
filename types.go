@@ -2,6 +2,7 @@ package gogram
 
 import (
 	"errors"
+	"fmt"
 	"os"
 )
 
@@ -277,6 +278,69 @@ func (m Message) TypeIndicator() string {
 		return TypeInvoice
 	case m.SuccessfulPayment != SuccessfulPayment{}:
 		return TypeSuccessfulPayment
+	default:
+		return TypeUnknown
+	}
+}
+
+func (m Message) String() string {
+	switch {
+	case m.Text != "":
+		return m.Text
+	case m.Photo != nil:
+		return fmt.Sprintf("Photo: %+v\n", m.Photo)
+	case m.DeleteChatPhoto == true:
+		return "DeleteChatPhoto"
+	case m.NewChatPhoto != nil:
+		return fmt.Sprintf("NewChatPhoto: %+v\n", m.NewChatPhoto)
+	case m.ForwardFrom != User{}:
+		return fmt.Sprintf("ForwardFrom: %+v\n", m.ForwardFrom)
+	case m.ReplyToMessage != nil:
+		return fmt.Sprintf("ReplyToMessage: %+v\n", m.ReplyToMessage)
+	case m.Audio != Audio{}:
+		return fmt.Sprintf("Audio: %+v\n", m.Audio)
+	case m.Sticker != Sticker{}:
+		return fmt.Sprintf("Sticker: %+v\n", m.Sticker)
+	case m.Document != Document{}:
+		return fmt.Sprintf("Document: %+v\n", m.Document)
+	case m.Location != Location{}:
+		return fmt.Sprintf("Location: %+v\n", m.Location)
+	case m.Video != Video{}:
+		return fmt.Sprintf("Video: %+v\n", m.Video)
+	case m.VideoNote != VideoNote{}:
+		return fmt.Sprintf("VideoNote: %+v\n", m.VideoNote)
+	case m.Voice != Voice{}:
+		return fmt.Sprintf("Voice: %+v\n", m.Voice)
+	case m.Contact != Contact{}:
+		return fmt.Sprintf("Contact: %+v\n", m.Contact)
+	case m.Dice != Dice{}:
+		return fmt.Sprintf("Dice: %+v\n", m.Dice)
+	case m.Game.Title != "":
+		return fmt.Sprintf("Game: %+v\n", m.Game)
+	case m.Poll.Id != "":
+		return fmt.Sprintf("Poll: %+v\n", m.Poll)
+	case m.Venue != Venue{}:
+		return fmt.Sprintf("Venue: %+v\n", m.Venue)
+	case m.LeftChatMember != User{}:
+		return fmt.Sprintf("LeftChatMember: %+v\n", m.LeftChatMember)
+	case m.NewChatTitle != "":
+		return fmt.Sprintf("NewChatTitle: %+v\n", m.NewChatTitle)
+	case m.GroupChatCreated == true:
+		return fmt.Sprintf("GroupChatCreated: %+v\n", m.GroupChatCreated)
+	case m.SupergroupChatCreated == true:
+		return fmt.Sprintf("SupergroupChatCreated: %+v\n", m.SupergroupChatCreated)
+	case m.ChannelChatCreated == true:
+		return fmt.Sprintf("ChannelChatCreated: %+v\n", m.ChannelChatCreated)
+	case m.MigrateToChatId != 0:
+		return fmt.Sprintf("MigrateToChatId: %+v\n", m.MigrateToChatId)
+	case m.MigrateFromChatId != 0:
+		return fmt.Sprintf("MigrateFromChatId %+v\n", m.MigrateFromChatId)
+	case m.PinnedMessage != nil:
+		return fmt.Sprintf("%+v\n", m.ForwardFrom)
+	case m.Invoice != Invoice{}:
+		return fmt.Sprintf("Invoice: %+v\n", m.Invoice)
+	case m.SuccessfulPayment != SuccessfulPayment{}:
+		return fmt.Sprintf("SuccessfulPayment: %+v\n", m.SuccessfulPayment)
 	default:
 		return TypeUnknown
 	}

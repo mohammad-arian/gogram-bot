@@ -80,6 +80,7 @@ func structMultipartParser(s interface{}, w *multipart.Writer) error {
 		if err := multipartSetter(value, w, tag); err != nil {
 			return err
 		}
+
 	}
 	return nil
 }
