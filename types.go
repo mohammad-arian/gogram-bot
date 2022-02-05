@@ -15,6 +15,21 @@ type Update struct {
 	Poll          Poll          `json:"poll"`
 }
 
+func (u Update) String() string {
+	switch {
+	case u.Message.MessageId != 0:
+		return fmt.Sprintf("Message: %+v\n", u.Message)
+	case u.InlineQuery.Id != "":
+		return fmt.Sprintf("InlineQuery: %+v\n", u.InlineQuery)
+	case u.CallbackQuery.Id != "":
+		return fmt.Sprintf("CallbackQuery: %+v\n", u.CallbackQuery)
+	case u.Poll.Id != "":
+		return fmt.Sprintf("Poll: %+v\n", u.Poll)
+	default:
+		return fmt.Sprintf("Update: %#v\n", u)
+	}
+}
+
 type CallbackQuery struct {
 	Id              string  `json:"id"`
 	Message         Message `json:"message"`
@@ -286,7 +301,7 @@ func (m Message) TypeIndicator() string {
 func (m Message) String() string {
 	switch {
 	case m.Text != "":
-		return m.Text
+		return fmt.Sprintf("Text: %+v\n", m.Text)
 	case m.Photo != nil:
 		return fmt.Sprintf("Photo: %+v\n", m.Photo)
 	case m.DeleteChatPhoto == true:
@@ -324,7 +339,7 @@ func (m Message) String() string {
 	case m.LeftChatMember != User{}:
 		return fmt.Sprintf("LeftChatMember: %+v\n", m.LeftChatMember)
 	case m.NewChatTitle != "":
-		return fmt.Sprintf("NewChatTitle: %+v\n", m.NewChatTitle)
+		return fmt.Sprintf("NewChatTitle: %+v\n", m.NewTypeUnknownChatTitle)
 	case m.GroupChatCreated == true:
 		return fmt.Sprintf("GroupChatCreated: %+v\n", m.GroupChatCreated)
 	case m.SupergroupChatCreated == true:
@@ -342,7 +357,7 @@ func (m Message) String() string {
 	case m.SuccessfulPayment != SuccessfulPayment{}:
 		return fmt.Sprintf("SuccessfulPayment: %+v\n", m.SuccessfulPayment)
 	default:
-		return TypeUnknown
+		return fmt.Sprintf("Message: %#v\n", m)
 	}
 }
 
