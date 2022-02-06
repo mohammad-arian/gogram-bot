@@ -46,6 +46,7 @@ func multipartSetter(s interface{}, w *multipart.Writer, tag string) error {
 			_, _ = io.Copy(file, j)
 			_, _ = j.Seek(0, io.SeekStart)
 		}
+	//
 	case []*os.File:
 		for _, f := range j {
 			if err := multipartSetter(f, w, ""); err != nil {
@@ -113,6 +114,8 @@ func request(method string, bot Bot, data interface{}, responseType interface{})
 	return responseType, nil
 }
 
+// globalEmptyFieldChecker is for general cases that we want to check if a filed is empty or not.
+// globalEmptyFieldChecker accepts a map in which keys are field names and values are fields that will be checked.
 func globalEmptyFieldChecker(a map[string]interface{}) error {
 	for i, j := range a {
 		switch v := j.(type) {
@@ -133,7 +136,7 @@ func globalEmptyFieldChecker(a map[string]interface{}) error {
 				return errors.New(i + " is false")
 			}
 		case nil:
-			return errors.New(i + " is false")
+			return errors.New(i + " is empty")
 		case *os.File:
 			if j == nil {
 				return errors.New(i + " is empty")

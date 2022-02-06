@@ -494,8 +494,8 @@ type Animation struct {
 
 type InputMedia interface {
 	// checkInputMedia checks InputMedias such as InputMediaPhoto, InputMediaDocument etc.
-	// If they have a file checkInputMedia adds it to f slice and sets Media field
-	// automatically to attach://<file name> so users won't have to deal with Media.
+	// If they have a file checkInputMedia adds it to f slice and sets Media field of InputMedias
+	// automatically to attach://<file name> so users won't have to deal with Media field.
 	// Methods like ReplyAble.SendMediaGroup() add f to data so multipartSetter() could create a form file.
 	// this behavior is because multipartSetter() can't parse each value in slices, so if a slice
 	// has a file, it won't be added to http requests, moreover adding a feature to multipartSetter()
