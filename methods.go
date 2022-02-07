@@ -108,7 +108,8 @@ func (m *Message) CopyMessage(b Bot, data CopyMessageData) (response *MessageRes
 	return data.Send(b)
 }
 
-func (u *User) GetUserProfilePhotos(b Bot, data UserProfilePhotosData) (response *UserProfileResponse, err error) {
+func (u *User) GetUserProfilePhotos(b Bot) (response *UserProfileResponse, err error) {
+	data := UserProfilePhotosData{}
 	data.UserId = u.Id
 	return data.Send(b)
 }
