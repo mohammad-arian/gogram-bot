@@ -146,7 +146,7 @@ func globalEmptyFieldChecker(a map[string]interface{}) error {
 				return errors.New(i + " is empty")
 			}
 		default:
-			Type := reflect.TypeOf(v)
+			Type := reflect.ValueOf(v)
 			if Type.Kind() == reflect.Slice {
 				if Type.Len() == 0 {
 					return errors.New(i + " is empty")
