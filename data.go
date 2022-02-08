@@ -807,6 +807,11 @@ func (s SetMyCommandsData) Send(b Bot) (response *BooleanResponse, err error) {
 	if err = globalEmptyFieldChecker(map[string]interface{}{"Commands": s.Commands}); err != nil {
 		return nil, err
 	}
+	types := map[string]bool{"default": true, "chat_member": true, "all_private_chats": true,
+		"all_group_chats": true, "all_chat_administrators": true, "chat": true, "chat_administrators": true}
+	if _, ok := types[s.Scope.Type]; ok == false {
+		s.Scope.Type = "default"
+	}
 	res, err := request("setMyCommands", b, s, &BooleanResponse{})
 	return res.(*BooleanResponse), err
 }
