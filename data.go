@@ -821,7 +821,7 @@ func (d DeleteMyCommandsData) Send(b Bot) (response *BooleanResponse, err error)
 	types := map[string]bool{"default": true, "chat_member": true, "all_private_chats": true,
 		"all_group_chats": true, "all_chat_administrators": true, "chat": true, "chat_administrators": true}
 	if _, ok := types[d.Scope.Type]; ok == false {
-		return nil, errors.New("set Type field of BotCommandScope to a valid type")
+		d.Scope.Type = "default"
 	}
 	res, err := request("deleteMyCommands", b, d, &BooleanResponse{})
 	return res.(*BooleanResponse), err
