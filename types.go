@@ -908,7 +908,7 @@ type BotCommand struct {
 	Description string `json:"description"`
 }
 
-// BotCommandScope Represents the scope of bot commands.
+// BotCommandScope describes scope of users for which the commands are relevant.
 type BotCommandScope struct {
 	// Type is the scope type. It can be:
 	// "default"                 -> Default commands are used if no commands with a narrower
