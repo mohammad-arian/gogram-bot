@@ -296,18 +296,18 @@ type MediaGroupData struct {
 	ChatId int          `json:"chat_id"`
 	Media  []InputMedia `json:"media"`
 	// leave this field. it will be set automatically.
-	File                     []*os.File
+	Files                    []*os.File
 	ReplyToMessageId         int  `json:"reply_to_message_id"`
 	AllowSendingWithoutReply bool `json:"allow_sending_without_reply"`
 }
 
-func (m *MediaGroupData) Send(b Bot) (response *SliceMessageResponse, err error) {
+func (m MediaGroupData) Send(b Bot) (response *SliceMessageResponse, err error) {
 	if len(m.Media) == 0 {
 		return &SliceMessageResponse{}, errors.New("media slice is empty. pass media a slice of structs of type " +
 			"InputMediaPhoto, InputMediaVideo, InputMediaDocument or InputMediaAudio")
 	}
 	for _, j := range m.Media {
-		m.File = append(m.File, j.returnFile())
+		m.Files = append(m.Files, j.returnFile())
 	}
 	res, err := request("sendMediaGroup", b, m, &SliceMessageResponse{})
 	return res.(*SliceMessageResponse), err
@@ -928,7 +928,7 @@ type EditMessageMediaData struct {
 	InlineKeyboard
 }
 
-func (e *EditMessageMediaData) Send(b Bot) (response *MapResponse, err error) {
+func (e EditMessageMediaData) Send(b Bot) (response *MapResponse, err error) {
 	if e.InlineMessageId == "" {
 		if e.ChatId == 0 || e.MessageId == 0 {
 			return nil, errors.New("you need to set both MessageId and " +

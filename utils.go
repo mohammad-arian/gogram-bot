@@ -46,7 +46,6 @@ func multipartSetter(s interface{}, w *multipart.Writer, tag string) error {
 			_, _ = io.Copy(file, j)
 			_, _ = j.Seek(0, io.SeekStart)
 		}
-	//
 	case []*os.File:
 		for _, f := range j {
 			if err := multipartSetter(f, w, ""); err != nil {
@@ -75,13 +74,16 @@ func multipartSetter(s interface{}, w *multipart.Writer, tag string) error {
 }
 
 func structMultipartParser(s interface{}, w *multipart.Writer) error {
-	for i := 0; i < reflect.ValueOf(s).NumField(); i++ {
+	v := reflect.ValueOf(s)
+	if v.Kind() == reflect.Ptr {
+		return errors.New("value is a pointer")
+	}
+	for i := 0; i < v.NumField(); i++ {
 		tag := reflect.TypeOf(s).Field(i).Tag.Get("json")
-		value := reflect.ValueOf(s).Field(i).Interface()
+		value := v.Field(i).Interface()
 		if err := multipartSetter(value, w, tag); err != nil {
 			return err
 		}
-
 	}
 	return nil
 }
