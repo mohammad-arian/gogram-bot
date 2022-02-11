@@ -54,7 +54,7 @@ func multipartSetter(s interface{}, w *multipart.Writer, tag string) error {
 		}
 	default:
 		Type := reflect.TypeOf(s).Kind()
-		if Type == reflect.Slice || Type == reflect.Struct {
+		if Type == reflect.Slice || Type == reflect.Struct || Type == reflect.Ptr {
 			// for Keyboard and InlineKeyboard, ReplyKeyboard
 			if Type == reflect.Struct && tag == "" {
 				return structMultipartParser(j, w)
