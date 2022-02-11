@@ -301,15 +301,13 @@ type MediaGroupData struct {
 	AllowSendingWithoutReply bool `json:"allow_sending_without_reply"`
 }
 
-func (m MediaGroupData) Send(b Bot) (response *SliceMessageResponse, err error) {
+func (m *MediaGroupData) Send(b Bot) (response *SliceMessageResponse, err error) {
 	if len(m.Media) == 0 {
 		return &SliceMessageResponse{}, errors.New("media slice is empty. pass media a slice of structs of type " +
 			"InputMediaPhoto, InputMediaVideo, InputMediaDocument or InputMediaAudio")
 	}
 	for _, j := range m.Media {
-		if j.checkInputMedia(&m.File) != nil {
-			return &SliceMessageResponse{}, err
-		}
+		m.File = append(m.File, j.returnFile())
 	}
 	res, err := request("sendMediaGroup", b, m, &SliceMessageResponse{})
 	return res.(*SliceMessageResponse), err
@@ -859,7 +857,7 @@ func (e EditMessageTextData) Send(b Bot) (response *MapResponse, err error) {
 		return nil, err
 	}
 	if e.InlineMessageId == "" {
-		if e.ChatId == 0 && e.MessageId == 0 {
+		if e.ChatId == 0 || e.MessageId == 0 {
 			return nil, errors.New("you need to set both MessageId and " +
 				"ChatId, otherwise set InlineMessageId")
 		}
@@ -880,7 +878,7 @@ type EditMessageCaptionData struct {
 
 func (e EditMessageCaptionData) Send(b Bot) (response *MapResponse, err error) {
 	if e.InlineMessageId == "" {
-		if e.ChatId == 0 && e.MessageId == 0 {
+		if e.ChatId == 0 || e.MessageId == 0 {
 			return nil, errors.New("you need to set both MessageId and " +
 				"ChatId, otherwise set InlineMessageId")
 		}
@@ -898,7 +896,7 @@ type EditMessageReplyMarkupData struct {
 
 func (e EditMessageReplyMarkupData) Send(b Bot) (response *MapResponse, err error) {
 	if e.InlineMessageId == "" {
-		if e.ChatId == 0 && e.MessageId == 0 {
+		if e.ChatId == 0 || e.MessageId == 0 {
 			return nil, errors.New("you need to set both MessageId and " +
 				"ChatId, otherwise set InlineMessageId")
 		}
@@ -926,13 +924,13 @@ type EditMessageMediaData struct {
 	Media           InputMedia `json:"media"`
 	ChatId          int        `json:"chat_id"`
 	MessageId       int        `json:"message_id"`
-	File            []*os.File
+	Files           []*os.File
 	InlineKeyboard
 }
 
-func (e EditMessageMediaData) Send(b Bot) (response *MapResponse, err error) {
+func (e *EditMessageMediaData) Send(b Bot) (response *MapResponse, err error) {
 	if e.InlineMessageId == "" {
-		if e.ChatId == 0 && e.MessageId == 0 {
+		if e.ChatId == 0 || e.MessageId == 0 {
 			return nil, errors.New("you need to set both MessageId and " +
 				"ChatId, otherwise set InlineMessageId")
 		}
@@ -941,9 +939,7 @@ func (e EditMessageMediaData) Send(b Bot) (response *MapResponse, err error) {
 		return nil, errors.New("media is nil. pass media a struct of type " +
 			"InputMediaPhoto, InputMediaVideo, InputMediaDocument or InputMediaAudio")
 	}
-	if e.Media.checkInputMedia(&e.File) != nil {
-		return nil, err
-	}
+	e.Files = append(e.Files, e.Media.returnFile())
 	res, err := request("editMessageMedia", b, e, &MapResponse{})
 	return res.(*MapResponse), err
 }

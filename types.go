@@ -493,43 +493,32 @@ type Animation struct {
 }
 
 type InputMedia interface {
-	// checkInputMedia checks InputMedias such as InputMediaPhoto, InputMediaDocument etc.
-	// If they have a file checkInputMedia adds it to f slice and sets Media field of InputMedias
-	// automatically to attach://<file name> so users won't have to deal with Media field.
-	// Methods like ReplyAble.SendMediaGroup() add f to data so multipartSetter() could create a form file.
-	// this behavior is because multipartSetter() can't parse each value in slices, so if a slice
-	// has a file, it won't be added to http requests, moreover adding a feature to multipartSetter()
-	// to check every slice element and every struct field impacts performance.
-	checkInputMedia(f *[]*os.File) error
+	// returnFile return *os.File if Media field of InputMedia is a file and automatically set the Media to
+	// the correct value: attach://<file name>
+	// Methods like ReplyAble.SendMediaGroup() use this method to add those files to request
+	// Be aware that after running returnFile, the Media field is no longer a file, it is a string.
+	// So if you intend to use a InputMedia twice, set the Media field again.
+	returnFile() *os.File
 }
 
-// InputMediaPhoto Represents a photo to be sent.
 type InputMediaPhoto struct {
 	// Type of the result, must be "photo"
 	Type string `json:"type"`
 	// Pass a file_id to send a file that exists on the Telegram servers (recommended),
-	// pass an HTTP URL for Telegram to get a file from the Internet or leave blank, and set
-	// File to a file and checkInputMedia() takes care of Media.
-	Media string `json:"media"`
-	// Optional. a file to be sent.
-	File *os.File
+	// pass an HTTP URL for Telegram to get a file from the Internet or pass a *os.File
+	Media interface{} `json:"media"`
 	// Optional. Caption of the photo to be sent, 0-1024 characters after entities parsing
 	Caption         string          `json:"caption"`
 	ParseMode       string          `json:"parse_mode"`
 	CaptionEntities []MessageEntity `json:"caption_entities"`
 }
 
-func (i *InputMediaPhoto) checkInputMedia(f *[]*os.File) error {
+func (i *InputMediaPhoto) returnFile() *os.File {
 	i.Type = "photo"
-	if i.Media == "" && i.File == nil {
-		return errors.New("both Media and File fields of InputMediaPhoto are empty")
-	}
-	if i.File != nil {
-		i.Media = "attach://" + i.File.Name()
-		if f == nil {
-			return errors.New("f slice is nil")
-		}
-		*f = append(*f, i.File)
+	switch m := i.Media.(type) {
+	case *os.File:
+		i.Media = "attach://" + m.Name()
+		return m
 	}
 	return nil
 }
@@ -538,11 +527,8 @@ type InputMediaVideo struct {
 	// Type of the result, must be "video"
 	Type string `json:"type"`
 	// Pass a file_id to send a file that exists on the Telegram servers (recommended),
-	// pass an HTTP URL for Telegram to get a file from the Internet or leave blank, and set
-	// File to a file and checkInputMedia() takes care of Media.
-	Media string `json:"media"`
-	// Optional. a file to be sent.
-	File *os.File
+	// pass an HTTP URL for Telegram to get a file from the Internet or pass a *os.File
+	Media interface{} `json:"media"`
 	// Optional. Caption of the photo to be sent, 0-1024 characters after entities parsing
 	Caption           string          `json:"caption"`
 	ParseMode         string          `json:"parse_mode"`
@@ -553,17 +539,12 @@ type InputMediaVideo struct {
 	CaptionEntities   []MessageEntity `json:"caption_entities"`
 }
 
-func (i *InputMediaVideo) checkInputMedia(f *[]*os.File) error {
+func (i *InputMediaVideo) returnFile() *os.File {
 	i.Type = "video"
-	if i.Media == "" && i.File == nil {
-		return errors.New("both Media and File fields of InputMediaVideo are empty")
-	}
-	if i.File != nil {
-		i.Media = "attach://" + i.File.Name()
-		if f == nil {
-			return errors.New("f slice is nil")
-		}
-		*f = append(*f, i.File)
+	switch m := i.Media.(type) {
+	case *os.File:
+		i.Media = "attach://" + m.Name()
+		return m
 	}
 	return nil
 }
@@ -572,11 +553,8 @@ type InputMediaDocument struct {
 	// Type of the result, must be "document"
 	Type string `json:"type"`
 	// Pass a file_id to send a file that exists on the Telegram servers (recommended),
-	// pass an HTTP URL for Telegram to get a file from the Internet or leave blank, and set
-	// File to a file and checkInputMedia() takes care of Media.
-	Media string `json:"media"`
-	// Optional. a file to be sent.
-	File *os.File
+	// pass an HTTP URL for Telegram to get a file from the Internet or pass a *os.File
+	Media interface{} `json:"media"`
 	// Optional. Caption of the photo to be sent, 0-1024 characters after entities parsing
 	Caption         string          `json:"caption"`
 	ParseMode       string          `json:"parse_mode"`
@@ -586,17 +564,12 @@ type InputMediaDocument struct {
 	DisableContentTypeDetection bool `json:"disable_content_type_detection"`
 }
 
-func (i *InputMediaDocument) checkInputMedia(f *[]*os.File) error {
+func (i *InputMediaDocument) returnFile() *os.File {
 	i.Type = "document"
-	if i.Media == "" && i.File == nil {
-		return errors.New("both Media and File fields of InputMediaDocument are empty")
-	}
-	if i.File != nil {
-		i.Media = "attach://" + i.File.Name()
-		if f == nil {
-			return errors.New("f slice is nil")
-		}
-		*f = append(*f, i.File)
+	switch m := i.Media.(type) {
+	case *os.File:
+		i.Media = "attach://" + m.Name()
+		return m
 	}
 	return nil
 }
@@ -605,11 +578,8 @@ type InputMediaAudio struct {
 	// Type of the result, must be "audio"
 	Type string `json:"type"`
 	// Pass a file_id to send a file that exists on the Telegram servers (recommended),
-	// pass an HTTP URL for Telegram to get a file from the Internet or leave blank, and set
-	// File to a file and checkInputMedia() takes care of Media.
-	Media string `json:"media"`
-	// Optional. a file to be sent.
-	File *os.File
+	// pass an HTTP URL for Telegram to get a file from the Internet or pass a *os.File
+	Media interface{} `json:"media"`
 	// Optional. Caption of the photo to be sent, 0-1024 characters after entities parsing
 	Caption         string          `json:"caption"`
 	ParseMode       string          `json:"parse_mode"`
@@ -619,17 +589,12 @@ type InputMediaAudio struct {
 	Tile            string          `json:"tile"`
 }
 
-func (i *InputMediaAudio) checkInputMedia(f *[]*os.File) error {
+func (i *InputMediaAudio) returnFile() *os.File {
 	i.Type = "audio"
-	if i.Media == "" && i.File == nil {
-		return errors.New("both Media and File fields of InputMediaAudio are empty")
-	}
-	if i.File != nil {
-		i.Media = "attach://" + i.File.Name()
-		if f == nil {
-			return errors.New("f slice is nil")
-		}
-		*f = append(*f, i.File)
+	switch m := i.Media.(type) {
+	case *os.File:
+		i.Media = "attach://" + m.Name()
+		return m
 	}
 	return nil
 }
@@ -638,11 +603,8 @@ type InputMediaAnimation struct {
 	// Type of the result, must be "animation"
 	Type string `json:"type"`
 	// Pass a file_id to send a file that exists on the Telegram servers (recommended),
-	// pass an HTTP URL for Telegram to get a file from the Internet or leave blank, and set
-	// File to a file and checkInputMedia() takes care of Media.
-	Media string `json:"media"`
-	// Optional. a file to be sent.
-	File *os.File
+	// pass an HTTP URL for Telegram to get a file from the Internet or pass a *os.File
+	Media interface{} `json:"media"`
 	// Optional. Caption of the photo to be sent, 0-1024 characters after entities parsing
 	Caption         string          `json:"caption"`
 	ParseMode       string          `json:"parse_mode"`
@@ -651,17 +613,12 @@ type InputMediaAnimation struct {
 	Height          int             `json:"height"`
 }
 
-func (i *InputMediaAnimation) checkInputMedia(f *[]*os.File) error {
+func (i *InputMediaAnimation) returnFile() *os.File {
 	i.Type = "animation"
-	if i.Media == "" && i.File == nil {
-		return errors.New("both Media and File fields of InputMediaAnimation are empty")
-	}
-	if i.File != nil {
-		i.Media = "attach://" + i.File.Name()
-		if f == nil {
-			return errors.New("f slice is nil")
-		}
-		*f = append(*f, i.File)
+	switch m := i.Media.(type) {
+	case *os.File:
+		i.Media = "attach://" + m.Name()
+		return m
 	}
 	return nil
 }
