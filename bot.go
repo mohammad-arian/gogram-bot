@@ -53,12 +53,9 @@ func (b Bot) ActivateProxy() error {
 
 // VerifyBot verifies the token
 func (b *Bot) VerifyBot() error {
-	res, err := request("getme", *b, nil, &UserResponse{})
-	if err != nil {
+	if res, err := request("getme", *b, nil, &UserResponse{}); err != nil {
 		return err
-	}
-	getMeRes := res.(*UserResponse)
-	if getMeRes.Ok != true {
+	} else if getMeRes := res.(*UserResponse); getMeRes.Ok != true {
 		return errors.New("token is wrong")
 	}
 	return nil

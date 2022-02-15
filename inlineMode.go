@@ -34,8 +34,8 @@ type InputTextMessageContent struct {
 }
 
 func (i InputTextMessageContent) checkMessageContent() error {
-	if len(i.MessageText) == 0 {
-		return errors.New("you need to set Id of InlineQueryResultPhoto to a string")
+	if err := globalEmptyFieldChecker(map[string]interface{}{"MessageText": i.MessageText}); err != nil {
+		return err
 	}
 	return nil
 }
@@ -60,11 +60,8 @@ type InputVenueMessageContent struct {
 }
 
 func (i InputVenueMessageContent) checkMessageContent() error {
-	if i.Title == "" {
-		return errors.New("you need to set Title of InputVenueMessageContent to a string")
-	}
-	if i.Address == "" {
-		return errors.New("you need to set Address of InputVenueMessageContent to a string")
+	if err := globalEmptyFieldChecker(map[string]interface{}{"Title": i.Title, "Address": i.Address}); err != nil {
+		return err
 	}
 	return nil
 }
@@ -77,11 +74,9 @@ type InputContactMessageContent struct {
 }
 
 func (i InputContactMessageContent) checkMessageContent() error {
-	if i.PhoneNumber == "" {
-		return errors.New("you need to set PhoneNumber of InputVenueMessageContent to a string")
-	}
-	if i.FirstName == "" {
-		return errors.New("you need to set FirstName of InputVenueMessageContent to a string")
+	if err := globalEmptyFieldChecker(map[string]interface{}{"PhoneNumber": i.PhoneNumber,
+		"FirstName": i.FirstName}); err != nil {
+		return err
 	}
 	return nil
 }
@@ -110,24 +105,9 @@ type InputInvoiceMessageContent struct {
 }
 
 func (i InputInvoiceMessageContent) checkMessageContent() error {
-	if i.Title == "" {
-		return errors.New("you need to set Title of InputInvoiceMessageContent to a string")
-	}
-	if i.Description == "" {
-		return errors.New("you need to set Description of InputInvoiceMessageContent to a string")
-	}
-	if i.Payload == "" {
-		return errors.New("you need to set Payload of InputInvoiceMessageContent to a string")
-	}
-	if i.ProviderData == "" {
-		return errors.New("you need to set ProviderData of InputInvoiceMessageContent to a string")
-	}
-	if i.Currency == "" {
-		return errors.New("you need to set Currency of InputInvoiceMessageContent to a string")
-	}
-	if len(i.Prices) == 0 {
-		return errors.New("you need to set Prices of InputInvoiceMessageContent to a slice of " +
-			"LabeledPrice struct")
+	if err := globalEmptyFieldChecker(map[string]interface{}{"Title": i.Title, "Description": i.Description,
+		"Payload": i.Payload, "ProviderData": i.ProviderToken, "Currency": i.Currency, "Prices": i.Prices}); err != nil {
+		return err
 	}
 	return nil
 }
@@ -151,17 +131,11 @@ func (i *InlineQueryResultArticle) checkQueryAnswer() error {
 	if i.InputMessageContent == nil {
 		return errors.New("you need to set InputMessageContent of InlineQueryResultArticle to a MessageContent" +
 			" such as InputTextMessageContent, InputLocationMessageContent etc")
-	} else {
-		e := i.InputMessageContent.checkMessageContent()
-		if e != nil {
-			return e
-		}
+	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
+		return err
 	}
-	if i.Id == "" {
-		return errors.New("you need to set Id of InlineQueryResultArticle to a unique string")
-	}
-	if i.Title == "" {
-		return errors.New("you need to set Title of InlineQueryResultArticle to a string")
+	if err := globalEmptyFieldChecker(map[string]interface{}{"Title": i.Title, "Id": i.Id}); err != nil {
+		return err
 	}
 	return nil
 }
@@ -185,27 +159,24 @@ type InlineQueryResultPhoto struct {
 
 func (i *InlineQueryResultPhoto) checkQueryAnswer() error {
 	i.Type = "photo"
-	if i.Id == "" {
-		return errors.New("you need to set Id of InlineQueryResultPhoto to a unique string")
-	}
 	if i.PhotoUrl == "" && i.PhotoFileId == "" {
 		return errors.New("you need to set PhotoUrl or PhotoFileId of InlineQueryResultPhoto to a photo url or " +
 			"file id on telegram server")
-	}
-	if i.PhotoUrl != "" && i.PhotoFileId != "" {
-		return errors.New("set PhotoUrl or PhotoFileId of InlineQueryResultPhoto, not both")
-	}
-	if i.ThumbUrl == "" && i.PhotoUrl != "" {
-		return errors.New("ThumbUrl is required if you are setting PhotoUrl of " +
-			"InlineQueryResultPhoto to a url")
+	} else if i.PhotoUrl != "" {
+		if i.PhotoFileId != "" {
+			return errors.New("set PhotoUrl or PhotoFileId of InlineQueryResultPhoto, not both")
+		}
+		if i.ThumbUrl == "" {
+			return errors.New("ThumbUrl is required if you are setting PhotoUrl to a url")
+		}
 	}
 	if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
-	} else {
-		e := i.InputMessageContent.checkMessageContent()
-		if e != nil {
-			return e
-		}
+	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
+		return err
+	}
+	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id}); err != nil {
+		return err
 	}
 	return nil
 }
@@ -230,26 +201,24 @@ type InlineQueryResultGif struct {
 
 func (i *InlineQueryResultGif) checkQueryAnswer() error {
 	i.Type = "gif"
-	if i.Id == "" {
-		return errors.New("you need to set Id of InlineQueryResultGif to a unique string")
-	}
 	if i.GifUrl == "" && i.GifFileId == "" {
 		return errors.New("you need to set GifUrl or GifFileId of InlineQueryResultGif to a gif url or " +
 			"file id on telegram server")
-	}
-	if i.GifUrl != "" && i.GifFileId != "" {
-		return errors.New("set GifUrl or GifFileId of InlineQueryResultGif, not both")
-	}
-	if i.ThumbUrl == "" && i.GifUrl != "" {
-		return errors.New("ThumbUrl is required if you are setting GifUrl of InlineQueryResultGif to a url")
+	} else if i.GifUrl != "" {
+		if i.GifFileId != "" {
+			return errors.New("set GifUrl or GifFileId of InlineQueryResultGif, not both")
+		}
+		if i.ThumbUrl == "" {
+			return errors.New("ThumbUrl is required if you are setting GifUrl to a url")
+		}
 	}
 	if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
-	} else {
-		e := i.InputMessageContent.checkMessageContent()
-		if e != nil {
-			return e
-		}
+	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
+		return err
+	}
+	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id}); err != nil {
+		return err
 	}
 	return nil
 }
@@ -274,27 +243,24 @@ type InlineQueryResultMpeg4Gif struct {
 
 func (i *InlineQueryResultMpeg4Gif) checkQueryAnswer() error {
 	i.Type = "mpeg4_gif"
-	if i.Id == "" {
-		return errors.New("you need to set Id of InlineQueryResultMpeg4Gif to a unique string")
-	}
 	if i.Mpeg4Url == "" && i.Mpeg4FileId == "" {
 		return errors.New("you need to set Mpeg4Url or Mpeg4FileId of InlineQueryResultMpeg4Gif to a " +
 			"video animation (H.264/MPEG-4 AVC video without sound) url or file id on telegram server")
-	}
-	if i.Mpeg4Url != "" && i.Mpeg4FileId != "" {
-		return errors.New("set Mpeg4Url or Mpeg4FileId of InlineQueryResultMpeg4Gif, not both")
-	}
-	if i.ThumbUrl == "" && i.Mpeg4Url != "" {
-		return errors.New("ThumbUrl is required if you are setting Mpeg4Url of " +
-			"InlineQueryResultMpeg4Gif to a url")
+	} else if i.Mpeg4Url != "" {
+		if i.Mpeg4FileId != "" {
+			return errors.New("set Mpeg4Url or Mpeg4FileId of InlineQueryResultGif, not both")
+		}
+		if i.ThumbUrl == "" {
+			return errors.New("ThumbUrl is required if you are setting Mpeg4Url to a url")
+		}
 	}
 	if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
-	} else {
-		e := i.InputMessageContent.checkMessageContent()
-		if e != nil {
-			return e
-		}
+	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
+		return err
+	}
+	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id}); err != nil {
+		return err
 	}
 	return nil
 }
@@ -320,34 +286,28 @@ type InlineQueryResultVideo struct {
 
 func (i *InlineQueryResultVideo) checkQueryAnswer() error {
 	i.Type = "video"
-	if i.Id == "" {
-		return errors.New("you need to set Id of InlineQueryResultVideo to a unique string")
-	}
 	if i.VideoUrl == "" && i.VideoFileId == "" {
 		return errors.New("you need to set VideoUrl or VideoFileId of InlineQueryResultVideo to a " +
 			"video url or file id on telegram server")
-	}
-	if i.VideoUrl != "" && i.VideoFileId != "" {
-		return errors.New("set VideoUrl or VideoFileId of InlineQueryResultVideo, not both")
-	}
-	if i.ThumbUrl == "" && i.VideoFileId != "" {
-		return errors.New("ThumbUrl is required if you are setting VideoUrl of " +
-			"InlineQueryResultVideo to a url")
-	}
-	if i.Title == "" {
-		return errors.New("you need to set Title of InlineQueryResultVideo to a string")
-	}
-	if i.MimeType == "" && i.VideoUrl != "" {
-		return errors.New("MimeType is required if you are setting VideoUrl of InlineQueryResultVideo to a url. " +
-			"you need to set MimeType to Mime type of the content of video url, “text/html” or “video/mp4”")
+	} else if i.VideoUrl != "" {
+		if i.VideoFileId != "" {
+			return errors.New("set VideoUrl or VideoFileId of InlineQueryResultVideo, not both")
+		}
+		if i.MimeType == "" {
+			return errors.New("MimeType is required if you are setting VideoUrl of InlineQueryResultVideo to a url. " +
+				"you need to set MimeType to Mime type of the content of video url, “text/html” or “video/mp4”")
+		}
+		if i.ThumbUrl == "" {
+			return errors.New("ThumbUrl is required if you are setting VideoUrl to a url")
+		}
 	}
 	if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
-	} else {
-		e := i.InputMessageContent.checkMessageContent()
-		if e != nil {
-			return e
-		}
+	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
+		return err
+	}
+	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "Title": i.Title}); err != nil {
+		return err
 	}
 	return nil
 }
@@ -369,26 +329,24 @@ type InlineQueryResultAudio struct {
 
 func (i *InlineQueryResultAudio) checkQueryAnswer() error {
 	i.Type = "audio"
-	if i.Id == "" {
-		return errors.New("you need to set Id of InlineQueryResultAudio to a unique string")
+	if i.Title == "" {
+		return errors.New("you need to set Title of InlineQueryResultAudio to a string")
 	}
 	if i.AudioUrl == "" && i.AudioFileId == "" {
 		return errors.New("you need to set AudioUrl or AudioFileId of InlineQueryResultAudio to a " +
 			"audio url or file id on telegram server")
-	}
-	if i.AudioUrl != "" && i.AudioFileId != "" {
-		return errors.New("set AudioUrl or AudioFileId of InlineQueryResultAudio, not both")
-	}
-	if i.Title == "" {
-		return errors.New("you need to set Title of InlineQueryResultAudio to a string")
+	} else if i.AudioUrl != "" {
+		if i.AudioFileId != "" {
+			return errors.New("set AudioUrl or AudioFileId of InlineQueryResultAudio, not both")
+		}
 	}
 	if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
-	} else {
-		e := i.InputMessageContent.checkMessageContent()
-		if e != nil {
-			return e
-		}
+	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
+		return err
+	}
+	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id}); err != nil {
+		return err
 	}
 	return nil
 }
@@ -409,26 +367,21 @@ type InlineQueryResultVoice struct {
 
 func (i *InlineQueryResultVoice) checkQueryAnswer() error {
 	i.Type = "voice"
-	if i.Id == "" {
-		return errors.New("you need to set Id of InlineQueryResultVoice to a unique string")
-	}
 	if i.VoiceUrl == "" && i.VoiceFileId == "" {
 		return errors.New("you need to set VoiceUrl or VoiceFileId of InlineQueryResultVoice to a " +
 			"audio url or file id on telegram server")
-	}
-	if i.VoiceUrl != "" && i.VoiceFileId != "" {
-		return errors.New("set VoiceUrl or VoiceFileId of InlineQueryResultVoice, not both")
-	}
-	if i.Title == "" {
-		return errors.New("you need to set Title of InlineQueryResultVoice to a string")
+	} else if i.VoiceUrl != "" {
+		if i.VoiceFileId != "" {
+			return errors.New("set VoiceUrl or VoiceFileId of InlineQueryResultVoice, not both")
+		}
 	}
 	if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
-	} else {
-		e := i.InputMessageContent.checkMessageContent()
-		if e != nil {
-			return e
-		}
+	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
+		return err
+	}
+	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id}); err != nil {
+		return err
 	}
 	return nil
 }
@@ -453,31 +406,28 @@ type InlineQueryResultDocument struct {
 
 func (i *InlineQueryResultDocument) checkQueryAnswer() error {
 	i.Type = "document"
-	if i.Id == "" {
-		return errors.New("you need to set Id of InlineQueryResultDocument to a unique string")
+	if i.Title == "" {
+		return errors.New("you need to set Title of InlineQueryResultDocument to a string")
 	}
 	if i.DocumentUrl == "" && i.DocumentFileId == "" {
 		return errors.New("you need to set DocumentUrl or DocumentFileId of InlineQueryResultDocument to a " +
 			"audio url or file id on telegram server")
-	}
-	if i.DocumentUrl != "" && i.DocumentFileId != "" {
-		return errors.New("set DocumentUrl or DocumentFileId of InlineQueryResultDocument, not both")
-	}
-	if i.MimeType == "" && i.DocumentUrl != "" {
-		return errors.New("MimeType is required if you are setting DocumentUrl of InlineQueryResultDocument to " +
-			"a url. you need to set MimeType to Mime type of the content of " +
-			"the file, either “application/pdf” or “application/zip”")
-	}
-	if i.Title == "" {
-		return errors.New("you need to set Title of InlineQueryResultDocument to a string")
+	} else if i.DocumentUrl != "" {
+		if i.DocumentFileId != "" {
+			return errors.New("set DocumentUrl or DocumentFileId of InlineQueryResultDocument, not both")
+		}
+		if i.MimeType == "" {
+			return errors.New("MimeType is required if you are setting DocumentUrl to a url. you need to set " +
+				"MimeType to Mime type of the content of the file, either “application/pdf” or “application/zip”")
+		}
 	}
 	if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
-	} else {
-		e := i.InputMessageContent.checkMessageContent()
-		if e != nil {
-			return e
-		}
+	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
+		return err
+	}
+	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id}); err != nil {
+		return err
 	}
 	return nil
 }
@@ -496,19 +446,13 @@ type InlineQueryResultLocation struct {
 
 func (i *InlineQueryResultLocation) checkQueryAnswer() error {
 	i.Type = "location"
-	if i.Id == "" {
-		return errors.New("you need to set Id of InlineQueryResultLocation to a unique string")
-	}
-	if i.Title == "" {
-		return errors.New("you need to set Title of InlineQueryResultLocation to a string")
+	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "Title": i.Title}); err != nil {
+		return err
 	}
 	if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
-	} else {
-		e := i.InputMessageContent.checkMessageContent()
-		if e != nil {
-			return e
-		}
+	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
+		return err
 	}
 	return nil
 }
@@ -533,22 +477,14 @@ type InlineQueryResultVenue struct {
 
 func (i *InlineQueryResultVenue) checkQueryAnswer() error {
 	i.Type = "venue"
-	if i.Id == "" {
-		return errors.New("you need to set Id of InlineQueryResultVenue to a unique string")
-	}
-	if i.Address == "" {
-		return errors.New("you need to set Address of InlineQueryResultVenue to a string")
-	}
-	if i.Title == "" {
-		return errors.New("you need to set Title of InlineQueryResultVenue to a string")
+	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "Title": i.Title,
+		"Address": i.Address}); err != nil {
+		return err
 	}
 	if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
-	} else {
-		e := i.InputMessageContent.checkMessageContent()
-		if e != nil {
-			return e
-		}
+	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
+		return err
 	}
 	return nil
 }
@@ -569,19 +505,13 @@ type InlineQueryResultContact struct {
 
 func (i *InlineQueryResultContact) checkQueryAnswer() error {
 	i.Type = "contact"
-	if i.Id == "" {
-		return errors.New("you need to set Id of InlineQueryResultContact to a unique string")
-	}
-	if i.FirstName == "" {
-		return errors.New("you need to set FirstName of InlineQueryResultContact to a string")
+	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "FirstName": i.FirstName}); err != nil {
+		return err
 	}
 	if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
-	} else {
-		e := i.InputMessageContent.checkMessageContent()
-		if e != nil {
-			return e
-		}
+	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
+		return err
 	}
 	return nil
 }
@@ -595,11 +525,9 @@ type InlineQueryResultGame struct {
 
 func (i *InlineQueryResultGame) checkQueryAnswer() error {
 	i.Type = "game"
-	if i.Id == "" {
-		return errors.New("you need to set Id of InlineQueryResultGame to a unique string")
-	}
-	if i.GameShortName == "" {
-		return errors.New("you need to set GameShortName of InlineQueryResultGame to a string")
+	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id,
+		"GameShortName": i.GameShortName}); err != nil {
+		return err
 	}
 	return nil
 }
@@ -614,11 +542,9 @@ type InlineQueryResultSticker struct {
 
 func (i *InlineQueryResultSticker) checkQueryAnswer() error {
 	i.Type = "sticker"
-	if i.Id == "" {
-		return errors.New("you need to set Id of InlineQueryResultSticker to a unique string")
-	}
-	if i.StickerFileId == "" {
-		return errors.New("you need to set GameShortName of InlineQueryResultGame to a file id")
+	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id,
+		"StickerFileId": i.StickerFileId}); err != nil {
+		return err
 	}
 	return nil
 }

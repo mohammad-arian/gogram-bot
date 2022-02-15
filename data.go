@@ -303,7 +303,7 @@ type MediaGroupData struct {
 
 func (m MediaGroupData) Send(b Bot) (response *SliceMessageResponse, err error) {
 	if len(m.Media) == 0 {
-		return &SliceMessageResponse{}, errors.New("media slice is empty. pass media a slice of structs of type " +
+		return nil, errors.New("media slice is empty. pass media a slice of structs of type " +
 			"InputMediaPhoto, InputMediaVideo, InputMediaDocument or InputMediaAudio")
 	}
 	for _, j := range m.Media {
@@ -1095,12 +1095,12 @@ func (a AnswerInlineQueryData) Send(b Bot) (response *BooleanResponse, err error
 		return nil, err
 	}
 	if len(a.Results) == 0 {
-		return &BooleanResponse{}, errors.New("results slice is empty. pass QueryAnswer structs such as " +
+		return nil, errors.New("results slice is empty. pass QueryAnswer structs such as " +
 			"InlineQueryResultArticle, InlineQueryResultPhoto and etc")
 	}
 	for _, j := range a.Results {
 		if e := j.checkQueryAnswer(); e != nil {
-			return &BooleanResponse{}, e
+			return nil, e
 		}
 	}
 	res, err := request("answerInlineQuery", b, a, &BooleanResponse{})
