@@ -25,7 +25,7 @@ func (t TextData) Send(b Bot) (response *Response, err error) {
 	if err = t.check(); err != nil {
 		return nil, err
 	}
-	res, err := request("sendMessage", b, t, &Response{Result: Message{}})
+	res, err := request("sendMessage", b, t, &Response{Result: &Message{}})
 	return res.(*Response), err
 }
 
