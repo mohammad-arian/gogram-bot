@@ -1093,7 +1093,7 @@ func (i InlineButton) check() error {
 		notEmpty += 1
 	}
 	if notEmpty != 1 {
-		return errors.New("you must set exactly one of the optional fields of InlineButton.")
+		return errors.New("you must set exactly one of the optional fields of InlineButton")
 	}
 	return nil
 }

@@ -5,6 +5,10 @@ import (
 	"os"
 )
 
+type Method interface {
+	check() error
+}
+
 type TextData struct {
 	Text                     string          `json:"text"`
 	ChatId                   int             `json:"chat_id"`
@@ -18,11 +22,15 @@ type TextData struct {
 }
 
 func (t TextData) Send(b Bot) (response *MessageResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"Text": t.Text, "ChatId": t.ChatId}); err != nil {
+	if err = t.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("sendMessage", b, t, &MessageResponse{})
 	return res.(*MessageResponse), err
+}
+
+func (t TextData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"Text": t.Text, "ChatId": t.ChatId})
 }
 
 type PhotoData struct {
@@ -38,11 +46,15 @@ type PhotoData struct {
 }
 
 func (p PhotoData) Send(b Bot) (response *MessageResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"Photo": p.Photo, "ChatId": p.ChatId}); err != nil {
+	if err = p.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("sendPhoto", b, p, &MessageResponse{})
 	return res.(*MessageResponse), err
+}
+
+func (p PhotoData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"Photo": p.Photo, "ChatId": p.ChatId})
 }
 
 type VideoData struct {
@@ -62,11 +74,15 @@ type VideoData struct {
 }
 
 func (v VideoData) Send(b Bot) (response *MessageResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"Video": v.Video, "ChatId": v.ChatId}); err != nil {
+	if err = v.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("sendVideo", b, v, &MessageResponse{})
 	return res.(*MessageResponse), err
+}
+
+func (v VideoData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"Video": v.Video, "ChatId": v.ChatId})
 }
 
 type AudioData struct {
@@ -85,11 +101,14 @@ type AudioData struct {
 }
 
 func (a AudioData) Send(b Bot) (response *MessageResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"Audio": a.Audio, "ChatId": a.ChatId}); err != nil {
+	if err = a.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("sendAudio", b, a, &MessageResponse{})
 	return res.(*MessageResponse), err
+}
+func (a AudioData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"Audio": a.Audio, "ChatId": a.ChatId})
 }
 
 type DocumentData struct {
@@ -110,11 +129,14 @@ type DocumentData struct {
 }
 
 func (d DocumentData) Send(b Bot) (response *MessageResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"Document": d.Document, "ChatId": d.ChatId}); err != nil {
+	if err = d.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("sendDocument", b, d, &MessageResponse{})
 	return res.(*MessageResponse), err
+}
+func (d DocumentData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"Document": d.Document, "ChatId": d.ChatId})
 }
 
 type VoiceData struct {
@@ -131,11 +153,14 @@ type VoiceData struct {
 }
 
 func (v VoiceData) Send(b Bot) (response *MessageResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"Voice": v.Voice, "ChatId": v.ChatId}); err != nil {
+	if err = v.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("sendVoice", b, v, &MessageResponse{})
 	return res.(*MessageResponse), err
+}
+func (v VoiceData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"Voice": v.Voice, "ChatId": v.ChatId})
 }
 
 type AnimationData struct {
@@ -154,11 +179,14 @@ type AnimationData struct {
 }
 
 func (a AnimationData) Send(b Bot) (response *MessageResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"Animation": a.Animation, "ChatId": a.ChatId}); err != nil {
+	if err = a.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("sendAnimation", b, a, &MessageResponse{})
 	return res.(*MessageResponse), err
+}
+func (a AnimationData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"Animation": a.Animation, "ChatId": a.ChatId})
 }
 
 type PollData struct {
@@ -199,11 +227,14 @@ type PollData struct {
 }
 
 func (p PollData) Send(b Bot) (response *MessageResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"Question": p.Question, "ChatId": p.ChatId, "Options": p.Options}); err != nil {
+	if err = p.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("sendPoll", b, p, &MessageResponse{})
 	return res.(*MessageResponse), err
+}
+func (p PollData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"Question": p.Question, "ChatId": p.ChatId, "Options": p.Options})
 }
 
 type DiceData struct {
@@ -221,11 +252,14 @@ type DiceData struct {
 }
 
 func (d DiceData) Send(b Bot) (response *MessageResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"Emoji": d.Emoji, "ChatId": d.ChatId}); err != nil {
+	if err = d.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("sendDice", b, d, &MessageResponse{})
 	return res.(*MessageResponse), err
+}
+func (d DiceData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"Emoji": d.Emoji, "ChatId": d.ChatId})
 }
 
 type VideoNoteData struct {
@@ -240,11 +274,14 @@ type VideoNoteData struct {
 }
 
 func (v VideoNoteData) Send(b Bot) (response *MessageResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"VideoNote": v.VideoNote, "ChatId": v.ChatId}); err != nil {
+	if err = v.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("sendVideoNote", b, v, &MessageResponse{})
 	return res.(*MessageResponse), err
+}
+func (v VideoNoteData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"VideoNote": v.VideoNote, "ChatId": v.ChatId})
 }
 
 type LocationData struct {
@@ -262,11 +299,14 @@ type LocationData struct {
 }
 
 func (l LocationData) Send(b Bot) (response *MessageResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": l.ChatId}); err != nil {
+	if err = l.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("sendLocation", b, l, &MessageResponse{})
 	return res.(*MessageResponse), err
+}
+func (l LocationData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": l.ChatId})
 }
 
 type ContactData struct {
@@ -283,12 +323,15 @@ type ContactData struct {
 }
 
 func (c ContactData) Send(b Bot) (response *MessageResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"PhoneNumber": c.PhoneNumber, "ChatId": c.ChatId,
-		"FirstName": c.FirstName}); err != nil {
+	if err = c.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("sendContact", b, c, &MessageResponse{})
 	return res.(*MessageResponse), err
+}
+func (c ContactData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"PhoneNumber": c.PhoneNumber, "ChatId": c.ChatId,
+		"FirstName": c.FirstName})
 }
 
 // MediaGroupData represents an album.
@@ -302,15 +345,21 @@ type MediaGroupData struct {
 }
 
 func (m MediaGroupData) Send(b Bot) (response *SliceMessageResponse, err error) {
-	if len(m.Media) == 0 {
-		return nil, errors.New("media slice is empty. pass media a slice of structs of type " +
-			"InputMediaPhoto, InputMediaVideo, InputMediaDocument or InputMediaAudio")
+	if err = m.check(); err != nil {
+		return nil, err
 	}
 	for _, j := range m.Media {
 		m.Files = append(m.Files, j.returnFile())
 	}
 	res, err := request("sendMediaGroup", b, m, &SliceMessageResponse{})
 	return res.(*SliceMessageResponse), err
+}
+func (m MediaGroupData) check() error {
+	if len(m.Media) == 0 {
+		return errors.New("media slice is empty. pass media a slice of structs of type " +
+			"InputMediaPhoto, InputMediaVideo, InputMediaDocument or InputMediaAudio")
+	}
+	return nil
 }
 
 type ForwardMessageData struct {
@@ -326,12 +375,15 @@ type ForwardMessageData struct {
 }
 
 func (f ForwardMessageData) Send(b Bot) (response *MessageResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"FromChatId": f.FromChatId, "ChatId": f.ChatId,
-		"MessageId": f.MessageId}); err != nil {
+	if err = f.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("forwardMessage", b, f, &MessageResponse{})
 	return res.(*MessageResponse), err
+}
+func (f ForwardMessageData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"FromChatId": f.FromChatId, "ChatId": f.ChatId,
+		"MessageId": f.MessageId})
 }
 
 type CopyMessageData struct {
@@ -348,12 +400,15 @@ type CopyMessageData struct {
 }
 
 func (c CopyMessageData) Send(b Bot) (response *MessageResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"FromChatId": c.FromChatId, "ChatId": c.ChatId,
-		"MessageId": c.MessageId}); err != nil {
+	if err = c.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("copyMessage", b, c, &MessageResponse{})
 	return res.(*MessageResponse), err
+}
+func (c CopyMessageData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"FromChatId": c.FromChatId, "ChatId": c.ChatId,
+		"MessageId": c.MessageId})
 }
 
 type DeleteMessageData struct {
@@ -362,12 +417,15 @@ type DeleteMessageData struct {
 }
 
 func (d DeleteMessageData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": d.ChatId,
-		"MessageId": d.MessageId}); err != nil {
+	if err = d.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("deleteMessage", b, d, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (d DeleteMessageData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": d.ChatId,
+		"MessageId": d.MessageId})
 }
 
 type DeleteChatStickerSetData struct {
@@ -375,11 +433,14 @@ type DeleteChatStickerSetData struct {
 }
 
 func (d DeleteChatStickerSetData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": d.ChatId}); err != nil {
+	if err = d.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("deleteChatStickerSet", b, d, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (d DeleteChatStickerSetData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": d.ChatId})
 }
 
 type SetChatStickerSetData struct {
@@ -388,12 +449,15 @@ type SetChatStickerSetData struct {
 }
 
 func (s SetChatStickerSetData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": s.ChatId,
-		"StickerSetName": s.StickerSetName}); err != nil {
+	if err = s.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("setChatStickerSet", b, s, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (s SetChatStickerSetData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": s.ChatId,
+		"StickerSetName": s.StickerSetName})
 }
 
 type GetChatMemberData struct {
@@ -402,12 +466,15 @@ type GetChatMemberData struct {
 }
 
 func (g GetChatMemberData) Send(b Bot) (response *ChatMemberResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": g.ChatId,
-		"UserId": g.UserId}); err != nil {
+	if err = g.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("getChatMember", b, g, &ChatMemberResponse{})
 	return res.(*ChatMemberResponse), err
+}
+func (g GetChatMemberData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": g.ChatId,
+		"UserId": g.UserId})
 }
 
 type GetChatMemberCountData struct {
@@ -415,11 +482,14 @@ type GetChatMemberCountData struct {
 }
 
 func (g GetChatMemberCountData) Send(b Bot) (response *IntResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": g.ChatId}); err != nil {
+	if err = g.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("getChatMemberCount", b, g, &IntResponse{})
 	return res.(*IntResponse), err
+}
+func (g GetChatMemberCountData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": g.ChatId})
 }
 
 type GetChatAdministratorsData struct {
@@ -427,7 +497,7 @@ type GetChatAdministratorsData struct {
 }
 
 func (g GetChatAdministratorsData) Send(b Bot) (response *ChatMemberResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": g.ChatId}); err != nil {
+	if err = g.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("getChatAdministrators", b, g, &ChatMemberResponse{})
@@ -435,17 +505,23 @@ func (g GetChatAdministratorsData) Send(b Bot) (response *ChatMemberResponse, er
 	member.permissionSetter()
 	return member, err
 }
+func (g GetChatAdministratorsData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": g.ChatId})
+}
 
 type GetChatData struct {
 	ChatId int `json:"chat_id"`
 }
 
 func (g GetChatData) Send(b Bot) (response *ChatResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": g.ChatId}); err != nil {
+	if err = g.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("getChat", b, g, &ChatResponse{})
 	return res.(*ChatResponse), err
+}
+func (g GetChatData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": g.ChatId})
 }
 
 type LeaveData struct {
@@ -453,11 +529,14 @@ type LeaveData struct {
 }
 
 func (l LeaveData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": l.ChatId}); err != nil {
+	if err = l.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("leaveChat", b, l, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (l LeaveData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": l.ChatId})
 }
 
 type UnpinAllChatMessagesData struct {
@@ -465,11 +544,14 @@ type UnpinAllChatMessagesData struct {
 }
 
 func (u UnpinAllChatMessagesData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": u.ChatId}); err != nil {
+	if err = u.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("unpinAllChatMessages", b, u, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (u UnpinAllChatMessagesData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": u.ChatId})
 }
 
 type SetChatDescriptionData struct {
@@ -478,12 +560,15 @@ type SetChatDescriptionData struct {
 }
 
 func (s SetChatDescriptionData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": s.ChatId,
-		"Description": s.Description}); err != nil {
+	if err = s.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("setChatDescription", b, s, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (s SetChatDescriptionData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": s.ChatId,
+		"Description": s.Description})
 }
 
 type SetChatTitleData struct {
@@ -492,12 +577,15 @@ type SetChatTitleData struct {
 }
 
 func (s SetChatTitleData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": s.ChatId,
-		"Title": s.Title}); err != nil {
+	if err = s.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("setChatTitle", b, s, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (s SetChatTitleData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": s.ChatId,
+		"Title": s.Title})
 }
 
 type DeleteChatPhotoData struct {
@@ -505,11 +593,14 @@ type DeleteChatPhotoData struct {
 }
 
 func (d DeleteChatPhotoData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": d.ChatId}); err != nil {
+	if err = d.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("deleteChatPhoto", b, d, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (d DeleteChatPhotoData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": d.ChatId})
 }
 
 type SetChatPhotoData struct {
@@ -518,11 +609,14 @@ type SetChatPhotoData struct {
 }
 
 func (s SetChatPhotoData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": s.ChatId, "Photo": s.Photo}); err != nil {
+	if err = s.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("setChatPhoto", b, s, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (s SetChatPhotoData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": s.ChatId, "Photo": s.Photo})
 }
 
 type RevokeChatInviteLinkData struct {
@@ -531,12 +625,15 @@ type RevokeChatInviteLinkData struct {
 }
 
 func (r RevokeChatInviteLinkData) Send(b Bot) (response *InviteLinkResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": r.ChatId,
-		"InviteLink": r.InviteLink}); err != nil {
+	if err = r.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("revokeChatInviteLink", b, r, &InviteLinkResponse{})
 	return res.(*InviteLinkResponse), err
+}
+func (r RevokeChatInviteLinkData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": r.ChatId,
+		"InviteLink": r.InviteLink})
 }
 
 type ExportChatInviteLinkData struct {
@@ -544,11 +641,14 @@ type ExportChatInviteLinkData struct {
 }
 
 func (e ExportChatInviteLinkData) Send(b Bot) (response *MapResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": e.ChatId}); err != nil {
+	if err = e.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("exportChatInviteLink", b, e, &MapResponse{})
 	return res.(*MapResponse), err
+}
+func (e ExportChatInviteLinkData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": e.ChatId})
 }
 
 type SendChatActionData struct {
@@ -557,18 +657,20 @@ type SendChatActionData struct {
 }
 
 func (s SendChatActionData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": s.ChatId}); err != nil {
+	if err = s.check(); err != nil {
 		return nil, err
 	}
-	var actions = []string{"typing", "upload_photo", "record_video", "upload_video", "general",
-		"upload_document", "upload_voice", "record_voice", "find_location", "record_video_note", "upload_video_note"}
-	for _, a := range actions {
-		if a == s.Action {
-			res, err := request("sendChatAction", b, s, &BooleanResponse{})
-			return res.(*BooleanResponse), err
-		}
+	res, err := request("sendChatAction", b, s, &BooleanResponse{})
+	return res.(*BooleanResponse), err
+}
+func (s SendChatActionData) check() error {
+	var actions = map[string]int{"typing": 1, "upload_photo": 1, "record_video": 1, "upload_video": 1, "general": 1,
+		"upload_document": 1, "upload_voice": 1, "record_voice": 1, "find_location": 1,
+		"record_video_note": 1, "upload_video_note": 1}
+	if _, ok := actions[s.Action]; ok == false {
+		return errors.New("action is unknown, read the document")
 	}
-	return nil, errors.New(s.Action + " is an unknown action, read the document.")
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": s.ChatId})
 }
 
 type GetFileData struct {
@@ -576,11 +678,14 @@ type GetFileData struct {
 }
 
 func (g GetFileData) Send(b Bot) (response *FileResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"FileId": g.FileId}); err != nil {
+	if err = g.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("getFile", b, g, &FileResponse{})
 	return res.(*FileResponse), err
+}
+func (g GetFileData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"FileId": g.FileId})
 }
 
 type UnbanChatMemberData struct {
@@ -590,11 +695,14 @@ type UnbanChatMemberData struct {
 }
 
 func (u UnbanChatMemberData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": u.ChatId, "UserId": u.UserId}); err != nil {
+	if err = u.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("unbanChatMember", b, u, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (u UnbanChatMemberData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": u.ChatId, "UserId": u.UserId})
 }
 
 type SetChatAdministratorCustomTitleData struct {
@@ -604,12 +712,15 @@ type SetChatAdministratorCustomTitleData struct {
 }
 
 func (s SetChatAdministratorCustomTitleData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": s.ChatId, "UserId": s.UserId,
-		"CustomTitle": s.CustomTitle}); err != nil {
+	if err = s.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("setChatAdministratorCustomTitle", b, s, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (s SetChatAdministratorCustomTitleData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": s.ChatId, "UserId": s.UserId,
+		"CustomTitle": s.CustomTitle})
 }
 
 type SetChatPermissionsData struct {
@@ -618,11 +729,14 @@ type SetChatPermissionsData struct {
 }
 
 func (s SetChatPermissionsData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": s.ChatId}); err != nil {
+	if err = s.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("setChatPermissions", b, s, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (s SetChatPermissionsData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": s.ChatId})
 }
 
 type UserProfilePhotosData struct {
@@ -636,11 +750,14 @@ type UserProfilePhotosData struct {
 }
 
 func (u UserProfilePhotosData) Send(b Bot) (response *UserProfileResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"UserId": u.UserId}); err != nil {
+	if err = u.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("getUserProfilePhotos", b, u, &UserProfileResponse{})
 	return res.(*UserProfileResponse), err
+}
+func (u UserProfilePhotosData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"UserId": u.UserId})
 }
 
 type BanChatMemberData struct {
@@ -658,11 +775,14 @@ type BanChatMemberData struct {
 }
 
 func (ban BanChatMemberData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"UserId": ban.UserId, "ChatId": ban.ChatId}); err != nil {
+	if err = ban.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("banChatMember", b, ban, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (ban BanChatMemberData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"UserId": ban.UserId, "ChatId": ban.ChatId})
 }
 
 type RestrictChatMemberData struct {
@@ -673,11 +793,14 @@ type RestrictChatMemberData struct {
 }
 
 func (r RestrictChatMemberData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"UserId": r.UserId, "ChatId": r.ChatId}); err != nil {
+	if err = r.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("restrictChatMember", b, r, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (r RestrictChatMemberData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"UserId": r.UserId, "ChatId": r.ChatId})
 }
 
 type PromoteChatMemberData struct {
@@ -712,11 +835,14 @@ type PromoteChatMemberData struct {
 }
 
 func (p PromoteChatMemberData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"UserId": p.UserId, "ChatId": p.ChatId}); err != nil {
+	if err = p.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("promoteChatMember", b, p, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (p PromoteChatMemberData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"UserId": p.UserId, "ChatId": p.ChatId})
 }
 
 type CreateChatInviteLinkData struct {
@@ -726,11 +852,14 @@ type CreateChatInviteLinkData struct {
 }
 
 func (c CreateChatInviteLinkData) Send(b Bot) (response *InviteLinkResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": c.ChatId}); err != nil {
+	if err = c.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("createChatInviteLink", b, c, &InviteLinkResponse{})
 	return res.(*InviteLinkResponse), err
+}
+func (c CreateChatInviteLinkData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": c.ChatId})
 }
 
 type EditChatInviteLinkData struct {
@@ -741,12 +870,14 @@ type EditChatInviteLinkData struct {
 }
 
 func (e EditChatInviteLinkData) Send(b Bot) (response *InviteLinkResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": e.ChatId,
-		"InviteLink": e.InviteLink}); err != nil {
+	if err = e.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("editChatInviteLink", b, e, &InviteLinkResponse{})
 	return res.(*InviteLinkResponse), err
+}
+func (e EditChatInviteLinkData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": e.ChatId, "InviteLink": e.InviteLink})
 }
 
 type PinChatMessageData struct {
@@ -756,12 +887,14 @@ type PinChatMessageData struct {
 }
 
 func (p PinChatMessageData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": p.ChatId,
-		"MessageId": p.MessageId}); err != nil {
+	if err = p.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("pinChatMessage", b, p, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (p PinChatMessageData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": p.ChatId, "MessageId": p.MessageId})
 }
 
 type UnpinChatMessageData struct {
@@ -770,12 +903,15 @@ type UnpinChatMessageData struct {
 }
 
 func (u UnpinChatMessageData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": u.ChatId,
-		"MessageId": u.MessageId}); err != nil {
+	if err = u.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("unpinChatMessage", b, u, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (u UnpinChatMessageData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": u.ChatId,
+		"MessageId": u.MessageId})
 }
 
 type AnswerCallbackQueryData struct {
@@ -787,11 +923,14 @@ type AnswerCallbackQueryData struct {
 }
 
 func (a AnswerCallbackQueryData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"CallbackQueryId": a.CallbackQueryId}); err != nil {
+	if err = a.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("answerCallbackQuery", b, a, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (a AnswerCallbackQueryData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"CallbackQueryId": a.CallbackQueryId})
 }
 
 type SetMyCommandsData struct {
@@ -802,16 +941,19 @@ type SetMyCommandsData struct {
 }
 
 func (s SetMyCommandsData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"Commands": s.Commands}); err != nil {
+	if err = s.check(); err != nil {
 		return nil, err
-	}
-	types := map[string]bool{"default": true, "chat_member": true, "all_private_chats": true,
-		"all_group_chats": true, "all_chat_administrators": true, "chat": true, "chat_administrators": true}
-	if _, ok := types[s.Scope.Type]; ok == false {
-		s.Scope.Type = "default"
 	}
 	res, err := request("setMyCommands", b, s, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (s SetMyCommandsData) check() error {
+	types := map[string]int{"default": 1, "chat_member": 1, "all_private_chats": 1,
+		"all_group_chats": 1, "all_chat_administrators": 1, "chat": 1, "chat_administrators": 1}
+	if _, ok := types[s.Scope.Type]; ok == false {
+		s.Scope.Type = "default"
+	}
+	return globalEmptyFieldChecker(map[string]interface{}{"Commands": s.Commands})
 }
 
 type DeleteMyCommandsData struct {
@@ -821,13 +963,19 @@ type DeleteMyCommandsData struct {
 }
 
 func (d DeleteMyCommandsData) Send(b Bot) (response *BooleanResponse, err error) {
-	types := map[string]bool{"default": true, "chat_member": true, "all_private_chats": true,
-		"all_group_chats": true, "all_chat_administrators": true, "chat": true, "chat_administrators": true}
-	if _, ok := types[d.Scope.Type]; ok == false {
-		d.Scope.Type = "default"
+	if err = d.check(); err != nil {
+		return nil, err
 	}
 	res, err := request("deleteMyCommands", b, d, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (d DeleteMyCommandsData) check() error {
+	types := map[string]int{"default": 1, "chat_member": 1, "all_private_chats": 1,
+		"all_group_chats": 1, "all_chat_administrators": 1, "chat": 1, "chat_administrators": 1}
+	if _, ok := types[d.Scope.Type]; ok == false {
+		d.Scope.Type = "default"
+	}
+	return nil
 }
 
 type GetMyCommandsData struct {
@@ -836,9 +984,15 @@ type GetMyCommandsData struct {
 	LanguageCode string          `json:"language_code"`
 }
 
-func (m GetMyCommandsData) Send(b Bot) (response *BotCommandResponse, err error) {
-	res, err := request("getMyCommands", b, m, &BooleanResponse{})
+func (g GetMyCommandsData) Send(b Bot) (response *BotCommandResponse, err error) {
+	if err = g.check(); err != nil {
+		return nil, err
+	}
+	res, err := request("getMyCommands", b, g, &BooleanResponse{})
 	return res.(*BotCommandResponse), err
+}
+func (g GetMyCommandsData) check() error {
+	return nil
 }
 
 type EditMessageTextData struct {
@@ -853,17 +1007,20 @@ type EditMessageTextData struct {
 }
 
 func (e EditMessageTextData) Send(b Bot) (response *MapResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"Text": e.Text}); err != nil {
+	if err = e.check(); err != nil {
 		return nil, err
-	}
-	if e.InlineMessageId == "" {
-		if e.ChatId == 0 || e.MessageId == 0 {
-			return nil, errors.New("you need to set both MessageId and " +
-				"ChatId, otherwise set InlineMessageId")
-		}
 	}
 	res, err := request("editMessageText", b, e, &MapResponse{})
 	return res.(*MapResponse), err
+}
+func (e EditMessageTextData) check() error {
+	if e.InlineMessageId == "" {
+		if e.ChatId == 0 || e.MessageId == 0 {
+			return errors.New("you need to set both MessageId and " +
+				"ChatId, otherwise set InlineMessageId")
+		}
+	}
+	return globalEmptyFieldChecker(map[string]interface{}{"Text": e.Text})
 }
 
 type EditMessageCaptionData struct {
@@ -877,14 +1034,20 @@ type EditMessageCaptionData struct {
 }
 
 func (e EditMessageCaptionData) Send(b Bot) (response *MapResponse, err error) {
-	if e.InlineMessageId == "" {
-		if e.ChatId == 0 || e.MessageId == 0 {
-			return nil, errors.New("you need to set both MessageId and " +
-				"ChatId, otherwise set InlineMessageId")
-		}
+	if err = e.check(); err != nil {
+		return nil, err
 	}
 	res, err := request("editMessageCaption", b, e, &MapResponse{})
 	return res.(*MapResponse), err
+}
+func (e EditMessageCaptionData) check() error {
+	if e.InlineMessageId == "" {
+		if e.ChatId == 0 || e.MessageId == 0 {
+			return errors.New("you need to set both MessageId and " +
+				"ChatId, otherwise set InlineMessageId")
+		}
+	}
+	return nil
 }
 
 type EditMessageReplyMarkupData struct {
@@ -895,14 +1058,20 @@ type EditMessageReplyMarkupData struct {
 }
 
 func (e EditMessageReplyMarkupData) Send(b Bot) (response *MapResponse, err error) {
-	if e.InlineMessageId == "" {
-		if e.ChatId == 0 || e.MessageId == 0 {
-			return nil, errors.New("you need to set both MessageId and " +
-				"ChatId, otherwise set InlineMessageId")
-		}
+	if err = e.check(); err != nil {
+		return nil, err
 	}
 	res, err := request("editMessageReplyMarkup", b, e, &MapResponse{})
 	return res.(*MapResponse), err
+}
+func (e EditMessageReplyMarkupData) check() error {
+	if e.InlineMessageId == "" {
+		if e.ChatId == 0 || e.MessageId == 0 {
+			return errors.New("you need to set both MessageId and " +
+				"ChatId, otherwise set InlineMessageId")
+		}
+	}
+	return nil
 }
 
 type StopPollData struct {
@@ -912,11 +1081,14 @@ type StopPollData struct {
 }
 
 func (s StopPollData) Send(b Bot) (response *PollResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": s.ChatId, "MessageId": s.MessageId}); err != nil {
+	if err = s.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("stopPoll", b, s, &PollResponse{})
 	return res.(*PollResponse), err
+}
+func (s StopPollData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": s.ChatId, "MessageId": s.MessageId})
 }
 
 type EditMessageMediaData struct {
@@ -929,19 +1101,25 @@ type EditMessageMediaData struct {
 }
 
 func (e EditMessageMediaData) Send(b Bot) (response *MapResponse, err error) {
-	if e.InlineMessageId == "" {
-		if e.ChatId == 0 || e.MessageId == 0 {
-			return nil, errors.New("you need to set both MessageId and " +
-				"ChatId, otherwise set InlineMessageId")
-		}
-	}
-	if e.Media == nil {
-		return nil, errors.New("media is nil. pass media a struct of type " +
-			"InputMediaPhoto, InputMediaVideo, InputMediaDocument or InputMediaAudio")
+	if err = e.check(); err != nil {
+		return nil, err
 	}
 	e.Files = append(e.Files, e.Media.returnFile())
 	res, err := request("editMessageMedia", b, e, &MapResponse{})
 	return res.(*MapResponse), err
+}
+func (e EditMessageMediaData) check() error {
+	if e.InlineMessageId == "" {
+		if e.ChatId == 0 || e.MessageId == 0 {
+			return errors.New("you need to set both MessageId and " +
+				"ChatId, otherwise set InlineMessageId")
+		}
+	}
+	if e.Media == nil {
+		return errors.New("media is nil. pass media a struct of type " +
+			"InputMediaPhoto, InputMediaVideo, InputMediaDocument or InputMediaAudio")
+	}
+	return nil
 }
 
 type SetWebhookData struct {
@@ -954,11 +1132,14 @@ type SetWebhookData struct {
 }
 
 func (s SetWebhookData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"Url": s.Url}); err != nil {
+	if err = s.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("setWebhook", b, s, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (s SetWebhookData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"Url": s.Url})
 }
 
 type SendStickerData struct {
@@ -971,11 +1152,14 @@ type SendStickerData struct {
 }
 
 func (s SendStickerData) Send(b Bot) (response *MessageResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"ChatId": s.ChatId, "Sticker": s.Sticker}); err != nil {
+	if err = s.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("sendSticker", b, s, &MessageResponse{})
 	return res.(*MessageResponse), err
+}
+func (s SendStickerData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": s.ChatId, "Sticker": s.Sticker})
 }
 
 type DeleteStickerFromSetData struct {
@@ -983,11 +1167,14 @@ type DeleteStickerFromSetData struct {
 }
 
 func (d DeleteStickerFromSetData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"Sticker": d.Sticker}); err != nil {
+	if err = d.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("deleteStickerFromSet", b, d, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (d DeleteStickerFromSetData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"Sticker": d.Sticker})
 }
 
 type SetStickerPositionInSetData struct {
@@ -996,11 +1183,14 @@ type SetStickerPositionInSetData struct {
 }
 
 func (s SetStickerPositionInSetData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"Sticker": s.Sticker, "Position": s.Position}); err != nil {
+	if err = s.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("setStickerPositionInSet", b, s, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (s SetStickerPositionInSetData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"Sticker": s.Sticker, "Position": s.Position})
 }
 
 type UploadStickerFileData struct {
@@ -1009,11 +1199,14 @@ type UploadStickerFileData struct {
 }
 
 func (u UploadStickerFileData) Send(b Bot) (response *FileResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"UserId": u.UserId, "PngSticker": u.PngSticker}); err != nil {
+	if err = u.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("uploadStickerFile", b, u, &FileResponse{})
 	return res.(*FileResponse), err
+}
+func (u UploadStickerFileData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"UserId": u.UserId, "PngSticker": u.PngSticker})
 }
 
 type GetStickerSetData struct {
@@ -1021,11 +1214,14 @@ type GetStickerSetData struct {
 }
 
 func (g GetStickerSetData) Send(b Bot) (response *StickerSetResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"Name": g.Name}); err != nil {
+	if err = g.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("getStickerSet", b, g, &StickerSetResponse{})
 	return res.(*StickerSetResponse), err
+}
+func (g GetStickerSetData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"Name": g.Name})
 }
 
 type CreateNewStickerSetData struct {
@@ -1040,12 +1236,15 @@ type CreateNewStickerSetData struct {
 }
 
 func (c CreateNewStickerSetData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"UserId": c.UserId, "Name": c.Name,
-		"Title": c.Title, "Emojis": c.Emojis}); err != nil {
+	if err = c.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("createNewStickerSet", b, c, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (c CreateNewStickerSetData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"UserId": c.UserId, "Name": c.Name,
+		"Title": c.Title, "Emojis": c.Emojis})
 }
 
 type AddStickerToSetData struct {
@@ -1058,12 +1257,14 @@ type AddStickerToSetData struct {
 }
 
 func (a AddStickerToSetData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"UserId": a.UserId, "Name": a.Name,
-		"Emojis": a.Emojis}); err != nil {
+	if err = a.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("addStickerToSet", b, a, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (a AddStickerToSetData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"UserId": a.UserId, "Name": a.Name, "Emojis": a.Emojis})
 }
 
 type SetStickerSetThumbData struct {
@@ -1073,11 +1274,14 @@ type SetStickerSetThumbData struct {
 }
 
 func (s SetStickerSetThumbData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"UserId": s.UserId, "Name": s.Name}); err != nil {
+	if err = s.check(); err != nil {
 		return nil, err
 	}
 	res, err := request("setStickerSetThumb", b, s, &BooleanResponse{})
 	return res.(*BooleanResponse), err
+}
+func (s SetStickerSetThumbData) check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"UserId": s.UserId, "Name": s.Name})
 }
 
 type AnswerInlineQueryData struct {
@@ -1090,19 +1294,26 @@ type AnswerInlineQueryData struct {
 	SwitchPmParameter string        `json:"switch_pm_parameter"`
 }
 
+func (a *AnswerInlineQueryData) AddResult(Type string, q QueryAnswer) {
+
+}
+
 func (a AnswerInlineQueryData) Send(b Bot) (response *BooleanResponse, err error) {
-	if err = globalEmptyFieldChecker(map[string]interface{}{"InlineQueryId": a.InlineQueryId}); err != nil {
+	if err = a.check(); err != nil {
 		return nil, err
 	}
+	res, err := request("answerInlineQuery", b, a, &BooleanResponse{})
+	return res.(*BooleanResponse), err
+}
+func (a AnswerInlineQueryData) check() error {
 	if len(a.Results) == 0 {
-		return nil, errors.New("results slice is empty. pass QueryAnswer structs such as " +
+		return errors.New("results slice is empty. pass QueryAnswer structs such as " +
 			"InlineQueryResultArticle, InlineQueryResultPhoto and etc")
 	}
 	for _, j := range a.Results {
 		if e := j.checkQueryAnswer(); e != nil {
-			return nil, e
+			return e
 		}
 	}
-	res, err := request("answerInlineQuery", b, a, &BooleanResponse{})
-	return res.(*BooleanResponse), err
+	return globalEmptyFieldChecker(map[string]interface{}{"InlineQueryId": a.InlineQueryId})
 }

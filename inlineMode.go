@@ -126,26 +126,24 @@ type InlineQueryResultArticle struct {
 	InlineKeyboard
 }
 
-func (i *InlineQueryResultArticle) checkQueryAnswer() error {
-	i.Type = "article"
+func (i *InlineQueryResultArticle) checkQueryAnswer() (string, error) {
 	if i.InputMessageContent == nil {
-		return errors.New("you need to set InputMessageContent of InlineQueryResultArticle to a MessageContent" +
+		return "", errors.New("you need to set InputMessageContent of InlineQueryResultArticle to a MessageContent" +
 			" such as InputTextMessageContent, InputLocationMessageContent etc")
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
-		return err
+		return "", err
+	} else if err = globalEmptyFieldChecker(map[string]interface{}{"Title": i.Title, "Id": i.Id}); err != nil {
+		return "", err
 	}
-	if err := globalEmptyFieldChecker(map[string]interface{}{"Title": i.Title, "Id": i.Id}); err != nil {
-		return err
-	}
-	return nil
+	return "article", nil
 }
 
 type InlineQueryResultPhoto struct {
+	Type                string          `json:"type"`
 	Id                  string          `json:"id"`
 	PhotoUrl            string          `json:"photo_url"`
 	PhotoFileId         string          `json:"photo_file_id"`
 	ThumbUrl            string          `json:"thumb_url"`
-	Type                string          `json:"type"`
 	PhotoWidth          int             `json:"photo_width"`
 	PhotoHeight         int             `json:"photo_height"`
 	Title               string          `json:"title"`
@@ -158,7 +156,6 @@ type InlineQueryResultPhoto struct {
 }
 
 func (i *InlineQueryResultPhoto) checkQueryAnswer() error {
-	i.Type = "photo"
 	if i.PhotoUrl == "" && i.PhotoFileId == "" {
 		return errors.New("you need to set PhotoUrl or PhotoFileId of InlineQueryResultPhoto to a photo url or " +
 			"file id on telegram server")
@@ -171,7 +168,6 @@ func (i *InlineQueryResultPhoto) checkQueryAnswer() error {
 		}
 	}
 	if i.InputMessageContent == nil {
-		i.InputMessageContent = InputEmptyContent{}
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
 	}
@@ -182,10 +178,10 @@ func (i *InlineQueryResultPhoto) checkQueryAnswer() error {
 }
 
 type InlineQueryResultGif struct {
+	Type                string          `json:"type"`
 	Id                  string          `json:"id"`
 	GifUrl              string          `json:"gif_url"`
 	GifFileId           string          `json:"gif_File_Id"`
-	Type                string          `json:"type"`
 	GifWidth            int             `json:"gif_width"`
 	GifHeight           int             `json:"gif_height"`
 	GifDuration         int             `json:"gif_duration"`
@@ -200,7 +196,6 @@ type InlineQueryResultGif struct {
 }
 
 func (i *InlineQueryResultGif) checkQueryAnswer() error {
-	i.Type = "gif"
 	if i.GifUrl == "" && i.GifFileId == "" {
 		return errors.New("you need to set GifUrl or GifFileId of InlineQueryResultGif to a gif url or " +
 			"file id on telegram server")
@@ -224,10 +219,10 @@ func (i *InlineQueryResultGif) checkQueryAnswer() error {
 }
 
 type InlineQueryResultMpeg4Gif struct {
+	Type                string          `json:"type"`
 	Id                  string          `json:"id"`
 	Mpeg4Url            string          `json:"mpeg4_url"`
 	Mpeg4FileId         string          `json:"mpeg4_file_id"`
-	Type                string          `json:"type"`
 	Mpeg4Width          int             `json:"mpeg4_width"`
 	Mpeg4Height         int             `json:"mpeg4_height"`
 	Mpeg4Duration       int             `json:"mpeg4_duration"`
@@ -242,7 +237,6 @@ type InlineQueryResultMpeg4Gif struct {
 }
 
 func (i *InlineQueryResultMpeg4Gif) checkQueryAnswer() error {
-	i.Type = "mpeg4_gif"
 	if i.Mpeg4Url == "" && i.Mpeg4FileId == "" {
 		return errors.New("you need to set Mpeg4Url or Mpeg4FileId of InlineQueryResultMpeg4Gif to a " +
 			"video animation (H.264/MPEG-4 AVC video without sound) url or file id on telegram server")
@@ -266,10 +260,10 @@ func (i *InlineQueryResultMpeg4Gif) checkQueryAnswer() error {
 }
 
 type InlineQueryResultVideo struct {
+	Type                string          `json:"type"`
 	Id                  string          `json:"id"`
 	VideoUrl            string          `json:"video_url"`
 	VideoFileId         string          `json:"video_file_id"`
-	Type                string          `json:"type"`
 	MimeType            string          `json:"mime_type"`
 	ThumbUrl            string          `json:"thumb_url"`
 	Title               string          `json:"title"`
@@ -285,7 +279,6 @@ type InlineQueryResultVideo struct {
 }
 
 func (i *InlineQueryResultVideo) checkQueryAnswer() error {
-	i.Type = "video"
 	if i.VideoUrl == "" && i.VideoFileId == "" {
 		return errors.New("you need to set VideoUrl or VideoFileId of InlineQueryResultVideo to a " +
 			"video url or file id on telegram server")
@@ -313,10 +306,10 @@ func (i *InlineQueryResultVideo) checkQueryAnswer() error {
 }
 
 type InlineQueryResultAudio struct {
+	Type                string          `json:"type"`
 	Id                  string          `json:"id"`
 	AudioUrl            string          `json:"audio_url"`
 	AudioFileId         string          `json:"audio_file_id"`
-	Type                string          `json:"type"`
 	Title               string          `json:"title"`
 	Caption             string          `json:"caption"`
 	ParseMode           string          `json:"parse_mode"`
@@ -328,7 +321,6 @@ type InlineQueryResultAudio struct {
 }
 
 func (i *InlineQueryResultAudio) checkQueryAnswer() error {
-	i.Type = "audio"
 	if i.Title == "" {
 		return errors.New("you need to set Title of InlineQueryResultAudio to a string")
 	}
@@ -366,7 +358,6 @@ type InlineQueryResultVoice struct {
 }
 
 func (i *InlineQueryResultVoice) checkQueryAnswer() error {
-	i.Type = "voice"
 	if i.VoiceUrl == "" && i.VoiceFileId == "" {
 		return errors.New("you need to set VoiceUrl or VoiceFileId of InlineQueryResultVoice to a " +
 			"audio url or file id on telegram server")
@@ -405,7 +396,6 @@ type InlineQueryResultDocument struct {
 }
 
 func (i *InlineQueryResultDocument) checkQueryAnswer() error {
-	i.Type = "document"
 	if i.Title == "" {
 		return errors.New("you need to set Title of InlineQueryResultDocument to a string")
 	}
@@ -445,7 +435,6 @@ type InlineQueryResultLocation struct {
 }
 
 func (i *InlineQueryResultLocation) checkQueryAnswer() error {
-	i.Type = "location"
 	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "Title": i.Title}); err != nil {
 		return err
 	}
@@ -476,7 +465,6 @@ type InlineQueryResultVenue struct {
 }
 
 func (i *InlineQueryResultVenue) checkQueryAnswer() error {
-	i.Type = "venue"
 	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "Title": i.Title,
 		"Address": i.Address}); err != nil {
 		return err
@@ -504,7 +492,6 @@ type InlineQueryResultContact struct {
 }
 
 func (i *InlineQueryResultContact) checkQueryAnswer() error {
-	i.Type = "contact"
 	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "FirstName": i.FirstName}); err != nil {
 		return err
 	}
@@ -524,7 +511,6 @@ type InlineQueryResultGame struct {
 }
 
 func (i *InlineQueryResultGame) checkQueryAnswer() error {
-	i.Type = "game"
 	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id,
 		"GameShortName": i.GameShortName}); err != nil {
 		return err
@@ -541,7 +527,6 @@ type InlineQueryResultSticker struct {
 }
 
 func (i *InlineQueryResultSticker) checkQueryAnswer() error {
-	i.Type = "sticker"
 	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id,
 		"StickerFileId": i.StickerFileId}); err != nil {
 		return err
