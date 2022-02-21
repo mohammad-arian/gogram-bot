@@ -21,12 +21,12 @@ type TextData struct {
 	Keyboard
 }
 
-func (t TextData) Send(b Bot) (response *MessageResponse, err error) {
+func (t TextData) Send(b Bot) (response *Response, err error) {
 	if err = t.check(); err != nil {
 		return nil, err
 	}
-	res, err := request("sendMessage", b, t, &MessageResponse{})
-	return res.(*MessageResponse), err
+	res, err := request("sendMessage", b, t, &Response{Result: Message{}})
+	return res.(*Response), err
 }
 
 func (t TextData) check() error {

@@ -708,9 +708,10 @@ type UserProfilePhotos struct {
 }
 
 type Response struct {
-	Ok          bool   `json:"ok"`
-	ErrorCode   int    `json:"error_code"`
-	Description string `json:"description"`
+	Ok          bool        `json:"ok"`
+	ErrorCode   int         `json:"error_code"`
+	Description string      `json:"description"`
+	Result      interface{} `json:"result"`
 }
 
 type UserProfileResponse struct {
