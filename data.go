@@ -1044,10 +1044,6 @@ type AnswerInlineQueryData struct {
 	SwitchPmParameter string        `json:"switch_pm_parameter"`
 }
 
-func (a *AnswerInlineQueryData) AddResult(Type string, q QueryAnswer) {
-
-}
-
 func (a AnswerInlineQueryData) Send(b Bot) (response Response, err error) {
 	return request("answerInlineQuery", b, a, &ResponseImpl{Result: &Boolean{}})
 }

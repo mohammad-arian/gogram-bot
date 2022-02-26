@@ -34,10 +34,7 @@ type InputTextMessageContent struct {
 }
 
 func (i InputTextMessageContent) checkMessageContent() error {
-	if err := globalEmptyFieldChecker(map[string]interface{}{"MessageText": i.MessageText}); err != nil {
-		return err
-	}
-	return nil
+	return globalEmptyFieldChecker(map[string]interface{}{"MessageText": i.MessageText})
 }
 
 type InputLocationMessageContent struct {
@@ -45,6 +42,8 @@ type InputLocationMessageContent struct {
 }
 
 func (i InputLocationMessageContent) checkMessageContent() error {
+	// Longitude and Latitude of InputLocationMessageContent are mandatory, but even if not set, 0 is
+	// a valid value for both of them
 	return nil
 }
 
@@ -60,10 +59,7 @@ type InputVenueMessageContent struct {
 }
 
 func (i InputVenueMessageContent) checkMessageContent() error {
-	if err := globalEmptyFieldChecker(map[string]interface{}{"Title": i.Title, "Address": i.Address}); err != nil {
-		return err
-	}
-	return nil
+	return globalEmptyFieldChecker(map[string]interface{}{"Title": i.Title, "Address": i.Address})
 }
 
 type InputContactMessageContent struct {
@@ -74,11 +70,7 @@ type InputContactMessageContent struct {
 }
 
 func (i InputContactMessageContent) checkMessageContent() error {
-	if err := globalEmptyFieldChecker(map[string]interface{}{"PhoneNumber": i.PhoneNumber,
-		"FirstName": i.FirstName}); err != nil {
-		return err
-	}
-	return nil
+	return globalEmptyFieldChecker(map[string]interface{}{"PhoneNumber": i.PhoneNumber, "FirstName": i.FirstName})
 }
 
 type InputInvoiceMessageContent struct {
@@ -105,11 +97,8 @@ type InputInvoiceMessageContent struct {
 }
 
 func (i InputInvoiceMessageContent) checkMessageContent() error {
-	if err := globalEmptyFieldChecker(map[string]interface{}{"Title": i.Title, "Description": i.Description,
-		"Payload": i.Payload, "ProviderData": i.ProviderToken, "Currency": i.Currency, "Prices": i.Prices}); err != nil {
-		return err
-	}
-	return nil
+	return globalEmptyFieldChecker(map[string]interface{}{"Title": i.Title, "Description": i.Description,
+		"Payload": i.Payload, "ProviderData": i.ProviderToken, "Currency": i.Currency, "Prices": i.Prices})
 }
 
 type InlineQueryResultArticle struct {
@@ -126,16 +115,14 @@ type InlineQueryResultArticle struct {
 	InlineKeyboard
 }
 
-func (i *InlineQueryResultArticle) checkQueryAnswer() (string, error) {
+func (i InlineQueryResultArticle) checkQueryAnswer() error {
 	if i.InputMessageContent == nil {
-		return "", errors.New("you need to set InputMessageContent of InlineQueryResultArticle to a MessageContent" +
+		return errors.New("you need to set InputMessageContent of InlineQueryResultArticle to a MessageContent" +
 			" such as InputTextMessageContent, InputLocationMessageContent etc")
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
-		return "", err
-	} else if err = globalEmptyFieldChecker(map[string]interface{}{"Title": i.Title, "Id": i.Id}); err != nil {
-		return "", err
+		return err
 	}
-	return "article", nil
+	return globalEmptyFieldChecker(map[string]interface{}{"Title": i.Title, "Id": i.Id})
 }
 
 type InlineQueryResultPhoto struct {
@@ -155,7 +142,7 @@ type InlineQueryResultPhoto struct {
 	InlineKeyboard
 }
 
-func (i *InlineQueryResultPhoto) checkQueryAnswer() error {
+func (i InlineQueryResultPhoto) checkQueryAnswer() error {
 	if i.PhotoUrl == "" && i.PhotoFileId == "" {
 		return errors.New("you need to set PhotoUrl or PhotoFileId of InlineQueryResultPhoto to a photo url or " +
 			"file id on telegram server")
@@ -166,15 +153,12 @@ func (i *InlineQueryResultPhoto) checkQueryAnswer() error {
 		if i.ThumbUrl == "" {
 			return errors.New("ThumbUrl is required if you are setting PhotoUrl to a url")
 		}
-	}
-	if i.InputMessageContent == nil {
+	} else if i.InputMessageContent == nil {
+		i.InputMessageContent = InputEmptyContent{}
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
 	}
-	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id}); err != nil {
-		return err
-	}
-	return nil
+	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id})
 }
 
 type InlineQueryResultGif struct {
@@ -195,7 +179,7 @@ type InlineQueryResultGif struct {
 	InlineKeyboard
 }
 
-func (i *InlineQueryResultGif) checkQueryAnswer() error {
+func (i InlineQueryResultGif) checkQueryAnswer() error {
 	if i.GifUrl == "" && i.GifFileId == "" {
 		return errors.New("you need to set GifUrl or GifFileId of InlineQueryResultGif to a gif url or " +
 			"file id on telegram server")
@@ -206,16 +190,12 @@ func (i *InlineQueryResultGif) checkQueryAnswer() error {
 		if i.ThumbUrl == "" {
 			return errors.New("ThumbUrl is required if you are setting GifUrl to a url")
 		}
-	}
-	if i.InputMessageContent == nil {
+	} else if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
 	}
-	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id}); err != nil {
-		return err
-	}
-	return nil
+	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id})
 }
 
 type InlineQueryResultMpeg4Gif struct {
@@ -236,7 +216,7 @@ type InlineQueryResultMpeg4Gif struct {
 	InlineKeyboard
 }
 
-func (i *InlineQueryResultMpeg4Gif) checkQueryAnswer() error {
+func (i InlineQueryResultMpeg4Gif) checkQueryAnswer() error {
 	if i.Mpeg4Url == "" && i.Mpeg4FileId == "" {
 		return errors.New("you need to set Mpeg4Url or Mpeg4FileId of InlineQueryResultMpeg4Gif to a " +
 			"video animation (H.264/MPEG-4 AVC video without sound) url or file id on telegram server")
@@ -253,10 +233,7 @@ func (i *InlineQueryResultMpeg4Gif) checkQueryAnswer() error {
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
 	}
-	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id}); err != nil {
-		return err
-	}
-	return nil
+	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id})
 }
 
 type InlineQueryResultVideo struct {
@@ -278,7 +255,7 @@ type InlineQueryResultVideo struct {
 	InlineKeyboard
 }
 
-func (i *InlineQueryResultVideo) checkQueryAnswer() error {
+func (i InlineQueryResultVideo) checkQueryAnswer() error {
 	if i.VideoUrl == "" && i.VideoFileId == "" {
 		return errors.New("you need to set VideoUrl or VideoFileId of InlineQueryResultVideo to a " +
 			"video url or file id on telegram server")
@@ -293,16 +270,12 @@ func (i *InlineQueryResultVideo) checkQueryAnswer() error {
 		if i.ThumbUrl == "" {
 			return errors.New("ThumbUrl is required if you are setting VideoUrl to a url")
 		}
-	}
-	if i.InputMessageContent == nil {
+	} else if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
 	}
-	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "Title": i.Title}); err != nil {
-		return err
-	}
-	return nil
+	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "Title": i.Title})
 }
 
 type InlineQueryResultAudio struct {
@@ -320,7 +293,7 @@ type InlineQueryResultAudio struct {
 	InlineKeyboard
 }
 
-func (i *InlineQueryResultAudio) checkQueryAnswer() error {
+func (i InlineQueryResultAudio) checkQueryAnswer() error {
 	if i.Title == "" {
 		return errors.New("you need to set Title of InlineQueryResultAudio to a string")
 	}
@@ -331,16 +304,12 @@ func (i *InlineQueryResultAudio) checkQueryAnswer() error {
 		if i.AudioFileId != "" {
 			return errors.New("set AudioUrl or AudioFileId of InlineQueryResultAudio, not both")
 		}
-	}
-	if i.InputMessageContent == nil {
+	} else if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
 	}
-	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id}); err != nil {
-		return err
-	}
-	return nil
+	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id})
 }
 
 type InlineQueryResultVoice struct {
@@ -357,7 +326,7 @@ type InlineQueryResultVoice struct {
 	InlineKeyboard
 }
 
-func (i *InlineQueryResultVoice) checkQueryAnswer() error {
+func (i InlineQueryResultVoice) checkQueryAnswer() error {
 	if i.VoiceUrl == "" && i.VoiceFileId == "" {
 		return errors.New("you need to set VoiceUrl or VoiceFileId of InlineQueryResultVoice to a " +
 			"audio url or file id on telegram server")
@@ -365,16 +334,12 @@ func (i *InlineQueryResultVoice) checkQueryAnswer() error {
 		if i.VoiceFileId != "" {
 			return errors.New("set VoiceUrl or VoiceFileId of InlineQueryResultVoice, not both")
 		}
-	}
-	if i.InputMessageContent == nil {
+	} else if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
 	}
-	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id}); err != nil {
-		return err
-	}
-	return nil
+	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id})
 }
 
 type InlineQueryResultDocument struct {
@@ -395,7 +360,7 @@ type InlineQueryResultDocument struct {
 	InlineKeyboard
 }
 
-func (i *InlineQueryResultDocument) checkQueryAnswer() error {
+func (i InlineQueryResultDocument) checkQueryAnswer() error {
 	if i.Title == "" {
 		return errors.New("you need to set Title of InlineQueryResultDocument to a string")
 	}
@@ -410,16 +375,12 @@ func (i *InlineQueryResultDocument) checkQueryAnswer() error {
 			return errors.New("MimeType is required if you are setting DocumentUrl to a url. you need to set " +
 				"MimeType to Mime type of the content of the file, either “application/pdf” or “application/zip”")
 		}
-	}
-	if i.InputMessageContent == nil {
+	} else if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
 	}
-	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id}); err != nil {
-		return err
-	}
-	return nil
+	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id})
 }
 
 type InlineQueryResultLocation struct {
@@ -434,16 +395,13 @@ type InlineQueryResultLocation struct {
 	InlineKeyboard
 }
 
-func (i *InlineQueryResultLocation) checkQueryAnswer() error {
-	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "Title": i.Title}); err != nil {
-		return err
-	}
+func (i InlineQueryResultLocation) checkQueryAnswer() error {
 	if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
 	}
-	return nil
+	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "Title": i.Title})
 }
 
 type InlineQueryResultVenue struct {
@@ -464,17 +422,13 @@ type InlineQueryResultVenue struct {
 	InlineKeyboard
 }
 
-func (i *InlineQueryResultVenue) checkQueryAnswer() error {
-	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "Title": i.Title,
-		"Address": i.Address}); err != nil {
-		return err
-	}
+func (i InlineQueryResultVenue) checkQueryAnswer() error {
 	if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
 	}
-	return nil
+	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "Title": i.Title, "Address": i.Address})
 }
 
 type InlineQueryResultContact struct {
@@ -491,16 +445,13 @@ type InlineQueryResultContact struct {
 	InlineKeyboard
 }
 
-func (i *InlineQueryResultContact) checkQueryAnswer() error {
-	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "FirstName": i.FirstName}); err != nil {
-		return err
-	}
+func (i InlineQueryResultContact) checkQueryAnswer() error {
 	if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
 	}
-	return nil
+	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "FirstName": i.FirstName})
 }
 
 type InlineQueryResultGame struct {
@@ -510,12 +461,8 @@ type InlineQueryResultGame struct {
 	InlineKeyboard
 }
 
-func (i *InlineQueryResultGame) checkQueryAnswer() error {
-	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id,
-		"GameShortName": i.GameShortName}); err != nil {
-		return err
-	}
-	return nil
+func (i InlineQueryResultGame) checkQueryAnswer() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "GameShortName": i.GameShortName})
 }
 
 type InlineQueryResultSticker struct {
@@ -526,15 +473,11 @@ type InlineQueryResultSticker struct {
 	InlineKeyboard
 }
 
-func (i *InlineQueryResultSticker) checkQueryAnswer() error {
-	if err := globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id,
-		"StickerFileId": i.StickerFileId}); err != nil {
-		return err
-	}
-	return nil
+func (i InlineQueryResultSticker) checkQueryAnswer() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "StickerFileId": i.StickerFileId})
 }
 
-func (i *InlineQuery) Answer(b Bot, data AnswerInlineQueryData) (response Response, err error) {
+func (i InlineQuery) Answer(b Bot, data AnswerInlineQueryData) (response Response, err error) {
 	data.InlineQueryId = i.Id
 	return data.Send(b)
 }
