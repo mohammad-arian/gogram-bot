@@ -52,13 +52,8 @@ func (b Bot) ActivateProxy() error {
 }
 
 // VerifyBot verifies the token
-func (b *Bot) VerifyBot() error {
-	if res, err := request("getme", *b, nil, &UserResponse{}); err != nil {
-		return err
-	} else if getMeRes := res.(*UserResponse); getMeRes.Ok != true {
-		return errors.New("token is wrong")
-	}
-	return nil
+func (b Bot) VerifyBot() (Response, error) {
+	return request("getme", b, nil, &ResponseImpl{Result: &User{}})
 }
 
 // SetWebhook specifies an url and receive incoming updates via an outgoing webhook.
@@ -69,19 +64,19 @@ func (b *Bot) VerifyBot() error {
 // If you'd like to make sure that the Webhook request comes from Telegram,
 // we recommend using a secret path in the URL, e.g. https://www.example.com/<token>.
 // Since nobody else knows your bot's token, you can be pretty sure it's us.
-func (b Bot) SetWebhook(data SetWebhookData) (response *BooleanResponse, err error) {
+func (b Bot) SetWebhook(data SetWebhookData) (response Response, err error) {
 	return data.Send(b)
 }
 
-func (b Bot) SetMyCommands(data SetMyCommandsData) (response *BooleanResponse, err error) {
+func (b Bot) SetMyCommands(data SetMyCommandsData) (response Response, err error) {
 	return data.Send(b)
 }
 
-func (b Bot) DeleteMyCommands(data DeleteMyCommandsData) (response *BooleanResponse, err error) {
+func (b Bot) DeleteMyCommands(data DeleteMyCommandsData) (response Response, err error) {
 	return data.Send(b)
 }
 
-func (b Bot) GetMyCommands(data GetMyCommandsData) (response *BotCommandResponse, err error) {
+func (b Bot) GetMyCommands(data GetMyCommandsData) (response Response, err error) {
 	return data.Send(b)
 }
 
@@ -103,7 +98,7 @@ func webhookHandler(r *http.Request, bot Bot) {
 	update := &Update{}
 	err := json.Unmarshal(res, update)
 	if err != nil {
-		log.Println(fmt.Errorf("webhookHandler error: %w\n", err))
+		log.Println(fmt.Errorf("error while unmarshaling json to Update: %w\n", err))
 	}
 	if bot.Handler == nil {
 		log.Println("Warning: Listener just received something, but you have not added a handler to bot." +

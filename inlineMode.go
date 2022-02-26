@@ -534,7 +534,7 @@ func (i *InlineQueryResultSticker) checkQueryAnswer() error {
 	return nil
 }
 
-func (i *InlineQuery) Answer(b Bot, data AnswerInlineQueryData) (response *BooleanResponse, err error) {
+func (i *InlineQuery) Answer(b Bot, data AnswerInlineQueryData) (response Response, err error) {
 	data.InlineQueryId = i.Id
 	return data.Send(b)
 }

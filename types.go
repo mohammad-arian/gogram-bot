@@ -1,8 +1,11 @@
 package gogram
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"os"
 )
 
@@ -707,127 +710,43 @@ type UserProfilePhotos struct {
 	Photos     [][]PhotoSize `json:"photos"`
 }
 
-type Response struct {
+type Response interface {
+	print()
+	getResultType()
+	set(*http.Response) (ResponseImpl, error)
+}
+
+type ResponseImpl struct {
 	Ok          bool        `json:"ok"`
 	ErrorCode   int         `json:"error_code"`
 	Description string      `json:"description"`
 	Result      interface{} `json:"result"`
 }
 
-type UserProfileResponse struct {
-	Result UserProfilePhotos `json:"result"`
-	Response
+func (r ResponseImpl) print() {
+
 }
 
-type BooleanResponse struct {
-	Result bool `json:"result"`
-	Response
+func (r ResponseImpl) getResultType() {
+
 }
 
-type IntResponse struct {
-	Result int `json:"result"`
-	Response
+func (r ResponseImpl) set(res *http.Response) (ResponseImpl, error) {
+	readRes, _ := ioutil.ReadAll(res.Body)
+	err := json.Unmarshal(readRes, &r)
+	return r, err
 }
 
-type MapResponse struct {
-	Result interface{} `json:"result"`
-	Response
+type Boolean struct {
+	Boolean bool
 }
 
-type PollResponse struct {
-	Result Poll `json:"result"`
-	Response
-}
-
-type UserResponse struct {
-	Result User `json:"result"`
-	Response
-}
-
-type MessageResponse struct {
-	Result Message `json:"result"`
-	Response
-}
-
-type SliceMessageResponse struct {
-	Result []Message `json:"result"`
-	Response
-}
-
-type InviteLinkResponse struct {
-	Result ChatInviteLink `json:"result"`
-	Response
-}
-
-type ChatResponse struct {
-	Result Chat `json:"result"`
-	Response
-}
-
-type FileResponse struct {
-	Result File `json:"result"`
-	Response
+type Int struct {
+	Int int
 }
 
 type ChatMemberResponse struct {
 	Result []ChatMember `json:"result"`
-	Response
-}
-
-type StickerSetResponse struct {
-	Result StickerSet `json:"result"`
-	Response
-}
-
-type BotCommandResponse struct {
-	Result []BotCommand `json:"result"`
-	Response
-}
-
-func (c *ChatMemberResponse) permissionSetter() {
-	for j := range c.Result {
-		if c.Result[j].Status != "restricted" {
-			c.Result[j].UntilDate = -1
-		}
-		if c.Result[j].Status == "creator" {
-			c.Result[j].IsMember = true
-			c.Result[j].CanPostMessages = true
-			c.Result[j].CanInviteUsers = true
-			c.Result[j].CanSendPolls = true
-			c.Result[j].CanAddWebPagePreviews = true
-			c.Result[j].CanChangeInfo = true
-			c.Result[j].CanSendOtherMessages = true
-			c.Result[j].CanSendMessages = true
-			c.Result[j].CanDeleteMessages = true
-			c.Result[j].CanManageChat = true
-			c.Result[j].CanPromoteMembers = true
-			c.Result[j].CanSendMediaMessages = true
-			c.Result[j].CanRestrictMembers = true
-			c.Result[j].CanPinMessages = true
-			c.Result[j].CanManageVoiceChats = true
-			c.Result[j].CanEditMessages = true
-			c.Result[j].CanSendPolls = true
-		}
-		if c.Result[j].Status == "administrator" {
-			c.Result[j].IsMember = true
-			c.Result[j].CanSendPolls = true
-			c.Result[j].CanSendMediaMessages = true
-			c.Result[j].CanSendOtherMessages = true
-			c.Result[j].CanAddWebPagePreviews = true
-			c.Result[j].CanSendMessages = true
-		}
-		if c.Result[j].Status == "member" {
-			c.Result[j].IsMember = true
-			c.Result[j].CanPostMessages = true
-			c.Result[j].CanInviteUsers = true
-			c.Result[j].CanSendPolls = true
-			c.Result[j].CanAddWebPagePreviews = true
-			c.Result[j].CanChangeInfo = true
-			c.Result[j].CanSendMessages = true
-			c.Result[j].CanPinMessages = true
-			c.Result[j].CanBeEdited = true
-		}
-	}
 }
 
 type ChatMember struct {
