@@ -714,6 +714,9 @@ type Response interface {
 	print()
 	getResultType()
 	set(*http.Response) (ResponseImpl, error)
+	isOk() bool
+	getDescription() string
+	getErrorCode() int
 }
 
 type ResponseImpl struct {
@@ -735,6 +738,18 @@ func (r ResponseImpl) set(res *http.Response) (ResponseImpl, error) {
 	readRes, _ := ioutil.ReadAll(res.Body)
 	err := json.Unmarshal(readRes, &r)
 	return r, err
+}
+
+func (r ResponseImpl) isOk() bool {
+	return r.Ok
+}
+
+func (r ResponseImpl) getDescription() string {
+	return r.Description
+}
+
+func (r ResponseImpl) getErrorCode() int {
+	return r.ErrorCode
 }
 
 type Boolean struct {

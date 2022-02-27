@@ -63,7 +63,6 @@ func multipartSetter(s interface{}, w *multipart.Writer, tag string) error {
 			if err != nil {
 				return err
 			}
-			fmt.Println(string(a))
 			if err = w.WriteField(tag, string(a)); err != nil {
 				return err
 			}

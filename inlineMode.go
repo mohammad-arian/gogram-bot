@@ -142,7 +142,7 @@ type InlineQueryResultPhoto struct {
 	InlineKeyboard
 }
 
-func (i InlineQueryResultPhoto) checkQueryAnswer() error {
+func (i *InlineQueryResultPhoto) checkQueryAnswer() error {
 	if i.PhotoUrl == "" && i.PhotoFileId == "" {
 		return errors.New("you need to set PhotoUrl or PhotoFileId of InlineQueryResultPhoto to a photo url or " +
 			"file id on telegram server")
@@ -153,7 +153,8 @@ func (i InlineQueryResultPhoto) checkQueryAnswer() error {
 		if i.ThumbUrl == "" {
 			return errors.New("ThumbUrl is required if you are setting PhotoUrl to a url")
 		}
-	} else if i.InputMessageContent == nil {
+	}
+	if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
@@ -179,7 +180,7 @@ type InlineQueryResultGif struct {
 	InlineKeyboard
 }
 
-func (i InlineQueryResultGif) checkQueryAnswer() error {
+func (i *InlineQueryResultGif) checkQueryAnswer() error {
 	if i.GifUrl == "" && i.GifFileId == "" {
 		return errors.New("you need to set GifUrl or GifFileId of InlineQueryResultGif to a gif url or " +
 			"file id on telegram server")
@@ -190,7 +191,8 @@ func (i InlineQueryResultGif) checkQueryAnswer() error {
 		if i.ThumbUrl == "" {
 			return errors.New("ThumbUrl is required if you are setting GifUrl to a url")
 		}
-	} else if i.InputMessageContent == nil {
+	}
+	if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
@@ -216,7 +218,7 @@ type InlineQueryResultMpeg4Gif struct {
 	InlineKeyboard
 }
 
-func (i InlineQueryResultMpeg4Gif) checkQueryAnswer() error {
+func (i *InlineQueryResultMpeg4Gif) checkQueryAnswer() error {
 	if i.Mpeg4Url == "" && i.Mpeg4FileId == "" {
 		return errors.New("you need to set Mpeg4Url or Mpeg4FileId of InlineQueryResultMpeg4Gif to a " +
 			"video animation (H.264/MPEG-4 AVC video without sound) url or file id on telegram server")
@@ -255,7 +257,7 @@ type InlineQueryResultVideo struct {
 	InlineKeyboard
 }
 
-func (i InlineQueryResultVideo) checkQueryAnswer() error {
+func (i *InlineQueryResultVideo) checkQueryAnswer() error {
 	if i.VideoUrl == "" && i.VideoFileId == "" {
 		return errors.New("you need to set VideoUrl or VideoFileId of InlineQueryResultVideo to a " +
 			"video url or file id on telegram server")
@@ -270,7 +272,8 @@ func (i InlineQueryResultVideo) checkQueryAnswer() error {
 		if i.ThumbUrl == "" {
 			return errors.New("ThumbUrl is required if you are setting VideoUrl to a url")
 		}
-	} else if i.InputMessageContent == nil {
+	}
+	if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
@@ -293,7 +296,7 @@ type InlineQueryResultAudio struct {
 	InlineKeyboard
 }
 
-func (i InlineQueryResultAudio) checkQueryAnswer() error {
+func (i *InlineQueryResultAudio) checkQueryAnswer() error {
 	if i.Title == "" {
 		return errors.New("you need to set Title of InlineQueryResultAudio to a string")
 	}
@@ -304,7 +307,8 @@ func (i InlineQueryResultAudio) checkQueryAnswer() error {
 		if i.AudioFileId != "" {
 			return errors.New("set AudioUrl or AudioFileId of InlineQueryResultAudio, not both")
 		}
-	} else if i.InputMessageContent == nil {
+	}
+	if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
@@ -326,7 +330,7 @@ type InlineQueryResultVoice struct {
 	InlineKeyboard
 }
 
-func (i InlineQueryResultVoice) checkQueryAnswer() error {
+func (i *InlineQueryResultVoice) checkQueryAnswer() error {
 	if i.VoiceUrl == "" && i.VoiceFileId == "" {
 		return errors.New("you need to set VoiceUrl or VoiceFileId of InlineQueryResultVoice to a " +
 			"audio url or file id on telegram server")
@@ -334,7 +338,8 @@ func (i InlineQueryResultVoice) checkQueryAnswer() error {
 		if i.VoiceFileId != "" {
 			return errors.New("set VoiceUrl or VoiceFileId of InlineQueryResultVoice, not both")
 		}
-	} else if i.InputMessageContent == nil {
+	}
+	if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
@@ -360,7 +365,7 @@ type InlineQueryResultDocument struct {
 	InlineKeyboard
 }
 
-func (i InlineQueryResultDocument) checkQueryAnswer() error {
+func (i *InlineQueryResultDocument) checkQueryAnswer() error {
 	if i.Title == "" {
 		return errors.New("you need to set Title of InlineQueryResultDocument to a string")
 	}
@@ -375,7 +380,8 @@ func (i InlineQueryResultDocument) checkQueryAnswer() error {
 			return errors.New("MimeType is required if you are setting DocumentUrl to a url. you need to set " +
 				"MimeType to Mime type of the content of the file, either “application/pdf” or “application/zip”")
 		}
-	} else if i.InputMessageContent == nil {
+	}
+	if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
@@ -395,7 +401,7 @@ type InlineQueryResultLocation struct {
 	InlineKeyboard
 }
 
-func (i InlineQueryResultLocation) checkQueryAnswer() error {
+func (i *InlineQueryResultLocation) checkQueryAnswer() error {
 	if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
@@ -422,7 +428,7 @@ type InlineQueryResultVenue struct {
 	InlineKeyboard
 }
 
-func (i InlineQueryResultVenue) checkQueryAnswer() error {
+func (i *InlineQueryResultVenue) checkQueryAnswer() error {
 	if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
@@ -445,7 +451,7 @@ type InlineQueryResultContact struct {
 	InlineKeyboard
 }
 
-func (i InlineQueryResultContact) checkQueryAnswer() error {
+func (i *InlineQueryResultContact) checkQueryAnswer() error {
 	if i.InputMessageContent == nil {
 		i.InputMessageContent = InputEmptyContent{}
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
