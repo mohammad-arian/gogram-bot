@@ -88,27 +88,23 @@ func structMultipartParser(s interface{}, w *multipart.Writer) error {
 	return nil
 }
 
-func request(method string, bot Bot, data Method, response Response) (Response, error) {
+func Request(method string, bot Bot, data Method, response Response) (Response, error) {
 	if err := data.check(); err != nil {
 		return nil, err
 	}
-	req, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/%s", bot.Token, method),
-		nil)
+	req, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/%s", bot.Token,
+		method), nil)
 	var body = &bytes.Buffer{}
-	var set bool
 	w := multipart.NewWriter(body)
 	if data != nil {
 		if err := structMultipartParser(data, w); err != nil {
 			w.Close()
 			return response, err
 		}
-		set = true
 	}
 	w.Close()
-	if set {
-		req.Header.Add("Content-Type", w.FormDataContentType())
-		req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
-	}
+	req.Header.Add("Content-Type", w.FormDataContentType())
+	req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
 	res, _ := http.DefaultClient.Do(req)
 	defer res.Body.Close()
 	return response.set(res)

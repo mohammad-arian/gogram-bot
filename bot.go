@@ -53,15 +53,15 @@ func (b Bot) ActivateProxy() error {
 
 // VerifyBot verifies the token
 func (b Bot) VerifyBot() (Response, error) {
-	return request("getme", b, nil, &ResponseImpl{Result: &User{}})
+	return Request("getme", b, nil, &ResponseImpl{Result: &User{}})
 }
 
 // SetWebhook specifies an url and receive incoming updates via an outgoing webhook.
-// Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url,
+// Whenever there is an update for the bot, we will send an HTTPS POST Request to the specified url,
 // containing a JSON-serialized Update.
-// In case of an unsuccessful request, we will give up after a reasonable amount of attempts.
+// In case of an unsuccessful Request, we will give up after a reasonable amount of attempts.
 // Returns True on success.
-// If you'd like to make sure that the Webhook request comes from Telegram,
+// If you'd like to make sure that the Webhook Request comes from Telegram,
 // we recommend using a secret path in the URL, e.g. https://www.example.com/<token>.
 // Since nobody else knows your bot's token, you can be pretty sure it's us.
 func (b Bot) SetWebhook(data SetWebhookData) (response Response, err error) {
@@ -108,7 +108,7 @@ func webhookHandler(r *http.Request, bot Bot) {
 		// we don't have to wait for goroutines to finish.
 		go bot.Handler(update, bot)
 		// webhookHandler returns so telegram won't wait for response. this improves
-		// performance and avoids errors such as request timeout.
+		// performance and avoids errors such as Request timeout.
 		return
 	} else {
 		bot.Handler(update, bot)

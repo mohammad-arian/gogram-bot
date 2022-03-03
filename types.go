@@ -232,7 +232,7 @@ const (
 	TypePinnedMessage     = "PinnedMessage"
 	TypeInvoice           = "Invoice"
 	TypeSuccessfulPayment = "SuccessfulPayment"
-	TypeUnknown
+	TypeUnknown           = "Unknown"
 )
 
 // TypeIndicator function returns the type of message.
@@ -302,62 +302,62 @@ func (m Message) TypeIndicator() string {
 }
 
 func (m Message) String() string {
-	switch {
-	case m.Text != "":
+	switch m.TypeIndicator() {
+	case TypeText:
 		return fmt.Sprintf("Text: %+v\n", m.Text)
-	case m.Photo != nil:
+	case TypePhoto:
 		return fmt.Sprintf("Photo: %+v\n", m.Photo)
-	case m.DeleteChatPhoto == true:
-		return "DeleteChatPhoto"
-	case m.NewChatPhoto != nil:
+	case TypeDeleteChatPhoto:
+		return fmt.Sprintf("DeleteChatPhoto: %+v\n", m.DeleteChatPhoto)
+	case TypeNewChatPhoto:
 		return fmt.Sprintf("NewChatPhoto: %+v\n", m.NewChatPhoto)
-	case m.ForwardFrom != User{}:
+	case TypeForwardFrom:
 		return fmt.Sprintf("ForwardFrom: %+v\n", m.ForwardFrom)
-	case m.ReplyToMessage != nil:
+	case TypeReply:
 		return fmt.Sprintf("ReplyToMessage: %+v\n", m.ReplyToMessage)
-	case m.Audio != Audio{}:
+	case TypeAudio:
 		return fmt.Sprintf("Audio: %+v\n", m.Audio)
-	case m.Sticker != Sticker{}:
+	case TypeSticker:
 		return fmt.Sprintf("Sticker: %+v\n", m.Sticker)
-	case m.Document != Document{}:
+	case TypeDocument:
 		return fmt.Sprintf("Document: %+v\n", m.Document)
-	case m.Location != Location{}:
+	case TypeLocation:
 		return fmt.Sprintf("Location: %+v\n", m.Location)
-	case m.Video != Video{}:
+	case TypeVideo:
 		return fmt.Sprintf("Video: %+v\n", m.Video)
-	case m.VideoNote != VideoNote{}:
+	case TypeVideoNote:
 		return fmt.Sprintf("VideoNote: %+v\n", m.VideoNote)
-	case m.Voice != Voice{}:
+	case TypeVoice:
 		return fmt.Sprintf("Voice: %+v\n", m.Voice)
-	case m.Contact != Contact{}:
+	case TypeContact:
 		return fmt.Sprintf("Contact: %+v\n", m.Contact)
-	case m.Dice != Dice{}:
+	case TypeDice:
 		return fmt.Sprintf("Dice: %+v\n", m.Dice)
-	case m.Game.Title != "":
+	case TypeGame:
 		return fmt.Sprintf("Game: %+v\n", m.Game)
-	case m.Poll.Id != "":
+	case TypePoll:
 		return fmt.Sprintf("Poll: %+v\n", m.Poll)
-	case m.Venue != Venue{}:
+	case TypeVenue:
 		return fmt.Sprintf("Venue: %+v\n", m.Venue)
-	case m.LeftChatMember != User{}:
+	case TypeMemberLeftChat:
 		return fmt.Sprintf("LeftChatMember: %+v\n", m.LeftChatMember)
-	case m.NewChatTitle != "":
+	case TypeNewChatTitle:
 		return fmt.Sprintf("NewChatTitle: %+v\n", m.NewChatTitle)
-	case m.GroupChatCreated == true:
+	case TypeGroupCreated:
 		return fmt.Sprintf("GroupChatCreated: %+v\n", m.GroupChatCreated)
-	case m.SupergroupChatCreated == true:
+	case TypeSuperGroupCreated:
 		return fmt.Sprintf("SupergroupChatCreated: %+v\n", m.SupergroupChatCreated)
-	case m.ChannelChatCreated == true:
+	case TypeChannelCreated:
 		return fmt.Sprintf("ChannelChatCreated: %+v\n", m.ChannelChatCreated)
-	case m.MigrateToChatId != 0:
+	case TypeMigrateToChatId:
 		return fmt.Sprintf("MigrateToChatId: %+v\n", m.MigrateToChatId)
-	case m.MigrateFromChatId != 0:
+	case TypeMigrateFromChatId:
 		return fmt.Sprintf("MigrateFromChatId %+v\n", m.MigrateFromChatId)
-	case m.PinnedMessage != nil:
-		return fmt.Sprintf("%+v\n", m.ForwardFrom)
-	case m.Invoice != Invoice{}:
+	case TypePinnedMessage:
+		return fmt.Sprintf("PinnedMessage: %+v\n", m.ForwardFrom)
+	case TypeInvoice:
 		return fmt.Sprintf("Invoice: %+v\n", m.Invoice)
-	case m.SuccessfulPayment != SuccessfulPayment{}:
+	case TypeSuccessfulPayment:
 		return fmt.Sprintf("SuccessfulPayment: %+v\n", m.SuccessfulPayment)
 	default:
 		return fmt.Sprintf("Message: %#v\n", m)
@@ -498,7 +498,7 @@ type Animation struct {
 type InputMedia interface {
 	// returnFile return *os.File if Media field of InputMedia is a file and automatically set the Media to
 	// the correct value: attach://<file name>
-	// Methods like ReplyAble.SendMediaGroup() use this method to add those files to request
+	// Methods like ReplyAble.SendMediaGroup() use this method to add those files to Request
 	// Be aware that after running returnFile, the Media field is no longer a file, it is a string.
 	// So if you intend to use a InputMedia twice, set the Media field again.
 	returnFile() *os.File
@@ -736,8 +736,7 @@ func (r ResponseImpl) getResultType() {
 
 func (r ResponseImpl) set(res *http.Response) (ResponseImpl, error) {
 	readRes, _ := ioutil.ReadAll(res.Body)
-	err := json.Unmarshal(readRes, &r)
-	return r, err
+	return r, json.Unmarshal(readRes, &r)
 }
 
 func (r ResponseImpl) isOk() bool {
