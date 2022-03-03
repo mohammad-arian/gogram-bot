@@ -89,7 +89,7 @@ func structMultipartParser(s interface{}, w *multipart.Writer) error {
 }
 
 func Request(method string, bot Bot, data Method, response Response) (Response, error) {
-	if err := data.check(); err != nil {
+	if err := data.Check(); err != nil {
 		return nil, err
 	}
 	req, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("https://api.telegram.org/bot%s/%s", bot.Token,
@@ -110,7 +110,7 @@ func Request(method string, bot Bot, data Method, response Response) (Response, 
 	return response.set(res)
 }
 
-// globalEmptyFieldChecker is for general cases that we want to check if a filed is empty or not.
+// globalEmptyFieldChecker is for general cases that we want to Check if a filed is empty or not.
 // globalEmptyFieldChecker accepts a map in which keys are field names and values are fields that will be checked.
 func globalEmptyFieldChecker(a map[string]interface{}) error {
 	for i, j := range a {
