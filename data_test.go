@@ -2,7 +2,6 @@ package gogram
 
 import (
 	"flag"
-	"fmt"
 	"net/url"
 	"testing"
 )
@@ -34,7 +33,27 @@ func TestTextData_Send(t *testing.T) {
 	} else if send.isOk() == false {
 		t.Error(send.getDescription())
 	}
-	fmt.Printf("%+v\n", send)
+}
+
+func TestTextData_Send_ParseMode(t *testing.T) {
+	prepare()
+	text := `<b>bold</b>, <strong>bold</strong>
+	<i>italic</i>, <em>italic</em>
+	<u>underline</u>, <ins>underline</ins>
+	<s>strikethrough</s>, <strike>strikethrough</strike>, <del>strikethrough</del>
+	<b>bold <i>italic bold <s>italic bold strikethrough</s> <u>underline italic bold</u></i> bold</b>
+	<a href="http://www.example.com/">inline URL</a>
+	<a href="tg://user?id=123456789">inline mention of a user</a>
+	<code>inline fixed-width code</code>
+	<pre>pre-formatted fixed-width code block</pre>
+	<pre><code class="language-python">pre-formatted fixed-width code block written in the Python programming language</code></pre>`
+	d := TextData{Text: text, ChatId: *ChatId, ParseMode: "HTML"}
+	send, err := d.Send(*bot)
+	if err != nil {
+		t.Error(err)
+	} else if send.isOk() == false {
+		t.Error(send.getDescription())
+	}
 }
 
 // TestTextData_Send_EmptyText tests TextData.Check in case Text is empty
@@ -62,7 +81,6 @@ func TestAnswerInlineQueryData_Send(t *testing.T) {
 			t.Error(send.getDescription())
 		}
 	}
-	fmt.Printf("%+v\n", send)
 }
 
 func TestKeyboard(t *testing.T) {
@@ -79,7 +97,44 @@ func TestKeyboard(t *testing.T) {
 	} else if send.isOk() == false {
 		t.Error(send.getDescription())
 	}
-	fmt.Printf("%+v\n", send)
+}
+
+func TestKeyboard2(t *testing.T) {
+	prepare()
+	d := TextData{Text: "Testing Text with Keyboard", ChatId: *ChatId}
+	err := d.SetReplyKeyboard(ReplyKeyboardOP{}, ReplyButton{Text: "A"},
+		ReplyButton{Text: "B"})
+	if err != nil {
+		t.Error(err)
+	}
+	send, err := d.Send(*bot)
+	if err != nil {
+		t.Error(err)
+	} else if send.isOk() == false {
+		t.Error(send.getDescription())
+	}
+}
+
+func TestSendChatActionData_Send(t *testing.T) {
+	prepare()
+	d := SendChatActionData{Action: "upload_photo", ChatId: *ChatId}
+	send, err := d.Send(*bot)
+	if err != nil {
+		t.Error(err)
+	} else if send.isOk() == false {
+		t.Error(send.getDescription())
+	}
+}
+
+func TestSendChatActionData_Send_WrongAction(t *testing.T) {
+	prepare()
+	d := SendChatActionData{Action: "WrongAction", ChatId: *ChatId}
+	send, err := d.Send(*bot)
+	if err != nil {
+		t.Error(err)
+	} else if send.isOk() == false {
+		t.Error(send.getDescription())
+	}
 }
 
 func TestDiceData_Send(t *testing.T) {
@@ -91,5 +146,4 @@ func TestDiceData_Send(t *testing.T) {
 	} else if send.isOk() == false {
 		t.Error(send.getDescription())
 	}
-	fmt.Printf("%+v\n", send)
 }

@@ -751,14 +751,6 @@ func (r ResponseImpl) getErrorCode() int {
 	return r.ErrorCode
 }
 
-type Boolean struct {
-	Boolean bool
-}
-
-type Int struct {
-	Int int
-}
-
 type ChatMemberResponse struct {
 	Result []ChatMember `json:"result"`
 }
