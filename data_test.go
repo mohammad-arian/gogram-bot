@@ -38,21 +38,40 @@ func TestTextData_Send(t *testing.T) {
 func TestTextData_Send_ParseMode(t *testing.T) {
 	prepare()
 	text := `<b>bold</b>, <strong>bold</strong>
-	<i>italic</i>, <em>italic</em>
-	<u>underline</u>, <ins>underline</ins>
-	<s>strikethrough</s>, <strike>strikethrough</strike>, <del>strikethrough</del>
-	<b>bold <i>italic bold <s>italic bold strikethrough</s> <u>underline italic bold</u></i> bold</b>
-	<a href="http://www.example.com/">inline URL</a>
-	<a href="tg://user?id=123456789">inline mention of a user</a>
-	<code>inline fixed-width code</code>
-	<pre>pre-formatted fixed-width code block</pre>
-	<pre><code class="language-python">pre-formatted fixed-width code block written in the Python programming language</code></pre>`
+		<i>italic</i>, <em>italic</em>
+		<u>underline</u>, <ins>underline</ins>
+		<s>strikethrough</s>, <strike>strikethrough</strike>, <del>strikethrough</del>
+		<b>bold <i>italic bold <s>italic bold strikethrough</s> <u>underline italic bold</u></i> bold</b>
+		<a href="https://www.example.com/">inline URL</a>
+		<a href="tg://user?id=123456789">inline mention of a user</a>
+		<code>inline fixed-width code</code>
+		<pre>pre-formatted fixed-width code block</pre>
+		<pre><code class="language-python">pre-formatted fixed-width code block written in the Python programming language</code></pre>`
 	d := TextData{Text: text, ChatId: *ChatId, ParseMode: "HTML"}
 	send, err := d.Send(*bot)
 	if err != nil {
 		t.Error(err)
 	} else if send.isOk() == false {
 		t.Error(send.getDescription())
+	}
+}
+
+func TestTextData_Send_WrongParseMode(t *testing.T) {
+	prepare()
+	text := `<b>bold</b>, <strong>bold</strong>
+		<i>italic</i>, <em>italic</em>
+		<u>underline</u>, <ins>underline</ins>
+		<s>strikethrough</s>, <strike>strikethrough</strike>, <del>strikethrough</del>
+		<b>bold <i>italic bold <s>italic bold strikethrough</s> <u>underline italic bold</u></i> bold</b>
+		<a href="https://www.example.com/">inline URL</a>
+		<a href="tg://user?id=123456789">inline mention of a user</a>
+		<code>inline fixed-width code</code>
+		<pre>pre-formatted fixed-width code block</pre>
+		<pre><code class="language-python">pre-formatted fixed-width code block written in the Python programming language</code></pre>`
+	d := TextData{Text: text, ChatId: *ChatId, ParseMode: "i am wrong"}
+	_, err := d.Send(*bot)
+	if err == nil {
+		t.Error(err)
 	}
 }
 

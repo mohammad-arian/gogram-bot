@@ -110,14 +110,21 @@ func Request(method string, bot Bot, data Method, response Response) (Response, 
 	return response.set(res)
 }
 
-// globalEmptyFieldChecker is for general cases that we want to Check if a filed is empty or not.
-// globalEmptyFieldChecker accepts a map in which keys are field names and values are fields that will be checked.
+// globalEmptyFieldChecker is for general cases that we want to Check if a field is empty or not.
+// it accepts a map in which keys are field names and values are checked against switch cases.
+// if a field is empty, an error in "<field name> is empty>" format will be returned.
+// globalEmptyFieldChecker treats ParseMode fields differently. if a field name is ParseMode, and its type is
+// string, then its value must be either "MarkdownV2", "HTML" or "Markdown"
 func globalEmptyFieldChecker(a map[string]interface{}) error {
 	for i, j := range a {
 		switch v := j.(type) {
 		case string:
 			if v == "" {
 				return errors.New(i + " is empty")
+			} else if i == "ParseMode" {
+				if v != "MarkdownV2" && v != "HTML" && v != "Markdown" {
+					return errors.New(i + " must be MarkdownV2, HTML or Markdown")
+				}
 			}
 		case int:
 			if v == 0 {

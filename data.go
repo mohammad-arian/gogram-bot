@@ -28,7 +28,7 @@ func (t TextData) Send(b Bot) (response Response, err error) {
 }
 
 func (t TextData) Check() error {
-	return globalEmptyFieldChecker(map[string]interface{}{"Text": t.Text, "ChatId": t.ChatId})
+	return globalEmptyFieldChecker(map[string]interface{}{"Text": t.Text, "ChatId": t.ChatId, "ParseMode": t.ParseMode})
 }
 
 type PhotoData struct {
@@ -48,7 +48,7 @@ func (p PhotoData) Send(b Bot) (response Response, err error) {
 }
 
 func (p PhotoData) Check() error {
-	return globalEmptyFieldChecker(map[string]interface{}{"Photo": p.Photo, "ChatId": p.ChatId})
+	return globalEmptyFieldChecker(map[string]interface{}{"Photo": p.Photo, "ChatId": p.ChatId, "ParseMode": p.ParseMode})
 }
 
 type VideoData struct {
@@ -72,7 +72,7 @@ func (v VideoData) Send(b Bot) (response Response, err error) {
 }
 
 func (v VideoData) Check() error {
-	return globalEmptyFieldChecker(map[string]interface{}{"Video": v.Video, "ChatId": v.ChatId})
+	return globalEmptyFieldChecker(map[string]interface{}{"Video": v.Video, "ChatId": v.ChatId, "ParseMode": v.ParseMode})
 }
 
 type AudioData struct {
@@ -94,7 +94,7 @@ func (a AudioData) Send(b Bot) (response Response, err error) {
 	return Request("sendAudio", b, a, &ResponseImpl{Result: &Message{}})
 }
 func (a AudioData) Check() error {
-	return globalEmptyFieldChecker(map[string]interface{}{"Audio": a.Audio, "ChatId": a.ChatId})
+	return globalEmptyFieldChecker(map[string]interface{}{"Audio": a.Audio, "ChatId": a.ChatId, "ParseMode": a.ParseMode})
 }
 
 type DocumentData struct {
@@ -118,7 +118,8 @@ func (d DocumentData) Send(b Bot) (response Response, err error) {
 	return Request("sendDocument", b, d, &ResponseImpl{Result: &Message{}})
 }
 func (d DocumentData) Check() error {
-	return globalEmptyFieldChecker(map[string]interface{}{"Document": d.Document, "ChatId": d.ChatId})
+	return globalEmptyFieldChecker(map[string]interface{}{"Document": d.Document, "ChatId": d.ChatId,
+		"ParseMode": d.ParseMode})
 }
 
 type VoiceData struct {
@@ -138,7 +139,8 @@ func (v VoiceData) Send(b Bot) (response Response, err error) {
 	return Request("sendVoice", b, v, &ResponseImpl{Result: &Message{}})
 }
 func (v VoiceData) Check() error {
-	return globalEmptyFieldChecker(map[string]interface{}{"Voice": v.Voice, "ChatId": v.ChatId})
+	return globalEmptyFieldChecker(map[string]interface{}{"Voice": v.Voice, "ChatId": v.ChatId,
+		"ParseMode": v.ParseMode})
 }
 
 type AnimationData struct {
@@ -160,7 +162,8 @@ func (a AnimationData) Send(b Bot) (response Response, err error) {
 	return Request("sendAnimation", b, a, &ResponseImpl{Result: &Message{}})
 }
 func (a AnimationData) Check() error {
-	return globalEmptyFieldChecker(map[string]interface{}{"Animation": a.Animation, "ChatId": a.ChatId})
+	return globalEmptyFieldChecker(map[string]interface{}{"Animation": a.Animation, "ChatId": a.ChatId,
+		"ParseMode": a.ParseMode})
 }
 
 type PollData struct {
@@ -351,7 +354,7 @@ func (c CopyMessageData) Send(b Bot) (response Response, err error) {
 }
 func (c CopyMessageData) Check() error {
 	return globalEmptyFieldChecker(map[string]interface{}{"FromChatId": c.FromChatId, "ChatId": c.ChatId,
-		"MessageId": c.MessageId})
+		"MessageId": c.MessageId, "ParseMode": c.ParseMode})
 }
 
 type DeleteMessageData struct {
@@ -823,7 +826,7 @@ func (e EditMessageTextData) Check() error {
 				"ChatId, otherwise set InlineMessageId")
 		}
 	}
-	return globalEmptyFieldChecker(map[string]interface{}{"Text": e.Text})
+	return globalEmptyFieldChecker(map[string]interface{}{"Text": e.Text, "ParseMode": e.ParseMode})
 }
 
 type EditMessageCaptionData struct {
@@ -846,7 +849,7 @@ func (e EditMessageCaptionData) Check() error {
 				"ChatId, otherwise set InlineMessageId")
 		}
 	}
-	return nil
+	return globalEmptyFieldChecker(map[string]interface{}{"ParseMode": e.ParseMode})
 }
 
 type EditMessageReplyMarkupData struct {
