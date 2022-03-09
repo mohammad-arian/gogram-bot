@@ -98,7 +98,8 @@ type Contact struct {
 	FirstName   string `json:"first_name"`
 	LastName    string `json:"last_name"`
 	UserId      int    `json:"user_id"`
-	Vcard       string `json:"vcard"`
+	// Additional data about the contact in the form of a vCard
+	Vcard string `json:"vcard"`
 }
 
 type Dice struct {

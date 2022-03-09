@@ -7,7 +7,7 @@ import (
 )
 
 // Some tests might need a ChatId or bot Token; set them as flags (e.g.
-// go test -run TestKeyboard -ChatId=<a chat id> -Token=<a bot token>)
+// go test -run TestKeyboard -ChatId=<chat id> -Token=<bot token>)
 var ChatId *int = flag.Int("ChatId", 0, "chat id")
 var Token *string = flag.String("Token", "", "token of the bot you want to use to test methods")
 var Host *string = flag.String("Host", "", "ip and port to use for bot in ip:port format")
@@ -157,8 +157,40 @@ func TestSendChatActionData_Send_WrongAction(t *testing.T) {
 }
 
 func TestDiceData_Send(t *testing.T) {
-	prepare()
 	d := DiceData{Emoji: "🎲", ChatId: *ChatId}
+	send, err := d.Send(*bot)
+	if err != nil {
+		t.Error(err)
+	} else if send.isOk() == false {
+		t.Error(send.getDescription())
+	}
+}
+
+func TestLocationData_Send(t *testing.T) {
+	prepare()
+	d := LocationData{ChatId: *ChatId, Location: Location{Latitude: 51.165691, Longitude: 10.451526}}
+	send, err := d.Send(*bot)
+	if err != nil {
+		t.Error(err)
+	} else if send.isOk() == false {
+		t.Error(send.getDescription())
+	}
+}
+
+func TestPollData_Send(t *testing.T) {
+	prepare()
+	d := PollData{ChatId: *ChatId, Question: "This is a poll test", Options: []string{"1", "2", "3"}}
+	send, err := d.Send(*bot)
+	if err != nil {
+		t.Error(err)
+	} else if send.isOk() == false {
+		t.Error(send.getDescription())
+	}
+}
+
+func TestContactData_Send(t *testing.T) {
+	prepare()
+	d := ContactData{ChatId: *ChatId, Contact: Contact{PhoneNumber: "00", FirstName: "TestUser"}}
 	send, err := d.Send(*bot)
 	if err != nil {
 		t.Error(err)

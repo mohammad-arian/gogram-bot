@@ -48,7 +48,8 @@ func (p PhotoData) Send(b Bot) (response Response, err error) {
 }
 
 func (p PhotoData) Check() error {
-	return globalEmptyFieldChecker(map[string]interface{}{"Photo": p.Photo, "ChatId": p.ChatId, "ParseMode": p.ParseMode})
+	return globalEmptyFieldChecker(map[string]interface{}{"Photo": p.Photo, "ChatId": p.ChatId,
+		"ParseMode": p.ParseMode})
 }
 
 type VideoData struct {
@@ -72,7 +73,8 @@ func (v VideoData) Send(b Bot) (response Response, err error) {
 }
 
 func (v VideoData) Check() error {
-	return globalEmptyFieldChecker(map[string]interface{}{"Video": v.Video, "ChatId": v.ChatId, "ParseMode": v.ParseMode})
+	return globalEmptyFieldChecker(map[string]interface{}{"Video": v.Video, "ChatId": v.ChatId,
+		"ParseMode": v.ParseMode})
 }
 
 type AudioData struct {
@@ -228,6 +230,7 @@ type DiceData struct {
 func (d DiceData) Send(b Bot) (response Response, err error) {
 	return Request("sendDice", b, d, &ResponseImpl{Result: &Message{}})
 }
+
 func (d DiceData) Check() error {
 	return globalEmptyFieldChecker(map[string]interface{}{"Emoji": d.Emoji, "ChatId": d.ChatId})
 }
@@ -251,16 +254,11 @@ func (v VideoNoteData) Check() error {
 }
 
 type LocationData struct {
-	ChatId                   int     `json:"chat_id"`
-	Latitude                 float64 `json:"latitude"`
-	Longitude                float64 `json:"longitude"`
-	HorizontalAccuracy       float64 `json:"horizontal_accuracy"`
-	LivePeriod               int     `json:"live_period"`
-	Heading                  int     `json:"heading"`
-	ProximityAlertRadius     int     `json:"proximity_alert_radius"`
-	DisableNotification      bool    `json:"disable_notification"`
-	ReplyToMessageId         int     `json:"reply_to_message_id"`
-	AllowSendingWithoutReply bool    `json:"allow_sending_without_reply"`
+	ChatId int `json:"chat_id"`
+	Location
+	DisableNotification      bool `json:"disable_notification"`
+	ReplyToMessageId         int  `json:"reply_to_message_id"`
+	AllowSendingWithoutReply bool `json:"allow_sending_without_reply"`
 	Keyboard
 }
 
@@ -272,15 +270,11 @@ func (l LocationData) Check() error {
 }
 
 type ContactData struct {
-	ChatId      int    `json:"chat_id"`
-	PhoneNumber string `json:"phone_number"`
-	FirstName   string `json:"first_name"`
-	LastName    string `json:"last_name"`
-	// Additional data about the contact in the form of a vCard
-	Vcard                    string `json:"vcard"`
-	DisableNotification      bool   `json:"disable_notification"`
-	ReplyToMessageId         int    `json:"reply_to_message_id"`
-	AllowSendingWithoutReply bool   `json:"allow_sending_without_reply"`
+	ChatId int `json:"chat_id"`
+	Contact
+	DisableNotification      bool `json:"disable_notification"`
+	ReplyToMessageId         int  `json:"reply_to_message_id"`
+	AllowSendingWithoutReply bool `json:"allow_sending_without_reply"`
 	Keyboard
 }
 
