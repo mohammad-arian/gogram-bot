@@ -198,6 +198,7 @@ type Message struct {
 	MigrateToChatId       int               `json:"migrate_to_chat_id"`
 	MigrateFromChatId     int               `json:"migrate_from_chat_id"`
 	PinnedMessage         *Message          `json:"pinned_message"`
+	PassportData          PasswordData      `json:"passport_data"`
 	Invoice               Invoice           `json:"invoice"`
 	SuccessfulPayment     SuccessfulPayment `json:"successful_payment"`
 	ConnectedWebsite      string            `json:"connected_website"`
@@ -233,6 +234,7 @@ const (
 	TypePinnedMessage     = "PinnedMessage"
 	TypeInvoice           = "Invoice"
 	TypeSuccessfulPayment = "SuccessfulPayment"
+	TypePassport          = "Passport"
 	TypeUnknown           = "Unknown"
 )
 
@@ -297,6 +299,8 @@ func (m Message) TypeIndicator() string {
 		return TypeInvoice
 	case m.SuccessfulPayment != SuccessfulPayment{}:
 		return TypeSuccessfulPayment
+	case len(m.PassportData.data) != 0:
+		return TypePassport
 	default:
 		return TypeUnknown
 	}
@@ -360,6 +364,8 @@ func (m Message) String() string {
 		return fmt.Sprintf("Invoice: %+v\n", m.Invoice)
 	case TypeSuccessfulPayment:
 		return fmt.Sprintf("SuccessfulPayment: %+v\n", m.SuccessfulPayment)
+	case TypePassport:
+		return fmt.Sprintf("Passport: %+v\n", m.PassportData)
 	default:
 		return fmt.Sprintf("Message: %#v\n", m)
 	}

@@ -157,6 +157,7 @@ func TestSendChatActionData_Send_WrongAction(t *testing.T) {
 }
 
 func TestDiceData_Send(t *testing.T) {
+	prepare()
 	d := DiceData{Emoji: "🎲", ChatId: *ChatId}
 	send, err := d.Send(*bot)
 	if err != nil {
