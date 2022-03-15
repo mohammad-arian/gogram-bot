@@ -116,6 +116,12 @@ type Game struct {
 	Animation    Animation       `json:"animation"`
 }
 
+type GameHighScore struct {
+	Position int  `json:"position"`
+	User     User `json:"user"`
+	Score    int  `json:"score"`
+}
+
 type Invoice struct {
 	Title          string `json:"title"`
 	Description    string `json:"description"`

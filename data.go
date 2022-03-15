@@ -1057,3 +1057,78 @@ func (a AnswerInlineQueryData) Check() error {
 	}
 	return globalEmptyFieldChecker(map[string]interface{}{"InlineQueryId": a.InlineQueryId})
 }
+
+type SendGameData struct {
+	ChatId                   int    `json:"chat_id"`
+	GameShortName            string `json:"game_short_name"`
+	DisableNotification      bool   `json:"disable_notification"`
+	ProtectContent           bool   `json:"protect_content"`
+	ReplyToMessageId         int    `json:"reply_to_message_id"`
+	AllowSendingWithoutReply bool   `json:"allow_sending_without_reply"`
+	InlineKeyboard
+}
+
+func (s SendGameData) Send(b Bot) (response Response, err error) {
+	return Request("sendGame", b, s, &ResponseImpl{Result: &Message{}})
+}
+func (s SendGameData) Check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": s.ChatId, "GameShortName": s.GameShortName})
+}
+
+// SetGameScoreData sets the score of the specified user in a game message.
+// On success, if the message is not an inline message, the Message is returned,
+// otherwise True is returned. Returns an error, if the new score is not greater
+// than the user's current score in the chat and force is False.
+type SetGameScoreData struct {
+	UserId             int    `json:"user_id"`
+	Score              int    `json:"score"`
+	Force              bool   `json:"force"`
+	DisableEditMessage bool   `json:"disable_edit_message"`
+	ChatId             int    `json:"chat_id"`
+	MessageId          int    `json:"message_id"`
+	InlineMessageId    string `json:"inline_message_id"`
+}
+
+func (s SetGameScoreData) Send(b Bot) (response Response, err error) {
+	return Request("setGameScore", b, s, &ResponseImpl{})
+}
+
+func (s SetGameScoreData) Check() error {
+	if s.InlineMessageId == "" {
+		if s.ChatId == 0 || s.MessageId == 0 {
+			return errors.New("you need to set both MessageId and " +
+				"ChatId, otherwise set InlineMessageId")
+		}
+	}
+	return globalEmptyFieldChecker(map[string]interface{}{"UserId": s.UserId, "Score": s.Score})
+}
+
+// GetGameHighScoresData Use this method to get data for high score tables.
+// Will return the score of the specified user and several of their neighbors in a game.
+// On success, returns an Array of GameHighScore objects.
+//This method will currently return scores for the target user, plus two of their closest
+//neighbors on each side. Will also return the top three users if the user and his neighbors are not among them.
+// Please note that this behavior is subject to change.
+type GetGameHighScoresData struct {
+	UserId             int    `json:"user_id"`
+	Score              int    `json:"score"`
+	Force              bool   `json:"force"`
+	DisableEditMessage bool   `json:"disable_edit_message"`
+	ChatId             int    `json:"chat_id"`
+	MessageId          int    `json:"message_id"`
+	InlineMessageId    string `json:"inline_message_id"`
+}
+
+func (g GetGameHighScoresData) Send(b Bot) (response Response, err error) {
+	return Request("getGameHighScores", b, g, &ResponseImpl{})
+}
+
+func (g GetGameHighScoresData) Check() error {
+	if g.InlineMessageId == "" {
+		if g.ChatId == 0 || g.MessageId == 0 {
+			return errors.New("you need to set both MessageId and " +
+				"ChatId, otherwise set InlineMessageId")
+		}
+	}
+	return globalEmptyFieldChecker(map[string]interface{}{"UserId": g.UserId})
+}
