@@ -119,12 +119,12 @@ func globalEmptyFieldChecker(a map[string]interface{}) error {
 	for i, j := range a {
 		switch v := j.(type) {
 		case string:
-			if v == "" {
+			if v == "" && i != "ParseMode" {
 				return errors.New(i + " is empty")
-			} else if i == "ParseMode" {
-				if v != "MarkdownV2" && v != "HTML" && v != "Markdown" {
-					return errors.New(i + " must be MarkdownV2, HTML or Markdown")
-				}
+			}
+			// if field name is ParseMode
+			if v != "MarkdownV2" && v != "HTML" && v != "Markdown" {
+				return errors.New(i + " must be MarkdownV2, HTML or Markdown")
 			}
 		case int:
 			if v == 0 {

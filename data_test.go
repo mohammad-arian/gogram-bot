@@ -199,3 +199,14 @@ func TestContactData_Send(t *testing.T) {
 		t.Error(send.getDescription())
 	}
 }
+
+func TestGetChatAdministratorsData_Send(t *testing.T) {
+	prepare()
+	d := GetChatAdministratorsData{ChatId: *ChatId}
+	send, err := d.Send(*bot)
+	if err != nil {
+		t.Error(err)
+	} else if send.isOk() == false {
+		t.Error(send.getDescription())
+	}
+}
