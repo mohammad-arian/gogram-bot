@@ -121,7 +121,7 @@ func globalEmptyFieldChecker(a map[string]interface{}) error {
 		case string:
 			if v == "" && i != "ParseMode" {
 				return errors.New(i + " is empty")
-			} else if i == "ParseMode" {
+			} else if i == "ParseMode" && v != "" {
 				if v != "MarkdownV2" && v != "HTML" && v != "Markdown" {
 					return errors.New(i + " must be MarkdownV2, HTML or Markdown")
 				}
