@@ -392,7 +392,7 @@ type GetChatMemberData struct {
 }
 
 func (g GetChatMemberData) Send(b Bot) (response Response, err error) {
-	return Request("getChatMember", b, g, &ResponseImpl{Result: &[]ChatMember{}})
+	return Request("getChatMember", b, g, &ResponseImpl{})
 }
 func (g GetChatMemberData) Check() error {
 	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": g.ChatId, "UserId": g.UserId})
@@ -429,7 +429,7 @@ type GetChatData struct {
 }
 
 func (g GetChatData) Send(b Bot) (response Response, err error) {
-	return Request("getChat", b, g, &ResponseImpl{Result: &[]ChatMember{}})
+	return Request("getChat", b, g, &ResponseImpl{})
 }
 func (g GetChatData) Check() error {
 	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": g.ChatId})
@@ -1110,17 +1110,14 @@ func (s SetGameScoreData) Check() error {
 // GetGameHighScoresData Use this method to get data for high score tables.
 // Will return the score of the specified user and several of their neighbors in a game.
 // On success, returns an Array of GameHighScore objects.
-//This method will currently return scores for the target user, plus two of their closest
-//neighbors on each side. Will also return the top three users if the user and his neighbors are not among them.
+// This method will currently return scores for the target user, plus two of their closest
+// neighbors on each side. Will also return the top three users if the user and his neighbors are not among them.
 // Please note that this behavior is subject to change.
 type GetGameHighScoresData struct {
-	UserId             int    `json:"user_id"`
-	Score              int    `json:"score"`
-	Force              bool   `json:"force"`
-	DisableEditMessage bool   `json:"disable_edit_message"`
-	ChatId             int    `json:"chat_id"`
-	MessageId          int    `json:"message_id"`
-	InlineMessageId    string `json:"inline_message_id"`
+	UserId          int    `json:"user_id"`
+	ChatId          int    `json:"chat_id"`
+	MessageId       int    `json:"message_id"`
+	InlineMessageId string `json:"inline_message_id"`
 }
 
 func (g GetGameHighScoresData) Send(b Bot) (response Response, err error) {

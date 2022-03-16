@@ -9,6 +9,8 @@ import (
 // Some tests might need a ChatId or bot Token; set them as flags (e.g.
 // go test -run TestKeyboard -ChatId=<chat id> -Token=<bot token>)
 var ChatId *int = flag.Int("ChatId", 0, "chat id")
+var UserId *int = flag.Int("UserId", 0, "user id")
+var MessageId *int = flag.Int("MessageId", 0, "message id")
 var Token *string = flag.String("Token", "", "token of the bot you want to use to test methods")
 var Host *string = flag.String("Host", "", "ip and port to use for bot in ip:port format")
 var bot *Bot
@@ -203,6 +205,17 @@ func TestContactData_Send(t *testing.T) {
 func TestGetChatAdministratorsData_Send(t *testing.T) {
 	prepare()
 	d := GetChatAdministratorsData{ChatId: *ChatId}
+	send, err := d.Send(*bot)
+	if err != nil {
+		t.Error(err)
+	} else if send.isOk() == false {
+		t.Error(send.getDescription())
+	}
+}
+
+func TestGetGameHighScoresData_Send(t *testing.T) {
+	prepare()
+	d := GetGameHighScoresData{ChatId: -1001584537184, UserId: 1141922418, MessageId: 285}
 	send, err := d.Send(*bot)
 	if err != nil {
 		t.Error(err)

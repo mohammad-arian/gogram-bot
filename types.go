@@ -19,18 +19,7 @@ type Update struct {
 }
 
 func (u Update) String() string {
-	switch {
-	case u.Message.MessageId != 0:
-		return fmt.Sprintf("Message: %+v\n", u.Message)
-	case u.InlineQuery.Id != "":
-		return fmt.Sprintf("InlineQuery: %+v\n", u.InlineQuery)
-	case u.CallbackQuery.Id != "":
-		return fmt.Sprintf("CallbackQuery: %+v\n", u.CallbackQuery)
-	case u.Poll.Id != "":
-		return fmt.Sprintf("Poll: %+v\n", u.Poll)
-	default:
-		return fmt.Sprintf("Update: %#v\n", u)
-	}
+	return fmt.Sprintf("Update: %#v\n", u)
 }
 
 type CallbackQuery struct {
@@ -762,31 +751,6 @@ func (r ResponseImpl) getDescription() string {
 
 func (r ResponseImpl) getErrorCode() int {
 	return r.ErrorCode
-}
-
-type ChatMemberResponse struct {
-	Result []ChatMember `json:"result"`
-}
-
-type ChatMember struct {
-	Status              string `json:"status"`
-	User                User   `json:"user"`
-	IsAnonymous         bool   `json:"is_anonymous"`
-	CustomTitle         string `json:"custom_title"`
-	IsMember            bool   `json:"is_member"`
-	CanBeEdited         bool   `json:"can_be_edited"`
-	CanManageChat       bool   `json:"can_manage_chat"`
-	CanDeleteMessages   bool   `json:"can_delete_messages"`
-	CanManageVoiceChats bool   `json:"can_manage_voice_chats"`
-	CanRestrictMembers  bool   `json:"can_restrict_members"`
-	CanPromoteMembers   bool   `json:"can_promote_members"`
-	CanPostMessages     bool   `json:"can_post_messages"`
-	CanEditMessages     bool   `json:"can_edit_messages"`
-	// if member is restricted, UntilDate is the date when restrictions will be lifted for this user;
-	// unix time. If 0, then the user is restricted forever. If -1 user is not
-	// restricted.
-	UntilDate int `json:"until_date"`
-	ChatPermissions
 }
 
 type ChatPermissions struct {
