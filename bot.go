@@ -16,30 +16,13 @@ type Bot struct {
 	// Token of your Bot.
 	// This field is mandatory.
 	Token string
-	/*
-			Handler invokes when webhook sends a new update.
-		    In the below example, we have a Bot called bot.
-		    We passed a function of type func (message gogram.Update, bot gogram.Bot)
-			to our bot called handle.
-			When telegram server sends something, this function is called.
-			Then we can use update.Message.User to send something back to user;
-
-			// create bot
-			var bot, _ = gogram.NewBot("<Token>", handle)
-			// start  listening to telegram
-			bot.Listener(<Port>)
-			// handler function
-			func handle(update gogram.Update, bot gogram.Bot) {
-				update.Message.User.SendText(bot, update.Message.Text, nil)
-			}
-	*/
+	// Handler is invokes by webhookHandler when webhook sends a new update.
 	Handler func(message *Update, bot Bot)
-	// Simultaneous if set to true, Handler functions run Simultaneously.
-	// This field is not mandatory
+	// if set to true, each Handler will run in a seperated goroutine.
 	Simultaneous bool
-	Proxy        *url.URL
+	// set Proxy for all connections. make
+	Proxy *url.URL
 	// Debug if set to true, every time Listener receives something, it will be printed.
-	// This field is not mandatory
 	Debug bool
 }
 

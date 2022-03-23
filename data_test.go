@@ -213,9 +213,10 @@ func TestGetChatAdministratorsData_Send(t *testing.T) {
 	}
 }
 
-func TestGetGameHighScoresData_Send(t *testing.T) {
+func TestSendInvoiceData_Send_WithoutPrice(t *testing.T) {
 	prepare()
-	d := GetGameHighScoresData{ChatId: -1001584537184, UserId: 1141922418, MessageId: 285}
+	d := SendInvoiceData{ChatId: *ChatId, Title: "TestProduct", Description: "Fake",
+		Payload: "123", Currency: "USD"}
 	send, err := d.Send(*bot)
 	if err != nil {
 		t.Error(err)

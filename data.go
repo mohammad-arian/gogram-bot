@@ -386,6 +386,8 @@ func (s SetChatStickerSetData) Check() error {
 	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": s.ChatId, "StickerSetName": s.StickerSetName})
 }
 
+// GetChatMemberData Use this method to get information about a member of a chat.
+// Returns a ChatMember object on success.
 type GetChatMemberData struct {
 	ChatId int `json:"chat_id"`
 	UserId int `json:"user_id"`
@@ -394,10 +396,12 @@ type GetChatMemberData struct {
 func (g GetChatMemberData) Send(b Bot) (response Response, err error) {
 	return Request("getChatMember", b, g, &ResponseImpl{})
 }
+
 func (g GetChatMemberData) Check() error {
 	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": g.ChatId, "UserId": g.UserId})
 }
 
+// GetChatMemberCountData get the number of members in a chat. Returns Int on success.
 type GetChatMemberCountData struct {
 	ChatId int `json:"chat_id"`
 }
@@ -1132,4 +1136,109 @@ func (g GetGameHighScoresData) Check() error {
 		}
 	}
 	return globalEmptyFieldChecker(map[string]interface{}{"UserId": g.UserId})
+}
+
+type SendInvoiceData struct {
+	// Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+	ChatId int `json:"chat_id"`
+	// Product name, 1-32 characters
+	Title string `json:"title"`
+	// Product description, 1-255 characters
+	Description string `json:"description"`
+	// bot-defined invoice payload, 1-128 bytes.
+	// This will not be displayed to the user, use for your internal processes.
+	Payload string `json:"payload"`
+	// Payments provider token, obtained via Botfather
+	ProviderToken string `json:"provider_token"`
+	// Three-letter ISO 4217 currency code, see more on https://core.telegram.org/bots/payments#supported-currencies
+	Currency string `json:"currency"`
+	// Price breakdown, a JSON-serialized list of components
+	// (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.)
+	Prices []LabeledPrice `json:"prices"`
+	// The maximum accepted amount for tips in the smallest units of the currency (integer, not float/double).
+	// For example, for a maximum tip of US$ 1.45 pass max_tip_amount = 145.
+	// See the exp parameter in https://core.telegram.org/bots/payments/currencies.json, it shows the
+	// number of digits past the decimal point for each currency (2 for the majority of currencies). Defaults to 0
+	MaxTipAmount int `json:"max_tip_amount"`
+	// A JSON-serialized array of suggested amounts of tips in the smallest units of the
+	// currency (integer, not float/double). At most 4 suggested tip amounts can be specified.
+	// The suggested tip amounts must be positive, passed in a strictly increased order
+	// and must not exceed max_tip_amount.
+	SuggestedTipAmounts []int `json:"suggested_tip_amounts"`
+	// Unique deep-linking parameter. If left empty, forwarded copies of the sent message will have a Pay button,
+	// allowing multiple users to pay directly from the forwarded message, using the same invoice.
+	// If non-empty, forwarded copies of the sent message will have a URL button with a deep link
+	// to the bot (instead of a Pay button), with the value used as the start parameter
+	StartParameter string `json:"start_parameter"`
+	// A JSON-serialized data about the invoice, which will be shared with the payment provider.
+	// A detailed description of required fields should be provided by the payment provider.
+	ProviderData string `json:"provider_data"`
+	// URL of the product photo for the invoice. Can be a photo of the goods or a marketing image for a service.
+	// People like it better when they see what they are paying for.
+	PhotoUrl    string `json:"photo_url"`
+	PhotoSize   int    `json:"photo_size"`
+	PhotoWidth  int    `json:"photo_width"`
+	PhotoHeight int    `json:"photo_height"`
+	// Pass true, if you require the user's full name to complete the order
+	NeedName bool `json:"need_name"`
+	// Pass true, if you require the user's phone number to complete the order
+	NeedPhoneNumber bool `json:"need_phone_number"`
+	// Pass true, if you require the user's email address to complete the order
+	NeedEmail bool `json:"need_email"`
+	// Pass true, if you require the user's shipping address to complete the order
+	NeedShippingAddress bool `json:"need_shipping_address"`
+	// Pass true, if user's phone number should be sent to provider
+	SendPhoneNumberToProvider bool `json:"send_phone_number_to_provider"`
+	// Pass true, if user's email address should be sent to provider
+	SendEmailToProvider bool `json:"send_email_to_provider"`
+	// Pass true, if the final price depends on the shipping method
+	IsFlexible bool `json:"is_flexible"`
+	// Sends the message silently. Users will receive a notification with no sound.
+	DisableNotification bool `json:"disable_notification"`
+	// Protects the contents of the sent message from forwarding and saving
+	ProtectContent bool `json:"protect_content"`
+	// If the message is a reply, ID of the original message
+	ReplyToMessageId int `json:"reply_to_message_id"`
+	// Pass true, if the message should be sent even if the specified replied-to message is not found
+	AllowSendingWithoutReply bool `json:"allow_sending_without_reply"`
+	InlineKeyboard
+}
+
+func (s SendInvoiceData) Send(b Bot) (response Response, err error) {
+	return Request("sendInvoice", b, s, &ResponseImpl{Result: &Message{}})
+}
+
+func (s SendInvoiceData) Check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": s.ChatId, "Title": s.Title,
+		"Description": s.Description, "Payload": s.Payload, "ProviderToken": s.ProviderToken,
+		"Currency": s.Currency, "Prices": s.Prices})
+}
+
+type AnswerShippingQueryData struct {
+	ShippingQueryId string            `json:"shipping_query_id"`
+	Ok              bool              `json:"ok"`
+	ShippingOptions []ShippingOptions `json:"shipping_options"`
+	ErrorMessage    string            `json:"error_message"`
+}
+
+func (a AnswerShippingQueryData) Send(b Bot) (response Response, err error) {
+	return Request("answerShippingQuery", b, a, &ResponseImpl{})
+}
+
+func (a AnswerShippingQueryData) Check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"ShippingQueryId": a.ShippingQueryId, "Ok": a.Ok})
+}
+
+type AnswerPreCheckoutQuery struct {
+	PreCheckoutQueryId string `json:"pre_checkout_query_id"`
+	Ok                 bool   `json:"ok"`
+	ErrorMessage       string `json:"error_message"`
+}
+
+func (a AnswerPreCheckoutQuery) Send(b Bot) (response Response, err error) {
+	return Request("answerPreCheckoutQuery", b, a, &ResponseImpl{})
+}
+
+func (a AnswerPreCheckoutQuery) Check() error {
+	return globalEmptyFieldChecker(map[string]interface{}{"PreCheckoutQueryId": a.PreCheckoutQueryId, "Ok": a.Ok})
 }
