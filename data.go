@@ -8,9 +8,11 @@ import (
 type Method interface {
 	// Check is used in Request
 	Check() error
+	// Send Sends requests to telegram server using Request
 	Send(b Bot) (Response, error)
 }
 
+// TextData sends text messages. On success, the sent Message is returned.
 type TextData struct {
 	Text                     string          `json:"text"`
 	ChatId                   int             `json:"chat_id"`
@@ -31,7 +33,13 @@ func (t TextData) Check() error {
 	return globalEmptyFieldChecker(map[string]interface{}{"Text": t.Text, "ChatId": t.ChatId, "ParseMode": t.ParseMode})
 }
 
+// PhotoData sends photos. On success, the sent Message is returned.
 type PhotoData struct {
+	// photo to send. Pass a file_id as String to send a photo that exists on the Telegram servers (recommended),
+	// pass an HTTP URL as a String for Telegram to get a photo from the Internet, or upload a new
+	// video using os.Open(<file_name>). The photo must be at most 10 MB in size.
+	// The photo's width and height must not exceed 10000 in total.
+	// Width and height ratio must be at most 20.
 	Photo                    interface{}     `json:"photo"`
 	ChatId                   int             `json:"chat_id"`
 	ParseMode                string          `json:"parse_mode"`
@@ -52,8 +60,14 @@ func (p PhotoData) Check() error {
 		"ParseMode": p.ParseMode})
 }
 
+// VideoData Use this method to send video files, Telegram clients support mp4
+// videos (other formats may be sent as Document). On success, the sent Message is returned.
+// Bots can currently send video files of up to 50 MB in size, this limit may be changed in the future.
 type VideoData struct {
-	ChatId                   int             `json:"chat_id"`
+	ChatId int `json:"chat_id"`
+	// video to send. Pass a file_id as String to send a video that exists on the Telegram servers (recommended),
+	// pass an HTTP URL as a String for Telegram to get a video from the Internet, or
+	// upload a new video using os.Open(<file_name>).
 	Video                    interface{}     `json:"video"`
 	Duration                 int             `json:"duration"`
 	Width                    int             `json:"width"`
@@ -77,8 +91,14 @@ func (v VideoData) Check() error {
 		"ParseMode": v.ParseMode})
 }
 
+// AudioData sends audio files, if you want Telegram clients to display them in the music player.
+// Your audio must be in the .MP3 or .M4A format. On success, the sent Message is returned.
+// Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
 type AudioData struct {
-	ChatId                   int             `json:"chat_id"`
+	ChatId int `json:"chat_id"`
+	// audio file to send. Pass a file_id as string to send an audio file that exists on the Telegram
+	// servers (recommended), pass an HTTP URL as a string for Telegram to get an audio file from the Internet,
+	// or upload a new video using os.Open(<file_name>).
 	Audio                    interface{}     `json:"audio"`
 	Performer                string          `json:"performer"`
 	Title                    string          `json:"title"`
@@ -99,14 +119,15 @@ func (a AudioData) Check() error {
 	return globalEmptyFieldChecker(map[string]interface{}{"Audio": a.Audio, "ChatId": a.ChatId, "ParseMode": a.ParseMode})
 }
 
+// DocumentData sends general files. On success, the sent Message is returned.
+// Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
 type DocumentData struct {
 	ChatId int `json:"chat_id"`
-	// file to send. Pass a file_id as string to send a file that exists on the Telegram servers (recommended),
-	// pass an HTTP URL as a string for Telegram to get a file from the Internet, or pass a *os.File
-	Document interface{} `json:"document"`
-	Caption  string      `json:"caption"`
-	// Optional. Disables automatic server-side content type
-	// detection for files uploaded using multipart/form-data
+	// file to send. Pass a file_id as string to send an audio file that exists on the Telegram
+	// servers (recommended), pass an HTTP URL as a string for Telegram to get a file from the Internet,
+	// or upload a new video using os.Open(<file_name>).
+	Document                    interface{}     `json:"document"`
+	Caption                     string          `json:"caption"`
 	DisableContentTypeDetection bool            `json:"disable_content_type_detection"`
 	ParseMode                   string          `json:"parse_mode"`
 	CaptionEntities             []MessageEntity `json:"caption_entities"`
@@ -124,8 +145,15 @@ func (d DocumentData) Check() error {
 		"ParseMode": d.ParseMode})
 }
 
+// VoiceData send audio files, if you want Telegram clients to display the file as a playable voice message.
+// For this to work, your audio must be in an .OGG file encoded with OPUS
+// (other formats may be sent as Audio or Document). On success, the sent Message is returned.
+// Bots can currently send voice messages of up to 50 MB in size, this limit may be changed in the future.
 type VoiceData struct {
-	ChatId                   int             `json:"chat_id"`
+	ChatId int `json:"chat_id"`
+	// audio file to send. Pass a file_id as string to send an audio file that exists on the Telegram
+	// servers (recommended), pass an HTTP URL as a string for Telegram to get an audio file from the Internet,
+	// or upload a new video using os.Open(<file_name>).
 	Voice                    interface{}     `json:"voice"`
 	Duration                 int             `json:"duration"`
 	Caption                  string          `json:"caption"`
