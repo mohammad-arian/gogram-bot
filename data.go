@@ -352,6 +352,8 @@ func (m MediaGroupData) Check() error {
 	return nil
 }
 
+// ForwardMessageData forwards messages of any kind. Service messages can't be forwarded.
+// On success, the sent Message is returned.
 type ForwardMessageData struct {
 	// Unique identifier for the target chat or username of the target channel (in the format @channelusername)
 	ChatId int `json:"chat_id"`
@@ -372,6 +374,9 @@ func (f ForwardMessageData) Check() error {
 		"MessageId": f.MessageId})
 }
 
+// CopyMessageData copies messages of any kind. Service messages and invoice messages can't be copied.
+// The method is analogous to the method forwardMessage, but the copied message doesn't have a link to
+// the original message. Returns the MessageId of the sent message on success.
 type CopyMessageData struct {
 	ChatId                   int             `json:"chat_id"`
 	FromChatId               int             `json:"from_chat_id"`
