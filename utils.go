@@ -14,7 +14,7 @@ import (
 	"strconv"
 )
 
-func multipartSetter(s interface{}, w *multipart.Writer, tag string) error {
+func multipartSetter(s any, w *multipart.Writer, tag string) error {
 	switch j := s.(type) {
 	case string:
 		if err := w.WriteField(tag, s.(string)); err != nil {
@@ -73,7 +73,7 @@ func multipartSetter(s interface{}, w *multipart.Writer, tag string) error {
 	return nil
 }
 
-func structMultipartParser(s interface{}, w *multipart.Writer) error {
+func structMultipartParser(s any, w *multipart.Writer) error {
 	v := reflect.ValueOf(s)
 	if v.Kind() == reflect.Ptr {
 		return errors.New("value is a pointer")
@@ -115,7 +115,7 @@ func Request(method string, bot Bot, data Method, response Response) (Response, 
 // if a field is empty, an error in "<field name> is empty" format will be returned.
 // globalEmptyFieldChecker treats ParseMode fields differently. if a field name is ParseMode, and its type is
 // string, then its value must be either "MarkdownV2", "HTML" or "Markdown"
-func globalEmptyFieldChecker(a map[string]interface{}) error {
+func globalEmptyFieldChecker(a map[string]any) error {
 	for i, j := range a {
 		switch v := j.(type) {
 		case string:

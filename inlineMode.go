@@ -34,7 +34,7 @@ type InputTextMessageContent struct {
 }
 
 func (i InputTextMessageContent) checkMessageContent() error {
-	return globalEmptyFieldChecker(map[string]interface{}{"MessageText": i.MessageText})
+	return globalEmptyFieldChecker(map[string]any{"MessageText": i.MessageText})
 }
 
 type InputLocationMessageContent struct {
@@ -59,7 +59,7 @@ type InputVenueMessageContent struct {
 }
 
 func (i InputVenueMessageContent) checkMessageContent() error {
-	return globalEmptyFieldChecker(map[string]interface{}{"Title": i.Title, "Address": i.Address})
+	return globalEmptyFieldChecker(map[string]any{"Title": i.Title, "Address": i.Address})
 }
 
 type InputContactMessageContent struct {
@@ -70,7 +70,7 @@ type InputContactMessageContent struct {
 }
 
 func (i InputContactMessageContent) checkMessageContent() error {
-	return globalEmptyFieldChecker(map[string]interface{}{"PhoneNumber": i.PhoneNumber, "FirstName": i.FirstName})
+	return globalEmptyFieldChecker(map[string]any{"PhoneNumber": i.PhoneNumber, "FirstName": i.FirstName})
 }
 
 type InputInvoiceMessageContent struct {
@@ -97,7 +97,7 @@ type InputInvoiceMessageContent struct {
 }
 
 func (i InputInvoiceMessageContent) checkMessageContent() error {
-	return globalEmptyFieldChecker(map[string]interface{}{"Title": i.Title, "Description": i.Description,
+	return globalEmptyFieldChecker(map[string]any{"Title": i.Title, "Description": i.Description,
 		"Payload": i.Payload, "ProviderData": i.ProviderToken, "Currency": i.Currency, "Prices": i.Prices})
 }
 
@@ -122,7 +122,7 @@ func (i InlineQueryResultArticle) checkQueryAnswer() error {
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
 	}
-	return globalEmptyFieldChecker(map[string]interface{}{"Title": i.Title, "Id": i.Id})
+	return globalEmptyFieldChecker(map[string]any{"Title": i.Title, "Id": i.Id})
 }
 
 type InlineQueryResultPhoto struct {
@@ -159,7 +159,7 @@ func (i *InlineQueryResultPhoto) checkQueryAnswer() error {
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
 	}
-	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id})
+	return globalEmptyFieldChecker(map[string]any{"Id": i.Id})
 }
 
 type InlineQueryResultGif struct {
@@ -197,7 +197,7 @@ func (i *InlineQueryResultGif) checkQueryAnswer() error {
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
 	}
-	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id})
+	return globalEmptyFieldChecker(map[string]any{"Id": i.Id})
 }
 
 type InlineQueryResultMpeg4Gif struct {
@@ -235,7 +235,7 @@ func (i *InlineQueryResultMpeg4Gif) checkQueryAnswer() error {
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
 	}
-	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id})
+	return globalEmptyFieldChecker(map[string]any{"Id": i.Id})
 }
 
 type InlineQueryResultVideo struct {
@@ -278,7 +278,7 @@ func (i *InlineQueryResultVideo) checkQueryAnswer() error {
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
 	}
-	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "Title": i.Title})
+	return globalEmptyFieldChecker(map[string]any{"Id": i.Id, "Title": i.Title})
 }
 
 type InlineQueryResultAudio struct {
@@ -313,7 +313,7 @@ func (i *InlineQueryResultAudio) checkQueryAnswer() error {
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
 	}
-	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id})
+	return globalEmptyFieldChecker(map[string]any{"Id": i.Id})
 }
 
 type InlineQueryResultVoice struct {
@@ -344,7 +344,7 @@ func (i *InlineQueryResultVoice) checkQueryAnswer() error {
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
 	}
-	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id})
+	return globalEmptyFieldChecker(map[string]any{"Id": i.Id})
 }
 
 type InlineQueryResultDocument struct {
@@ -386,7 +386,7 @@ func (i *InlineQueryResultDocument) checkQueryAnswer() error {
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
 	}
-	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id})
+	return globalEmptyFieldChecker(map[string]any{"Id": i.Id})
 }
 
 type InlineQueryResultLocation struct {
@@ -407,7 +407,7 @@ func (i *InlineQueryResultLocation) checkQueryAnswer() error {
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
 	}
-	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "Title": i.Title})
+	return globalEmptyFieldChecker(map[string]any{"Id": i.Id, "Title": i.Title})
 }
 
 type InlineQueryResultVenue struct {
@@ -434,7 +434,7 @@ func (i *InlineQueryResultVenue) checkQueryAnswer() error {
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
 	}
-	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "Title": i.Title, "Address": i.Address})
+	return globalEmptyFieldChecker(map[string]any{"Id": i.Id, "Title": i.Title, "Address": i.Address})
 }
 
 type InlineQueryResultContact struct {
@@ -457,7 +457,7 @@ func (i *InlineQueryResultContact) checkQueryAnswer() error {
 	} else if err := i.InputMessageContent.checkMessageContent(); err != nil {
 		return err
 	}
-	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "FirstName": i.FirstName})
+	return globalEmptyFieldChecker(map[string]any{"Id": i.Id, "FirstName": i.FirstName})
 }
 
 type InlineQueryResultGame struct {
@@ -468,7 +468,7 @@ type InlineQueryResultGame struct {
 }
 
 func (i InlineQueryResultGame) checkQueryAnswer() error {
-	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "GameShortName": i.GameShortName})
+	return globalEmptyFieldChecker(map[string]any{"Id": i.Id, "GameShortName": i.GameShortName})
 }
 
 type InlineQueryResultSticker struct {
@@ -480,7 +480,7 @@ type InlineQueryResultSticker struct {
 }
 
 func (i InlineQueryResultSticker) checkQueryAnswer() error {
-	return globalEmptyFieldChecker(map[string]interface{}{"Id": i.Id, "StickerFileId": i.StickerFileId})
+	return globalEmptyFieldChecker(map[string]any{"Id": i.Id, "StickerFileId": i.StickerFileId})
 }
 
 func (i InlineQuery) Answer(b Bot, data AnswerInlineQueryData) (response Response, err error) {

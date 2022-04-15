@@ -562,7 +562,7 @@ type Animation struct {
 type InputMedia interface {
 	// returnFile return *os.File if Media field of InputMedia is a file and automatically set the Media to
 	// the correct value: attach://<file name>
-	// Methods like ReplyAble.SendMediaGroup() use this method to add those files to Request
+	// Methods like MediaGroupData.Send() use this method to add those files to request.
 	// Be aware that after running returnFile, the Media field is no longer a file, it is a string.
 	// So if you intend to use a InputMedia twice, set the Media field again.
 	returnFile() *os.File
@@ -573,7 +573,7 @@ type InputMediaPhoto struct {
 	Type string `json:"type"`
 	// Pass a file_id to send a file that exists on the Telegram servers (recommended),
 	// pass an HTTP URL for Telegram to get a file from the Internet or pass a *os.File
-	Media interface{} `json:"media"`
+	Media any `json:"media"`
 	// Optional. Caption of the photo to be sent, 0-1024 characters after entities parsing
 	Caption         string          `json:"caption"`
 	ParseMode       string          `json:"parse_mode"`
@@ -595,7 +595,7 @@ type InputMediaVideo struct {
 	Type string `json:"type"`
 	// Pass a file_id to send a file that exists on the Telegram servers (recommended),
 	// pass an HTTP URL for Telegram to get a file from the Internet or pass a *os.File
-	Media interface{} `json:"media"`
+	Media any `json:"media"`
 	// Optional. Caption of the photo to be sent, 0-1024 characters after entities parsing
 	Caption           string          `json:"caption"`
 	ParseMode         string          `json:"parse_mode"`
@@ -621,7 +621,7 @@ type InputMediaDocument struct {
 	Type string `json:"type"`
 	// Pass a file_id to send a file that exists on the Telegram servers (recommended),
 	// pass an HTTP URL for Telegram to get a file from the Internet or pass a *os.File
-	Media interface{} `json:"media"`
+	Media any `json:"media"`
 	// Optional. Caption of the photo to be sent, 0-1024 characters after entities parsing
 	Caption         string          `json:"caption"`
 	ParseMode       string          `json:"parse_mode"`
@@ -646,7 +646,7 @@ type InputMediaAudio struct {
 	Type string `json:"type"`
 	// Pass a file_id to send a file that exists on the Telegram servers (recommended),
 	// pass an HTTP URL for Telegram to get a file from the Internet or pass a *os.File
-	Media interface{} `json:"media"`
+	Media any `json:"media"`
 	// Optional. Caption of the photo to be sent, 0-1024 characters after entities parsing
 	Caption         string          `json:"caption"`
 	ParseMode       string          `json:"parse_mode"`
@@ -671,7 +671,7 @@ type InputMediaAnimation struct {
 	Type string `json:"type"`
 	// Pass a file_id to send a file that exists on the Telegram servers (recommended),
 	// pass an HTTP URL for Telegram to get a file from the Internet or pass a *os.File
-	Media interface{} `json:"media"`
+	Media any `json:"media"`
 	// Optional. Caption of the photo to be sent, 0-1024 characters after entities parsing
 	Caption         string          `json:"caption"`
 	ParseMode       string          `json:"parse_mode"`
@@ -784,10 +784,10 @@ type Response interface {
 }
 
 type ResponseImpl struct {
-	Ok          bool        `json:"ok"`
-	ErrorCode   int         `json:"error_code"`
-	Description string      `json:"description"`
-	Result      interface{} `json:"result"`
+	Ok          bool   `json:"ok"`
+	ErrorCode   int    `json:"error_code"`
+	Description string `json:"description"`
+	Result      any    `json:"result"`
 }
 
 func (r ResponseImpl) print() {
@@ -941,7 +941,7 @@ func (t *ForceReply) SetForceReply(selective bool, inputFieldPlaceholder string)
 }
 
 type Keyboard struct {
-	ReplyMarkup interface{} `json:"reply_markup"`
+	ReplyMarkup any `json:"reply_markup"`
 }
 
 func (k *Keyboard) SetInlineKeyboard(horizontal bool, a ...InlineButton) error {

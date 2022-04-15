@@ -214,5 +214,5 @@ func (s SetPassportDataErrors) Check() error {
 			return err
 		}
 	}
-	return globalEmptyFieldChecker(map[string]interface{}{"ChatId": s.ChatId, "Errors": s.Errors})
+	return globalEmptyFieldChecker(map[string]any{"ChatId": s.ChatId, "Errors": s.Errors})
 }
