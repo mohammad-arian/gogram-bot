@@ -378,8 +378,12 @@ func (f ForwardMessageData) Check() error {
 // The method is analogous to the method forwardMessage, but the copied message doesn't have a link to
 // the original message. Returns the MessageId of the sent message on success.
 type CopyMessageData struct {
-	ChatId                   int             `json:"chat_id"`
-	FromChatId               int             `json:"from_chat_id"`
+	// Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+	ChatId int `json:"chat_id"`
+	// Unique identifier for the chat where the original message was sent
+	// (or channel username in the format @channelusername)
+	FromChatId int `json:"from_chat_id"`
+	// Message identifier in the chat specified in from_chat_id
 	MessageId                int             `json:"message_id"`
 	Caption                  string          `json:"caption"`
 	ParseMode                string          `json:"parse_mode"`
@@ -398,6 +402,15 @@ func (c CopyMessageData) Check() error {
 		"MessageId": c.MessageId, "ParseMode": c.ParseMode})
 }
 
+// DeleteMessageData deletes a message, including service messages, with the following limitations:
+//- A message can only be deleted if it was sent less than 48 hours ago.
+//- A dice message in a private chat can only be deleted if it was sent more than 24 hours ago.
+//- Bots can delete outgoing messages in private chats, groups, and supergroups.
+//- Bots can delete incoming messages in private chats.
+//- Bots granted can_post_messages permissions can delete outgoing messages in channels.
+//- If the bot is an administrator of a group, it can delete any message there.
+//- If the bot has can_delete_messages permission in a supergroup or a channel, it can delete any message there.
+// Returns true on success.
 type DeleteMessageData struct {
 	ChatId    int `json:"chat_id"`
 	MessageId int `json:"message_id"`
@@ -410,6 +423,11 @@ func (d DeleteMessageData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"ChatId": d.ChatId, "MessageId": d.MessageId})
 }
 
+// DeleteChatStickerSetData delete a group sticker set from a supergroup.
+// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
+// Use the field Chat.CanSetStickerSet optionally returned in GetChatData
+// requests to check if the bot can use this method.
+// Returns True on success.
 type DeleteChatStickerSetData struct {
 	ChatId int `json:"chat_id"`
 }
@@ -421,6 +439,11 @@ func (d DeleteChatStickerSetData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"ChatId": d.ChatId})
 }
 
+// SetChatStickerSetData sets a new group sticker set for a supergroup.
+// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
+// Use the field Chat.CanSetStickerSet optionally returned in GetChatData
+// requests to check if the bot can use this method.
+// Returns True on success.
 type SetChatStickerSetData struct {
 	ChatId         int    `json:"chat_id"`
 	StickerSetName string `json:"sticker_set_name"`
@@ -433,7 +456,7 @@ func (s SetChatStickerSetData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"ChatId": s.ChatId, "StickerSetName": s.StickerSetName})
 }
 
-// GetChatMemberData Use this method to get information about a member of a chat.
+// GetChatMemberData gets information about a member of a chat.
 // Returns a ChatMember object on success.
 type GetChatMemberData struct {
 	ChatId int `json:"chat_id"`
@@ -448,7 +471,7 @@ func (g GetChatMemberData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"ChatId": g.ChatId, "UserId": g.UserId})
 }
 
-// GetChatMemberCountData get the number of members in a chat. Returns Int on success.
+// GetChatMemberCountData gets the number of members in a chat. Returns Int on success.
 type GetChatMemberCountData struct {
 	ChatId int `json:"chat_id"`
 }
@@ -460,7 +483,7 @@ func (g GetChatMemberCountData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"ChatId": g.ChatId})
 }
 
-// GetChatAdministratorsData get a list of administrators in a chat.
+// GetChatAdministratorsData gets a list of administrators in a chat.
 // On success, returns an Array of ChatMember objects that contains information about
 // all chat administrators except other bots.
 // If the chat is a group or a supergroup and no administrators were appointed, only the creator will be returned.
@@ -475,28 +498,37 @@ func (g GetChatAdministratorsData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"ChatId": g.ChatId})
 }
 
+// GetChatData gets up-to-date information about the chat (current name of the user for one-on-one
+// conversations, current username of a user, group or channel, etc.). Returns a Chat object on success.
 type GetChatData struct {
 	ChatId int `json:"chat_id"`
 }
 
 func (g GetChatData) Send(b Bot) (response Response, err error) {
-	return Request("getChat", b, g, &ResponseImpl{})
+	return Request("getChat", b, g, &ResponseImpl{Result: &Chat{}})
 }
 func (g GetChatData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"ChatId": g.ChatId})
 }
 
-type LeaveData struct {
+// LeaveChatData leaves a group, supergroup or channel for your bot.
+// Returns True on success.
+type LeaveChatData struct {
 	ChatId int `json:"chat_id"`
 }
 
-func (l LeaveData) Send(b Bot) (response Response, err error) {
+func (l LeaveChatData) Send(b Bot) (response Response, err error) {
 	return Request("leaveChat", b, l, &ResponseImpl{})
 }
-func (l LeaveData) Check() error {
+func (l LeaveChatData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"ChatId": l.ChatId})
 }
 
+// UnpinAllChatMessagesData clear the list of pinned messages in a chat.
+// If the chat is not a private chat, the bot must be an administrator in the chat for this to work and
+// must have the 'can_pin_messages' administrator right in a supergroup or
+// 'can_edit_messages' administrator right in a channel.
+// Returns True on success.
 type UnpinAllChatMessagesData struct {
 	ChatId int `json:"chat_id"`
 }

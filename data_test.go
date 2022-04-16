@@ -224,3 +224,33 @@ func TestSendInvoiceData_Send_WithoutPrice(t *testing.T) {
 		t.Error(send.getDescription())
 	}
 }
+
+func TestCopyMessageData_Send(t *testing.T) {
+
+	d := TextData{Text: "Testing Text", ChatId: *ChatId}
+	send, err := d.Send(*bot)
+	if err != nil {
+		t.Error(err)
+	} else if send.isOk() == false {
+		t.Error(send.getDescription())
+	}
+	v := send.getResult().(*Message)
+	d2 := CopyMessageData{ChatId: *ChatId, MessageId: v.MessageId, FromChatId: v.Chat.Id}
+	send2, err2 := d2.Send(*bot)
+	if err2 != nil {
+		t.Error(err2)
+	} else if send2.isOk() == false {
+		t.Error(send2.getDescription())
+	}
+}
+
+func TestGetChatData_Send(t *testing.T) {
+	prepare()
+	d := GetChatData{ChatId: *ChatId}
+	send, err := d.Send(*bot)
+	if err != nil {
+		t.Error(err)
+	} else if send.isOk() == false {
+		t.Error(send.getDescription())
+	}
+}
