@@ -540,6 +540,9 @@ func (u UnpinAllChatMessagesData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"ChatId": u.ChatId})
 }
 
+// SetChatDescriptionData changes the description of a group, a supergroup or a channel.
+// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
+// Returns True on success.
 type SetChatDescriptionData struct {
 	ChatId      int    `json:"chat_id"`
 	Description string `json:"description"`
@@ -552,6 +555,9 @@ func (s SetChatDescriptionData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"ChatId": s.ChatId, "Description": s.Description})
 }
 
+// SetChatTitleData change the title of a chat. Titles can't be changed for private chats.
+// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
+// Returns True on success.
 type SetChatTitleData struct {
 	ChatId int    `json:"chat_id"`
 	Title  string `json:"title"`
@@ -564,6 +570,9 @@ func (s SetChatTitleData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"ChatId": s.ChatId, "Title": s.Title})
 }
 
+// DeleteChatPhotoData deletes a chat photo. Photos can't be changed for private chats.
+// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
+// Returns True on success.
 type DeleteChatPhotoData struct {
 	ChatId int `json:"chat_id"`
 }
@@ -575,6 +584,9 @@ func (d DeleteChatPhotoData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"ChatId": d.ChatId})
 }
 
+// SetChatPhotoData sets a new profile photo for the chat. Photos can't be changed for private chats.
+// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
+// Returns True on success.
 type SetChatPhotoData struct {
 	ChatId int      `json:"chat_id"`
 	Photo  *os.File `json:"photo"`
@@ -587,18 +599,26 @@ func (s SetChatPhotoData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"ChatId": s.ChatId, "Photo": s.Photo})
 }
 
+// RevokeChatInviteLinkData revokes an invitation link created by the bot.
+// If the primary link is revoked, a new link is automatically generated.
+// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
+// Returns the revoked invite link as ChatInviteLink object.
 type RevokeChatInviteLinkData struct {
 	ChatId     int    `json:"chat_id"`
 	InviteLink string `json:"invite_link"`
 }
 
 func (r RevokeChatInviteLinkData) Send(b Bot) (response Response, err error) {
-	return Request("revokeChatInviteLink", b, r, &ResponseImpl{})
+	return Request("revokeChatInviteLink", b, r, &ResponseImpl{Result: &ChatInviteLink{}})
 }
 func (r RevokeChatInviteLinkData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"ChatId": r.ChatId, "InviteLink": r.InviteLink})
 }
 
+// ExportChatInviteLinkData generate a new primary invite link for a chat; any previously generated primary
+// link is revoked. The bot must be an administrator in the chat for this to work and must have the
+// appropriate administrator rights.
+// Returns the new invite link as String on success.
 type ExportChatInviteLinkData struct {
 	ChatId int `json:"chat_id"`
 }
@@ -610,6 +630,10 @@ func (e ExportChatInviteLinkData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"ChatId": e.ChatId})
 }
 
+// SendChatActionData tell the user that something is happening on the bot's side.
+// The status is set for 5 seconds or less (when a message arrives from your bot, Telegram
+// clients clear its typing status). for more info visit https://core.telegram.org/bots/api#sendchataction
+// Returns True on success.
 type SendChatActionData struct {
 	ChatId int    `json:"chat_id"`
 	Action string `json:"action"`
@@ -628,17 +652,30 @@ func (s SendChatActionData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"ChatId": s.ChatId})
 }
 
+// GetFileData get basic info about a file and prepare it for downloading.
+// For the moment, bots can download files of up to 20MB in size.
+// On success, a File object is returned.
+// The file can then be downloaded via the link https://api.telegram.org/file/bot<token>/<file_path>,
+// where <file_path> is taken from the response.
+// It is guaranteed that the link will be valid for at least 1 hour.
+// When the link expires, a new one can be requested by calling getFile again.
 type GetFileData struct {
 	FileId string `json:"file_id"`
 }
 
 func (g GetFileData) Send(b Bot) (response Response, err error) {
-	return Request("getFile", b, g, &ResponseImpl{})
+	return Request("getFile", b, g, &ResponseImpl{Result: &File{}})
 }
 func (g GetFileData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"FileId": g.FileId})
 }
 
+// UnbanChatMemberData unbans a previously banned user in a supergroup or channel.
+// The user will not return to the group or channel automatically, but will be able to join via link, etc.
+// The bot must be an administrator for this to work. By default, this method guarantees that after the
+// call the user is not a member of the chat, but will be able to join it. So if the user is a member of
+// the chat they will also be removed from the chat. If you don't want this, use the parameter only_if_banned.
+// Returns True on success.
 type UnbanChatMemberData struct {
 	ChatId       int  `json:"chat_id"`
 	UserId       int  `json:"user_id"`

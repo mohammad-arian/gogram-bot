@@ -3,6 +3,7 @@ package gogram
 import (
 	"flag"
 	"net/url"
+	"os"
 	"testing"
 )
 
@@ -252,5 +253,25 @@ func TestGetChatData_Send(t *testing.T) {
 		t.Error(err)
 	} else if send.isOk() == false {
 		t.Error(send.getDescription())
+	}
+}
+
+func TestGetFileData_Send(t *testing.T) {
+	prepare()
+	open, _ := os.Open("README.md")
+	a := DocumentData{Document: open, ChatId: *ChatId}
+	send, err := a.Send(*bot)
+	if err != nil {
+		t.Error(err)
+	} else if send.isOk() == false {
+		t.Error(send.getDescription())
+	}
+	v := send.getResult().(*Message)
+	d := GetFileData{FileId: v.Document.FileId}
+	send2, err := d.Send(*bot)
+	if err != nil {
+		t.Error(err)
+	} else if send2.isOk() == false {
+		t.Error(send2.getDescription())
 	}
 }

@@ -350,14 +350,14 @@ type PhotoSize struct {
 }
 
 type File struct {
-	// fileId is Identifier for this file, which can be used to download or reuse the file
-	fileId string
-	// fileUniqueId isUnique identifier for this file, which is supposed to be the same over time and for different bots. Can't be used to download or reuse the file.
-	fileUniqueId string
-	// fileUniqueId is File size in bytes, if known. Optional
-	fileSize int
-	// filePath is File path. Use https://api.telegram.org/file/bot<token>/<file_path> to get the file. Optional
-	filePath string
+	// Identifier for this file, which can be used to download or reuse the file
+	FileId string `json:"file_id"`
+	// Unique identifier for this file, which is supposed to be the same over time and for different bots. Can't be used to download or reuse the file.
+	FileUniqueId string `json:"file_unique_id"`
+	// file size in bytes, if known. Optional
+	FileSize int `json:"file_size"`
+	// file path. Use https://api.telegram.org/file/bot<token>/<file_path> to get the file. Optional
+	FilePath string `json:"file_path"`
 }
 
 type ReplyAble struct {
