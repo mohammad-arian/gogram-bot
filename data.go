@@ -965,7 +965,7 @@ func (g GetMyCommandsData) Check() error {
 	return nil
 }
 
-// EditMessageTextData edit text and Game messages.
+// EditMessageTextData edits text and Game messages.
 // On success, if the edited message is not an inline message, the edited Message is returned,
 // otherwise True is returned.
 type EditMessageTextData struct {
@@ -992,7 +992,7 @@ func (e EditMessageTextData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"Text": e.Text, "ParseMode": e.ParseMode})
 }
 
-// EditMessageCaptionData edit captions of messages.
+// EditMessageCaptionData edits captions of messages.
 // On success, if the edited message is not an inline message, the edited Message is returned,
 // otherwise True is returned.
 type EditMessageCaptionData struct {
@@ -1018,7 +1018,7 @@ func (e EditMessageCaptionData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"ParseMode": e.ParseMode})
 }
 
-// EditMessageReplyMarkupData edit only the reply markup of messages.
+// EditMessageReplyMarkupData edits only the reply markup of messages.
 // On success, if the edited message is not an inline message, the edited Message is returned,
 // otherwise True is returned.
 type EditMessageReplyMarkupData struct {
@@ -1041,7 +1041,7 @@ func (e EditMessageReplyMarkupData) Check() error {
 	return nil
 }
 
-// StopPollData stop a poll which was sent by the bot. On success, the stopped Poll is returned.
+// StopPollData stops a poll which was sent by the bot. On success, the stopped Poll is returned.
 type StopPollData struct {
 	ChatId    int `json:"chat_id"`
 	MessageId int `json:"message_id"`
@@ -1055,12 +1055,25 @@ func (s StopPollData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"ChatId": s.ChatId, "MessageId": s.MessageId})
 }
 
+// EditMessageMediaData edits animation, audio, document, photo, or video messages.
+// If a message is part of a message album, then it can be edited only to an audio for audio albums,
+// only to a document for document albums and to a photo or a video otherwise.
+// When an inline message is edited, a new file can't be uploaded; use a previously uploaded file via
+// its file_id or specify a URL. On success, if the edited message is not an inline
+// message, the edited Message is returned, otherwise True is returned.
 type EditMessageMediaData struct {
-	InlineMessageId string     `json:"inline_message_id"`
-	Media           InputMedia `json:"media"`
-	ChatId          int        `json:"chat_id"`
-	MessageId       int        `json:"message_id"`
-	Files           []*os.File
+	// Required if ChatId and MessageId are not specified. Identifier of the inline message
+	InlineMessageId string `json:"inline_message_id"`
+	// pass InputMediaPhoto, InputMediaVideo, InputMediaDocument, InputMediaAudio or InputMediaAnimation
+	Media InputMedia `json:"media"`
+	// Required if InlineMessageId is not specified.
+	// Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+	ChatId int `json:"chat_id"`
+	// Required if InlineMessageId is not specified. Identifier of the message to edit
+	MessageId int `json:"message_id"`
+	// Do Not change this field. It automatically will be set by EditMessageMediaData.Send
+	// using returnFile of InputMedia
+	Files []*os.File
 	InlineKeyboard
 }
 
