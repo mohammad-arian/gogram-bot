@@ -907,6 +907,9 @@ func (a AnswerCallbackQueryData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"CallbackQueryId": a.CallbackQueryId})
 }
 
+// SetMyCommandsData changes the list of the bot's commands.
+// See https://core.telegram.org/bots#commands for more details about bot commands.
+// Returns True on success.
 type SetMyCommandsData struct {
 	Commands []BotCommand `json:"commands"`
 	// Scope describing scope of users for which the commands are relevant. Defaults to "default".
@@ -926,6 +929,9 @@ func (s SetMyCommandsData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"Commands": s.Commands})
 }
 
+// DeleteMyCommandsData deletes the list of the bot's commands for the given scope and user language.
+// After deletion, higher level commands will be shown to affected users.
+// Returns True on success.
 type DeleteMyCommandsData struct {
 	// Scope describing scope of users for which the commands are relevant. Defaults to "default".
 	Scope        BotCommandScope `json:"scope"`
@@ -944,6 +950,8 @@ func (d DeleteMyCommandsData) Check() error {
 	return nil
 }
 
+// GetMyCommandsData gets the current list of the bot's commands for the given scope and user language.
+// Returns Array of BotCommand on success. If commands aren't set, an empty list is returned.
 type GetMyCommandsData struct {
 	// Scope describing scope of users for which the commands are relevant. Defaults to "default".
 	Scope        BotCommandScope `json:"scope"`
@@ -951,12 +959,15 @@ type GetMyCommandsData struct {
 }
 
 func (g GetMyCommandsData) Send(b Bot) (response Response, err error) {
-	return Request("getMyCommands", b, g, &ResponseImpl{})
+	return Request("getMyCommands", b, g, &ResponseImpl{Result: &BotCommand{}})
 }
 func (g GetMyCommandsData) Check() error {
 	return nil
 }
 
+// EditMessageTextData edit text and Game messages.
+// On success, if the edited message is not an inline message, the edited Message is returned,
+// otherwise True is returned.
 type EditMessageTextData struct {
 	Text                  string          `json:"text"`
 	InlineMessageId       string          `json:"inline_message_id"`
@@ -981,6 +992,9 @@ func (e EditMessageTextData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"Text": e.Text, "ParseMode": e.ParseMode})
 }
 
+// EditMessageCaptionData edit captions of messages.
+// On success, if the edited message is not an inline message, the edited Message is returned,
+// otherwise True is returned.
 type EditMessageCaptionData struct {
 	ChatId          int             `json:"chat_id"`
 	MessageId       int             `json:"message_id"`
@@ -1004,6 +1018,9 @@ func (e EditMessageCaptionData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"ParseMode": e.ParseMode})
 }
 
+// EditMessageReplyMarkupData edit only the reply markup of messages.
+// On success, if the edited message is not an inline message, the edited Message is returned,
+// otherwise True is returned.
 type EditMessageReplyMarkupData struct {
 	ChatId          int    `json:"chat_id"`
 	MessageId       int    `json:"message_id"`
@@ -1024,6 +1041,7 @@ func (e EditMessageReplyMarkupData) Check() error {
 	return nil
 }
 
+// StopPollData stop a poll which was sent by the bot. On success, the stopped Poll is returned.
 type StopPollData struct {
 	ChatId    int `json:"chat_id"`
 	MessageId int `json:"message_id"`
