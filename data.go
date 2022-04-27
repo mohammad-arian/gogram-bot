@@ -1095,7 +1095,15 @@ func (e EditMessageMediaData) Check() error {
 	return nil
 }
 
+// SetWebhookData specifies an url and receive incoming updates via an outgoing webhook.
+// Whenever there is an update for the bot, telegram will send an HTTPS POST request to the specified url,
+// containing a JSON-serialized Update. In case of an unsuccessful request, we will give up after a
+// reasonable amount of attempts.
+// Returns True on success.
+// If you'd like to make sure that the Webhook request comes from Telegram, we recommend using a secret path in the
+// URL, e.g. https://www.example.com/<token>. Since nobody else knows your bot's token, you can be pretty sure it's us.
 type SetWebhookData struct {
+	// HTTPS url to send updates to. Use an empty string to remove webhook integration
 	Url                string   `json:"url"`
 	Certificate        *os.File `json:"certificate"`
 	IpAddress          string   `json:"ip_address"`
@@ -1111,6 +1119,8 @@ func (s SetWebhookData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"Url": s.Url})
 }
 
+// SendStickerData sends static .WEBP, animated .TGS, or video .WEBM stickers.
+// On success, the sent Message is returned.
 type SendStickerData struct {
 	ChatId                   int `json:"chat_id"`
 	Sticker                  `json:"sticker"`
@@ -1127,6 +1137,7 @@ func (s SendStickerData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"ChatId": s.ChatId, "Sticker": s.Sticker})
 }
 
+// DeleteStickerFromSetData deletes a sticker from a set created by the bot. Returns True on success.
 type DeleteStickerFromSetData struct {
 	Sticker string `json:"sticker"`
 }
@@ -1138,6 +1149,7 @@ func (d DeleteStickerFromSetData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"Sticker": d.Sticker})
 }
 
+// SetStickerPositionInSetData moves a sticker in a set created by the bot to a specific position.
 type SetStickerPositionInSetData struct {
 	Sticker  string `json:"sticker"`
 	Position int    `json:"position"`
@@ -1150,29 +1162,35 @@ func (s SetStickerPositionInSetData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"Sticker": s.Sticker, "Position": s.Position})
 }
 
+// UploadStickerFileData uploads a .PNG file with a sticker for later use in createNewStickerSet and addStickerToSet
+// methods (can be used multiple times). Returns the uploaded File on success.
 type UploadStickerFileData struct {
 	UserId     int      `json:"user_id"`
 	PngSticker *os.File `json:"png_sticker"`
 }
 
 func (u UploadStickerFileData) Send(b Bot) (response Response, err error) {
-	return Request("uploadStickerFile", b, u, &ResponseImpl{})
+	return Request("uploadStickerFile", b, u, &ResponseImpl{Result: &File{}})
 }
 func (u UploadStickerFileData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"UserId": u.UserId, "PngSticker": u.PngSticker})
 }
 
+// GetStickerSetData gets a sticker set. On success, a StickerSet object is returned.
 type GetStickerSetData struct {
 	Name string `json:"name"`
 }
 
 func (g GetStickerSetData) Send(b Bot) (response Response, err error) {
-	return Request("getStickerSet", b, g, &ResponseImpl{})
+	return Request("getStickerSet", b, g, &ResponseImpl{Result: &StickerSet{}})
 }
 func (g GetStickerSetData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"Name": g.Name})
 }
 
+// CreateNewStickerSetData creates a new sticker set owned by a user. The bot will be able to edit the
+// sticker set thus created. You must use exactly one of the fields PngSticker, TgsSticker, or WebmSticker.
+// Returns True on success.
 type CreateNewStickerSetData struct {
 	UserId        int          `json:"user_id"`
 	Name          string       `json:"name"`
@@ -1180,6 +1198,7 @@ type CreateNewStickerSetData struct {
 	Emojis        string       `json:"emojis"`
 	PngSticker    any          `json:"png_sticker"`
 	TgsSticker    *os.File     `json:"tgs_sticker"`
+	WebmSticker   *os.File     `json:"webm_sticker"`
 	ContainsMasks bool         `json:"contains_masks"`
 	MaskPosition  MaskPosition `json:"mask_position"`
 }
@@ -1192,12 +1211,18 @@ func (c CreateNewStickerSetData) Check() error {
 		"Title": c.Title, "Emojis": c.Emojis})
 }
 
+// AddStickerToSetData adds a new sticker to a set created by the bot.
+// You must use exactly one of the fields PngSticker, TgsSticker, or WebmSticker.
+// Animated stickers can be added to animated sticker sets and only to them.
+// Animated sticker sets can have up to 50 stickers. Static sticker sets can have up to 120 stickers.
+// Returns True on success.
 type AddStickerToSetData struct {
 	UserId       int          `json:"user_id"`
 	Name         string       `json:"name"`
 	Emojis       string       `json:"emojis"`
 	PngSticker   any          `json:"png_sticker"`
 	TgsSticker   *os.File     `json:"tgs_sticker"`
+	WebmSticker  *os.File     `json:"webm_sticker"`
 	MaskPosition MaskPosition `json:"mask_position"`
 }
 
@@ -1208,6 +1233,9 @@ func (a AddStickerToSetData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"UserId": a.UserId, "Name": a.Name, "Emojis": a.Emojis})
 }
 
+// SetStickerSetThumbData sets the thumbnail of a sticker set.
+// Animated thumbnails can be set for animated sticker sets only.
+// Video thumbnails can be set only for video sticker sets only. Returns True on success.
 type SetStickerSetThumbData struct {
 	UserId int    `json:"user_id"`
 	Name   string `json:"name"`
@@ -1221,6 +1249,8 @@ func (s SetStickerSetThumbData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"UserId": s.UserId, "Name": s.Name})
 }
 
+// AnswerInlineQueryData sends answers to an inline query. On success, True is returned.
+// No more than 50 results per query are allowed.
 type AnswerInlineQueryData struct {
 	InlineQueryId     string        `json:"inline_query_id"`
 	Results           []QueryAnswer `json:"results"`
@@ -1247,6 +1277,7 @@ func (a AnswerInlineQueryData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"InlineQueryId": a.InlineQueryId})
 }
 
+// SendGameData sends a game. On success, the sent Message is returned.
 type SendGameData struct {
 	ChatId                   int    `json:"chat_id"`
 	GameShortName            string `json:"game_short_name"`
@@ -1319,69 +1350,34 @@ func (g GetGameHighScoresData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"UserId": g.UserId})
 }
 
+// SendInvoiceData sends invoices. On success, the sent Message is returned.
 type SendInvoiceData struct {
-	// Unique identifier for the target chat or username of the target channel (in the format @channelusername)
-	ChatId int `json:"chat_id"`
-	// Product name, 1-32 characters
-	Title string `json:"title"`
-	// Product description, 1-255 characters
-	Description string `json:"description"`
-	// bot-defined invoice payload, 1-128 bytes.
-	// This will not be displayed to the user, use for your internal processes.
-	Payload string `json:"payload"`
-	// Payments provider token, obtained via Botfather
-	ProviderToken string `json:"provider_token"`
-	// Three-letter ISO 4217 currency code, see more on https://core.telegram.org/bots/payments#supported-currencies
-	Currency string `json:"currency"`
-	// Price breakdown, a JSON-serialized list of components
-	// (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.)
-	Prices []LabeledPrice `json:"prices"`
-	// The maximum accepted amount for tips in the smallest units of the currency (integer, not float/double).
-	// For example, for a maximum tip of US$ 1.45 pass max_tip_amount = 145.
-	// See the exp parameter in https://core.telegram.org/bots/payments/currencies.json, it shows the
-	// number of digits past the decimal point for each currency (2 for the majority of currencies). Defaults to 0
-	MaxTipAmount int `json:"max_tip_amount"`
-	// A JSON-serialized array of suggested amounts of tips in the smallest units of the
-	// currency (integer, not float/double). At most 4 suggested tip amounts can be specified.
-	// The suggested tip amounts must be positive, passed in a strictly increased order
-	// and must not exceed max_tip_amount.
-	SuggestedTipAmounts []int `json:"suggested_tip_amounts"`
-	// Unique deep-linking parameter. If left empty, forwarded copies of the sent message will have a Pay button,
-	// allowing multiple users to pay directly from the forwarded message, using the same invoice.
-	// If non-empty, forwarded copies of the sent message will have a URL button with a deep link
-	// to the bot (instead of a Pay button), with the value used as the start parameter
-	StartParameter string `json:"start_parameter"`
-	// A JSON-serialized data about the invoice, which will be shared with the payment provider.
-	// A detailed description of required fields should be provided by the payment provider.
-	ProviderData string `json:"provider_data"`
-	// URL of the product photo for the invoice. Can be a photo of the goods or a marketing image for a service.
-	// People like it better when they see what they are paying for.
-	PhotoUrl    string `json:"photo_url"`
-	PhotoSize   int    `json:"photo_size"`
-	PhotoWidth  int    `json:"photo_width"`
-	PhotoHeight int    `json:"photo_height"`
-	// Pass true, if you require the user's full name to complete the order
-	NeedName bool `json:"need_name"`
-	// Pass true, if you require the user's phone number to complete the order
-	NeedPhoneNumber bool `json:"need_phone_number"`
-	// Pass true, if you require the user's email address to complete the order
-	NeedEmail bool `json:"need_email"`
-	// Pass true, if you require the user's shipping address to complete the order
-	NeedShippingAddress bool `json:"need_shipping_address"`
-	// Pass true, if user's phone number should be sent to provider
-	SendPhoneNumberToProvider bool `json:"send_phone_number_to_provider"`
-	// Pass true, if user's email address should be sent to provider
-	SendEmailToProvider bool `json:"send_email_to_provider"`
-	// Pass true, if the final price depends on the shipping method
-	IsFlexible bool `json:"is_flexible"`
-	// Sends the message silently. Users will receive a notification with no sound.
-	DisableNotification bool `json:"disable_notification"`
-	// Protects the contents of the sent message from forwarding and saving
-	ProtectContent bool `json:"protect_content"`
-	// If the message is a reply, ID of the original message
-	ReplyToMessageId int `json:"reply_to_message_id"`
-	// Pass true, if the message should be sent even if the specified replied-to message is not found
-	AllowSendingWithoutReply bool `json:"allow_sending_without_reply"`
+	ChatId                    int            `json:"chat_id"`
+	Title                     string         `json:"title"`
+	Description               string         `json:"description"`
+	Payload                   string         `json:"payload"`
+	ProviderToken             string         `json:"provider_token"`
+	Currency                  string         `json:"currency"`
+	Prices                    []LabeledPrice `json:"prices"`
+	MaxTipAmount              int            `json:"max_tip_amount"`
+	SuggestedTipAmounts       []int          `json:"suggested_tip_amounts"`
+	StartParameter            string         `json:"start_parameter"`
+	ProviderData              string         `json:"provider_data"`
+	PhotoUrl                  string         `json:"photo_url"`
+	PhotoSize                 int            `json:"photo_size"`
+	PhotoWidth                int            `json:"photo_width"`
+	PhotoHeight               int            `json:"photo_height"`
+	NeedName                  bool           `json:"need_name"`
+	NeedPhoneNumber           bool           `json:"need_phone_number"`
+	NeedEmail                 bool           `json:"need_email"`
+	NeedShippingAddress       bool           `json:"need_shipping_address"`
+	SendPhoneNumberToProvider bool           `json:"send_phone_number_to_provider"`
+	SendEmailToProvider       bool           `json:"send_email_to_provider"`
+	IsFlexible                bool           `json:"is_flexible"`
+	DisableNotification       bool           `json:"disable_notification"`
+	ProtectContent            bool           `json:"protect_content"`
+	ReplyToMessageId          int            `json:"reply_to_message_id"`
+	AllowSendingWithoutReply  bool           `json:"allow_sending_without_reply"`
 	InlineKeyboard
 }
 
@@ -1395,6 +1391,9 @@ func (s SendInvoiceData) Check() error {
 		"Currency": s.Currency, "Prices": s.Prices})
 }
 
+// AnswerShippingQueryData replies to shipping queries.
+// If you sent an invoice requesting a shipping address and the parameter is_flexible was specified,
+// the Bot API will send an Update with a shipping_query field to the bot. On success, True is returned.
 type AnswerShippingQueryData struct {
 	ShippingQueryId string            `json:"shipping_query_id"`
 	Ok              bool              `json:"ok"`
@@ -1405,11 +1404,14 @@ type AnswerShippingQueryData struct {
 func (a AnswerShippingQueryData) Send(b Bot) (response Response, err error) {
 	return Request("answerShippingQuery", b, a, &ResponseImpl{})
 }
-
 func (a AnswerShippingQueryData) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"ShippingQueryId": a.ShippingQueryId, "Ok": a.Ok})
 }
 
+// AnswerPreCheckoutQuery responds to pre-checkout queries.
+// Once the user has confirmed their payment and shipping details, the Bot API sends the final confirmation
+// in the form of an Update with the field pre_checkout_query. On success, True is returned.
+// Note: The Bot API must receive an answer within 10 seconds after the pre-checkout query was sent.
 type AnswerPreCheckoutQuery struct {
 	PreCheckoutQueryId string `json:"pre_checkout_query_id"`
 	Ok                 bool   `json:"ok"`
@@ -1419,7 +1421,6 @@ type AnswerPreCheckoutQuery struct {
 func (a AnswerPreCheckoutQuery) Send(b Bot) (response Response, err error) {
 	return Request("answerPreCheckoutQuery", b, a, &ResponseImpl{})
 }
-
 func (a AnswerPreCheckoutQuery) Check() error {
 	return globalEmptyFieldChecker(map[string]any{"PreCheckoutQueryId": a.PreCheckoutQueryId, "Ok": a.Ok})
 }

@@ -78,8 +78,8 @@ func (b Bot) Listener(port string, ip ...string) {
 // If Bot has a Handler, it will be called, otherwise a message will be printed.
 // If Bot.concurrent set to true, each handler will be called in a separate goroutine.
 // Since ListenAndServe function in Bot.Listener is a blocking function,
-// we don't have to wait for goroutines to finish, However if ListenAndServe returns an error,
-// all goroutines (handlers) will be aborted.
+// we don't have to wait for goroutines to finish, however if http.ListenAndServe in Bot.Listener
+// returns an error, all goroutines (handlers) will be aborted.
 func webhookHandler(r *http.Request, bot Bot) {
 	res, _ := ioutil.ReadAll(r.Body)
 	if bot.Debug {
@@ -92,7 +92,7 @@ func webhookHandler(r *http.Request, bot Bot) {
 	}
 	if bot.Handler == nil {
 		log.Println("Warning: Listener just received something, but you have not added a handler to bot." +
-			"add handler to bot by setting bot's Handler field to a function of type func(message Update, bot Bot) ")
+			"add handler to bot by setting bot's Handler field to a function of type func(message Update, bot Bot)")
 	} else if bot.concurrent {
 		go bot.Handler(update, bot)
 		return
