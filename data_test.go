@@ -2,24 +2,27 @@ package gogram
 
 import (
 	"flag"
+	"fmt"
 	"net/url"
 	"os"
 	"testing"
 )
 
-// Some tests might need a ChatId or bot Token; set them as flags (e.g.
-// go test -run TestKeyboard -ChatId=<chat id> -Token=<bot token>)
+// Some tests might need a ChatId or bot Token; set them as flags
+// (e.g. go test -run TestKeyboard -ChatId=<chat id> -Token=<bot token> )
 var ChatId *int = flag.Int("ChatId", 0, "chat id")
 var UserId *int = flag.Int("UserId", 0, "user id")
 var MessageId *int = flag.Int("MessageId", 0, "message id")
 var Token *string = flag.String("Token", "", "token of the bot you want to use to test methods")
-var Host *string = flag.String("Host", "", "ip and port to use for bot in ip:port format")
+
+// add Proxy flag for test to use (e.g.go test -run TestTextData_Send -Token=<a bot token> -Proxy="192.168.1.100:8888"
+var Proxy *string = flag.String("Proxy", "", "ip and port to use for bot in ip:port format")
 var bot *Bot
 
-// prepare creates a bot by passed flags and activated proxy if there is a -Host flag in ip:port format
+// prepare creates a bot by passed flags and activated proxy if there is a -Proxy flag in ip:port format
 func prepare() {
-	bot = &Bot{Token: *Token, Proxy: &url.URL{Host: *Host}}
-	if *Host != "" {
+	bot = &Bot{Token: *Token, Proxy: &url.URL{Host: *Proxy}}
+	if *Proxy != "" {
 		err := bot.ActivateProxy()
 		if err != nil {
 			panic(err)
@@ -274,4 +277,16 @@ func TestGetFileData_Send(t *testing.T) {
 	} else if send2.isOk() == false {
 		t.Error(send2.getDescription())
 	}
+}
+
+func TestGetStickerSetData_Send(t *testing.T) {
+	prepare()
+	a := GetStickerSetData{Name: "testgetsticker"}
+	send, err := a.Send(*bot)
+	if err != nil {
+		t.Error(err)
+	} else if send.isOk() == false {
+		t.Error(send.getDescription())
+	}
+	fmt.Printf("%+v\n", send.getResult())
 }

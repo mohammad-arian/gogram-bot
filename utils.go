@@ -98,16 +98,18 @@ func Request(method string, bot Bot, data Method, response Response) (Response, 
 	w := multipart.NewWriter(body)
 	if data != nil {
 		if err := structMultipartParser(data, w); err != nil {
-			w.Close()
 			return response, err
 		}
 	}
 	w.Close()
 	req.Header.Add("Content-Type", w.FormDataContentType())
 	req.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
-	res, _ := http.DefaultClient.Do(req)
-	defer res.Body.Close()
-	return response.set(res)
+	if res, err := http.DefaultClient.Do(req); err != nil {
+		return response, err
+	} else {
+		defer res.Body.Close()
+		return response.set(res)
+	}
 }
 
 // globalEmptyFieldChecker is for general cases that we want to Check if a field is empty or not.
