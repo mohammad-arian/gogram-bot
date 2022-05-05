@@ -261,7 +261,7 @@ func TestGetChatData_Send(t *testing.T) {
 
 func TestGetFileData_Send(t *testing.T) {
 	prepare()
-	open, _ := os.Open("README.md")
+	open, _ := os.Open("README.md.md")
 	a := DocumentData{Document: open, ChatId: *ChatId}
 	send, err := a.Send(*bot)
 	if err != nil {
