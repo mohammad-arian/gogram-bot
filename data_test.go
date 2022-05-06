@@ -288,5 +288,16 @@ func TestGetStickerSetData_Send(t *testing.T) {
 	} else if send.isOk() == false {
 		t.Error(send.getDescription())
 	}
+}
+
+func TestGetMyCommandsData_Send(t *testing.T) {
+	prepare()
+	a := GetMyCommandsData{}
+	send, err := a.Send(*bot)
+	if err != nil {
+		t.Error(err)
+	} else if send.isOk() == false {
+		t.Error(send.getDescription())
+	}
 	fmt.Printf("%+v\n", send.getResult())
 }

@@ -921,10 +921,8 @@ func (s SetMyCommandsData) Send(b Bot) (response Response, err error) {
 	return Request("setMyCommands", b, s, &ResponseImpl{})
 }
 func (s SetMyCommandsData) Check() error {
-	types := map[string]int{"default": 1, "chat_member": 1, "all_private_chats": 1,
-		"all_group_chats": 1, "all_chat_administrators": 1, "chat": 1, "chat_administrators": 1}
-	if _, ok := types[s.Scope.Type]; ok == false {
-		s.Scope.Type = "default"
+	if err := s.Scope.checkScope(); err != nil {
+		return err
 	}
 	return globalEmptyFieldChecker(map[string]any{"Commands": s.Commands})
 }
@@ -942,12 +940,7 @@ func (d DeleteMyCommandsData) Send(b Bot) (response Response, err error) {
 	return Request("deleteMyCommands", b, d, &ResponseImpl{})
 }
 func (d DeleteMyCommandsData) Check() error {
-	types := map[string]int{"default": 1, "chat_member": 1, "all_private_chats": 1,
-		"all_group_chats": 1, "all_chat_administrators": 1, "chat": 1, "chat_administrators": 1}
-	if _, ok := types[d.Scope.Type]; ok == false {
-		d.Scope.Type = "default"
-	}
-	return nil
+	return d.Scope.checkScope()
 }
 
 // GetMyCommandsData gets the current list of the bot's commands for the given scope and user language.
@@ -959,7 +952,7 @@ type GetMyCommandsData struct {
 }
 
 func (g GetMyCommandsData) Send(b Bot) (response Response, err error) {
-	return Request("getMyCommands", b, g, &ResponseImpl{Result: &BotCommand{}})
+	return Request("getMyCommands", b, g, &ResponseImpl{Result: &[]BotCommand{}})
 }
 func (g GetMyCommandsData) Check() error {
 	return nil

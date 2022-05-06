@@ -352,7 +352,8 @@ type PhotoSize struct {
 type File struct {
 	// Identifier for this file, which can be used to download or reuse the file
 	FileId string `json:"file_id"`
-	// Unique identifier for this file, which is supposed to be the same over time and for different bots. Can't be used to download or reuse the file.
+	// Unique identifier for this file, which is supposed to be the same over time and for different bots.
+	// Can't be used to download or reuse the file.
 	FileUniqueId string `json:"file_unique_id"`
 	// file size in bytes, if known. Optional
 	FileSize int `json:"file_size"`
@@ -639,8 +640,8 @@ func (i LoginUrl) check() error {
 	return nil
 }
 
-// CallbackGame is a placeholder, currently holds no information. Use BotFather to set up your game and set
-// Active to true.
+// CallbackGame is a placeholder, currently holds no information. Use BotFather to set up your game
+// and set Active to true.
 type CallbackGame struct {
 	Active bool
 }
@@ -765,25 +766,67 @@ type BotCommand struct {
 	Description string `json:"description"`
 }
 
-// BotCommandScope describes scope of users for which the commands are relevant.
-type BotCommandScope struct {
-	// Type is the scope type. It can be:
-	// "default"                 -> Default commands are used if no commands with a narrower
-	//                              scope are specified for the user.
-	// "chat_member"             -> covers a specific member of a group or supergroup chat.
-	// "all_private_chats"       -> covers all private chats.
-	// "all_group_chats"         -> covers all group and supergroup chats.
-	// "all_chat_administrators" -> covers all group and supergroup chat administrators.
-	// "chat"                    -> covers a specific chat.
-	// "chat_administrators"     -> covers all administrators of a specific group or supergroup chat.
+type BotCommandScope interface {
+	checkScope() error
+}
+
+type BotCommandScopeDefault struct {
 	Type string `json:"type"`
-	// ChatId is unique identifier for the target chat or username of the target
-	// supergroup (in the format @supergroupusername).
-	// Required only if Type is "chat_administrators", "chat" or "chat_member".
-	ChatId int `json:"chat_id"`
-	// UserId is unique identifier of the target user.
-	// Required only if Type is "chat_member"
-	UserId int `json:"user_id"`
+}
+
+func (b BotCommandScopeDefault) checkScope() error {
+	if b.Type != "default" {
+		return errors.New("botCommandScope type must be default")
+	}
+	return nil
+}
+
+type BotCommandScopeAllGroupChats struct {
+	Type string `json:"type"`
+}
+
+func (b BotCommandScopeAllGroupChats) checkScope() error {
+	if b.Type != "all_group_chats" {
+		return errors.New("botCommandScope type must be all_group_chats")
+	}
+	return nil
+}
+
+type BotCommandScopeChat struct {
+	Type   string `json:"type"`
+	ChatId int    `json:"chat_id"`
+}
+
+func (b BotCommandScopeChat) checkScope() error {
+	if b.Type != "chat" {
+		return errors.New("botCommandScope type must be chat")
+	}
+	return nil
+}
+
+type BotCommandScopeChatAdministrators struct {
+	Type   string `json:"type"`
+	ChatId int    `json:"chat_id"`
+}
+
+func (b BotCommandScopeChatAdministrators) checkScope() error {
+	if b.Type != "chat_administrators" {
+		return errors.New("botCommandScope type must be chat_administrators")
+	}
+	return nil
+}
+
+type BotCommandScopeChatMember struct {
+	Type   string `json:"type"`
+	ChatId int    `json:"chat_id"`
+	UserId int    `json:"user_id"`
+}
+
+func (b BotCommandScopeChatMember) checkScope() error {
+	if b.Type != "chat_member" {
+		return errors.New("botCommandScope type must be chat_member")
+	}
+	return nil
 }
 
 type InlineKeyboard struct {
