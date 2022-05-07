@@ -34,11 +34,11 @@ func multipartSetter(s any, w *multipart.Writer, tag string) error {
 		}
 	case nil:
 		return nil
-	// use *os.File is for methods like SendVideo() and SendPhoto() that
-	// the fieldName of CreateFormFile() can't be the name of the file, instead it must be json tag.
 	case *os.File:
 		if j != nil {
 			name := tag
+			// if tag is not empty string, then fieldname of CreateFormFile below will be the json tag.
+			// Otherwise, fieldname and filename both will be the name of the file.
 			if name == "" {
 				name = j.Name()
 			}
@@ -55,7 +55,7 @@ func multipartSetter(s any, w *multipart.Writer, tag string) error {
 	default:
 		Type := reflect.TypeOf(s).Kind()
 		if Type == reflect.Slice || Type == reflect.Struct || Type == reflect.Ptr {
-			// for Keyboard and InlineKeyboard, ReplyKeyboard
+			// for Keyboard, InlineKeyboard and ReplyKeyboard
 			if Type == reflect.Struct && tag == "" {
 				return structMultipartParser(j, w)
 			}

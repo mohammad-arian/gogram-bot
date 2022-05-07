@@ -457,7 +457,7 @@ func (s SetChatStickerSetData) Check() error {
 }
 
 // GetChatMemberData gets information about a member of a chat.
-// Returns a ChatMember object on success.
+// Returns a ChatMember (https://core.telegram.org/bots/api#chatmember) object on success.
 type GetChatMemberData struct {
 	ChatId int `json:"chat_id"`
 	UserId int `json:"user_id"`
@@ -484,8 +484,8 @@ func (g GetChatMemberCountData) Check() error {
 }
 
 // GetChatAdministratorsData gets a list of administrators in a chat.
-// On success, returns an Array of ChatMember objects that contains information about
-// all chat administrators except other bots.
+// On success, returns an array of ChatMember (https://core.telegram.org/bots/api#chatmember) objects
+// that contains information about all chat administrators except other bots.
 // If the chat is a group or a supergroup and no administrators were appointed, only the creator will be returned.
 type GetChatAdministratorsData struct {
 	ChatId int `json:"chat_id"`
@@ -1200,6 +1200,19 @@ func (c CreateNewStickerSetData) Send(b Bot) (response Response, err error) {
 	return Request("createNewStickerSet", b, c, &ResponseImpl{})
 }
 func (c CreateNewStickerSetData) Check() error {
+	set := 0
+	if c.PngSticker != nil {
+		set++
+	}
+	if c.TgsSticker != nil {
+		set++
+	}
+	if c.WebmSticker != nil {
+		set++
+	}
+	if set != 1 {
+		return errors.New("you must use exactly one of the fields PngSticker, TgsSticker, or WebmSticker")
+	}
 	return globalEmptyFieldChecker(map[string]any{"UserId": c.UserId, "Name": c.Name,
 		"Title": c.Title, "Emojis": c.Emojis})
 }
@@ -1223,6 +1236,19 @@ func (a AddStickerToSetData) Send(b Bot) (response Response, err error) {
 	return Request("addStickerToSet", b, a, &ResponseImpl{})
 }
 func (a AddStickerToSetData) Check() error {
+	set := 0
+	if a.PngSticker != nil {
+		set++
+	}
+	if a.TgsSticker != nil {
+		set++
+	}
+	if a.WebmSticker != nil {
+		set++
+	}
+	if set != 1 {
+		return errors.New("you must use exactly one of the fields PngSticker, TgsSticker, or WebmSticker")
+	}
 	return globalEmptyFieldChecker(map[string]any{"UserId": a.UserId, "Name": a.Name, "Emojis": a.Emojis})
 }
 

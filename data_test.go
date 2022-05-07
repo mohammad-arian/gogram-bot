@@ -2,7 +2,6 @@ package gogram
 
 import (
 	"flag"
-	"fmt"
 	"net/url"
 	"os"
 	"testing"
@@ -299,5 +298,4 @@ func TestGetMyCommandsData_Send(t *testing.T) {
 	} else if send.isOk() == false {
 		t.Error(send.getDescription())
 	}
-	fmt.Printf("%+v\n", send.getResult())
 }
