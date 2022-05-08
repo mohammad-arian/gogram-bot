@@ -17,7 +17,7 @@ type Bot struct {
 	// This field is mandatory.
 	Token string
 	// Handler is invokes by webhookHandler when webhook sends a new update.
-	Handler func(message Update)
+	Handler func(Update, Bot)
 	// if set to true, each Handler will run in a seperated goroutine.
 	Concurrent bool
 	// set Proxy for all connections. make
@@ -70,9 +70,9 @@ func (b Bot) webhookHandler(_ http.ResponseWriter, r *http.Request) {
 		log.Println("Warning: Listener just received something, but you have not added a handler to bot." +
 			"add handler to bot by setting bot's Handler field to a function of type func(message Update, bot Bot)")
 	} else if b.Concurrent {
-		go b.Handler(*update)
+		go b.Handler(*update, b)
 		return
 	} else {
-		b.Handler(*update)
+		b.Handler(*update, b)
 	}
 }
