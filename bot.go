@@ -17,9 +17,9 @@ type Bot struct {
 	// This field is mandatory.
 	Token string
 	// Handler is invokes by webhookHandler when webhook sends a new update.
-	Handler func(message *Update, bot Bot)
+	Handler func(message Update)
 	// if set to true, each Handler will run in a seperated goroutine.
-	concurrent bool
+	Concurrent bool
 	// set Proxy for all connections. make
 	Proxy *url.URL
 	// Debug if set to true, every time Listener receives something, it will be printed.
@@ -42,7 +42,7 @@ func (b Bot) VerifyBot() (Response, error) {
 // Listener listens to upcoming webhook updates and calls webhookHandler when telegram
 // sends an update.
 func (b Bot) Listener(port string, ip ...string) {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { webhookHandler(r, b) })
+	http.HandleFunc("/", b.webhookHandler)
 	address := ":" + port
 	if len(ip) != 0 {
 		address = ip[0] + address
@@ -56,9 +56,9 @@ func (b Bot) Listener(port string, ip ...string) {
 // Since ListenAndServe function in Bot.Listener is a blocking function,
 // we don't have to wait for goroutines to finish, however if http.ListenAndServe in Bot.Listener
 // returns an error, all goroutines (handlers) will be aborted.
-func webhookHandler(r *http.Request, bot Bot) {
+func (b Bot) webhookHandler(_ http.ResponseWriter, r *http.Request) {
 	res, _ := ioutil.ReadAll(r.Body)
-	if bot.Debug {
+	if b.Debug {
 		log.Println(string(res))
 	}
 	update := &Update{}
@@ -66,13 +66,13 @@ func webhookHandler(r *http.Request, bot Bot) {
 	if err != nil {
 		log.Println(fmt.Errorf("error while unmarshaling json to Update: %w\n", err))
 	}
-	if bot.Handler == nil {
+	if b.Handler == nil {
 		log.Println("Warning: Listener just received something, but you have not added a handler to bot." +
 			"add handler to bot by setting bot's Handler field to a function of type func(message Update, bot Bot)")
-	} else if bot.concurrent {
-		go bot.Handler(update, bot)
+	} else if b.Concurrent {
+		go b.Handler(*update)
 		return
 	} else {
-		bot.Handler(update, bot)
+		b.Handler(*update)
 	}
 }

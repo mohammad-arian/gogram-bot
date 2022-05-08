@@ -27,7 +27,36 @@ through the data itself.
 ## An Example:
 
 We are going to make an echo bot.
-```
-print '3 backticks or'
-print 'indent 4 spaces'
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/gcoder-dev/gogram-bot"
+	"os"
+)
+
+var bot = gogram.Bot{
+	Token: "Your Bot Token", 
+	Handler: handle, 
+	Debug: true,
+	Concurrent: true,
+}
+
+func main() {
+	response, err := gogram.SetWebhookData{Url: "Your webhook url"}.Send(bot)
+	fmt.Printf("%+v\n---%+v\n", response, err)
+	if err != nil {
+		return
+	}
+	bot.Listener(os.Getenv("PORT"))
+}
+
+func handle(update gogram.Update) {
+	response, err := gogram.TextData{Text: update.Message.Text, ChatId: update.Message.Chat.Id}.Send(bot)
+	fmt.Printf("%+v\n---%+v\n", response, err)
+	if err != nil {
+		return
+	}
+}
 ```
