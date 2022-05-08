@@ -39,30 +39,6 @@ func (b Bot) VerifyBot() (Response, error) {
 	return Request("getme", b, nil, &ResponseImpl{Result: &User{}})
 }
 
-// SetWebhook specifies an url and receive incoming updates via an outgoing webhook.
-// Whenever there is an update for the bot, we will send an HTTPS POST Request to the specified url,
-// containing a JSON-serialized Update.
-// In case of an unsuccessful Request, we will give up after a reasonable amount of attempts.
-// Returns True on success.
-// If you'd like to make sure that the Webhook Request comes from Telegram,
-// we recommend using a secret path in the URL, e.g. https://www.example.com/<token>.
-// Since nobody else knows your bot's token, you can be pretty sure it's us.
-func (b Bot) SetWebhook(data SetWebhookData) (response Response, err error) {
-	return data.Send(b)
-}
-
-func (b Bot) SetMyCommands(data SetMyCommandsData) (response Response, err error) {
-	return data.Send(b)
-}
-
-func (b Bot) DeleteMyCommands(data DeleteMyCommandsData) (response Response, err error) {
-	return data.Send(b)
-}
-
-func (b Bot) GetMyCommands(data GetMyCommandsData) (response Response, err error) {
-	return data.Send(b)
-}
-
 // Listener listens to upcoming webhook updates and calls webhookHandler when telegram
 // sends an update.
 func (b Bot) Listener(port string, ip ...string) {

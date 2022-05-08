@@ -25,7 +25,7 @@ type TextData struct {
 	Keyboard
 }
 
-func (t TextData) Send(b Bot) (response Response, err error) {
+func (t TextData) Send(b Bot) (Response, error) {
 	return Request("sendMessage", b, t, &ResponseImpl{Result: &Message{}})
 }
 
@@ -51,7 +51,7 @@ type PhotoData struct {
 	Keyboard
 }
 
-func (p PhotoData) Send(b Bot) (response Response, err error) {
+func (p PhotoData) Send(b Bot) (Response, error) {
 	return Request("sendPhoto", b, p, &ResponseImpl{Result: &Message{}})
 }
 
@@ -81,7 +81,7 @@ type VideoData struct {
 	Keyboard
 }
 
-func (v VideoData) Send(b Bot) (response Response, err error) {
+func (v VideoData) Send(b Bot) (Response, error) {
 	return Request("sendVideo", b, v, &ResponseImpl{Result: &Message{}})
 }
 
@@ -111,7 +111,7 @@ type AudioData struct {
 	Keyboard
 }
 
-func (a AudioData) Send(b Bot) (response Response, err error) {
+func (a AudioData) Send(b Bot) (Response, error) {
 	return Request("sendAudio", b, a, &ResponseImpl{Result: &Message{}})
 }
 func (a AudioData) Check() error {
@@ -136,7 +136,7 @@ type DocumentData struct {
 	Keyboard
 }
 
-func (d DocumentData) Send(b Bot) (response Response, err error) {
+func (d DocumentData) Send(b Bot) (Response, error) {
 	return Request("sendDocument", b, d, &ResponseImpl{Result: &Message{}})
 }
 func (d DocumentData) Check() error {
@@ -164,7 +164,7 @@ type VoiceData struct {
 	Keyboard
 }
 
-func (v VoiceData) Send(b Bot) (response Response, err error) {
+func (v VoiceData) Send(b Bot) (Response, error) {
 	return Request("sendVoice", b, v, &ResponseImpl{Result: &Message{}})
 }
 func (v VoiceData) Check() error {
@@ -190,7 +190,7 @@ type AnimationData struct {
 	Keyboard
 }
 
-func (a AnimationData) Send(b Bot) (response Response, err error) {
+func (a AnimationData) Send(b Bot) (Response, error) {
 	return Request("sendAnimation", b, a, &ResponseImpl{Result: &Message{}})
 }
 func (a AnimationData) Check() error {
@@ -236,7 +236,7 @@ type PollData struct {
 	Keyboard
 }
 
-func (p PollData) Send(b Bot) (response Response, err error) {
+func (p PollData) Send(b Bot) (Response, error) {
 	return Request("sendPoll", b, p, &ResponseImpl{Result: &Message{}})
 }
 func (p PollData) Check() error {
@@ -260,7 +260,7 @@ type DiceData struct {
 	Keyboard
 }
 
-func (d DiceData) Send(b Bot) (response Response, err error) {
+func (d DiceData) Send(b Bot) (Response, error) {
 	return Request("sendDice", b, d, &ResponseImpl{Result: &Message{}})
 }
 
@@ -282,7 +282,7 @@ type VideoNoteData struct {
 	Keyboard
 }
 
-func (v VideoNoteData) Send(b Bot) (response Response, err error) {
+func (v VideoNoteData) Send(b Bot) (Response, error) {
 	return Request("sendVideoNote", b, v, &ResponseImpl{Result: &Message{}})
 }
 func (v VideoNoteData) Check() error {
@@ -300,7 +300,7 @@ type LocationData struct {
 	Keyboard
 }
 
-func (l LocationData) Send(b Bot) (response Response, err error) {
+func (l LocationData) Send(b Bot) (Response, error) {
 	return Request("sendLocation", b, l, &ResponseImpl{Result: &Message{}})
 }
 func (l LocationData) Check() error {
@@ -318,7 +318,7 @@ type ContactData struct {
 	Keyboard
 }
 
-func (c ContactData) Send(b Bot) (response Response, err error) {
+func (c ContactData) Send(b Bot) (Response, error) {
 	return Request("sendContact", b, c, &ResponseImpl{Result: &Message{}})
 }
 func (c ContactData) Check() error {
@@ -338,7 +338,7 @@ type MediaGroupData struct {
 	AllowSendingWithoutReply bool `json:"allow_sending_without_reply"`
 }
 
-func (m MediaGroupData) Send(b Bot) (response Response, err error) {
+func (m MediaGroupData) Send(b Bot) (Response, error) {
 	for _, j := range m.Media {
 		m.Files = append(m.Files, j.returnFile())
 	}
@@ -366,7 +366,7 @@ type ForwardMessageData struct {
 	ProtectContent      bool `json:"protect_content"`
 }
 
-func (f ForwardMessageData) Send(b Bot) (response Response, err error) {
+func (f ForwardMessageData) Send(b Bot) (Response, error) {
 	return Request("forwardMessage", b, f, &ResponseImpl{Result: &Message{}})
 }
 func (f ForwardMessageData) Check() error {
@@ -394,7 +394,7 @@ type CopyMessageData struct {
 	Keyboard
 }
 
-func (c CopyMessageData) Send(b Bot) (response Response, err error) {
+func (c CopyMessageData) Send(b Bot) (Response, error) {
 	return Request("copyMessage", b, c, &ResponseImpl{Result: &Message{}})
 }
 func (c CopyMessageData) Check() error {
@@ -416,7 +416,7 @@ type DeleteMessageData struct {
 	MessageId int `json:"message_id"`
 }
 
-func (d DeleteMessageData) Send(b Bot) (response Response, err error) {
+func (d DeleteMessageData) Send(b Bot) (Response, error) {
 	return Request("deleteMessage", b, d, &ResponseImpl{})
 }
 func (d DeleteMessageData) Check() error {
@@ -432,7 +432,7 @@ type DeleteChatStickerSetData struct {
 	ChatId int `json:"chat_id"`
 }
 
-func (d DeleteChatStickerSetData) Send(b Bot) (response Response, err error) {
+func (d DeleteChatStickerSetData) Send(b Bot) (Response, error) {
 	return Request("deleteChatStickerSet", b, d, &ResponseImpl{})
 }
 func (d DeleteChatStickerSetData) Check() error {
@@ -449,7 +449,7 @@ type SetChatStickerSetData struct {
 	StickerSetName string `json:"sticker_set_name"`
 }
 
-func (s SetChatStickerSetData) Send(b Bot) (response Response, err error) {
+func (s SetChatStickerSetData) Send(b Bot) (Response, error) {
 	return Request("setChatStickerSet", b, s, &ResponseImpl{})
 }
 func (s SetChatStickerSetData) Check() error {
@@ -463,7 +463,7 @@ type GetChatMemberData struct {
 	UserId int `json:"user_id"`
 }
 
-func (g GetChatMemberData) Send(b Bot) (response Response, err error) {
+func (g GetChatMemberData) Send(b Bot) (Response, error) {
 	return Request("getChatMember", b, g, &ResponseImpl{})
 }
 
@@ -476,7 +476,7 @@ type GetChatMemberCountData struct {
 	ChatId int `json:"chat_id"`
 }
 
-func (g GetChatMemberCountData) Send(b Bot) (response Response, err error) {
+func (g GetChatMemberCountData) Send(b Bot) (Response, error) {
 	return Request("getChatMemberCount", b, g, &ResponseImpl{})
 }
 func (g GetChatMemberCountData) Check() error {
@@ -491,7 +491,7 @@ type GetChatAdministratorsData struct {
 	ChatId int `json:"chat_id"`
 }
 
-func (g GetChatAdministratorsData) Send(b Bot) (response Response, err error) {
+func (g GetChatAdministratorsData) Send(b Bot) (Response, error) {
 	return Request("getChatAdministrators", b, g, &ResponseImpl{})
 }
 func (g GetChatAdministratorsData) Check() error {
@@ -504,7 +504,7 @@ type GetChatData struct {
 	ChatId int `json:"chat_id"`
 }
 
-func (g GetChatData) Send(b Bot) (response Response, err error) {
+func (g GetChatData) Send(b Bot) (Response, error) {
 	return Request("getChat", b, g, &ResponseImpl{Result: &Chat{}})
 }
 func (g GetChatData) Check() error {
@@ -517,7 +517,7 @@ type LeaveChatData struct {
 	ChatId int `json:"chat_id"`
 }
 
-func (l LeaveChatData) Send(b Bot) (response Response, err error) {
+func (l LeaveChatData) Send(b Bot) (Response, error) {
 	return Request("leaveChat", b, l, &ResponseImpl{})
 }
 func (l LeaveChatData) Check() error {
@@ -533,7 +533,7 @@ type UnpinAllChatMessagesData struct {
 	ChatId int `json:"chat_id"`
 }
 
-func (u UnpinAllChatMessagesData) Send(b Bot) (response Response, err error) {
+func (u UnpinAllChatMessagesData) Send(b Bot) (Response, error) {
 	return Request("unpinAllChatMessages", b, u, &ResponseImpl{})
 }
 func (u UnpinAllChatMessagesData) Check() error {
@@ -548,7 +548,7 @@ type SetChatDescriptionData struct {
 	Description string `json:"description"`
 }
 
-func (s SetChatDescriptionData) Send(b Bot) (response Response, err error) {
+func (s SetChatDescriptionData) Send(b Bot) (Response, error) {
 	return Request("setChatDescription", b, s, &ResponseImpl{})
 }
 func (s SetChatDescriptionData) Check() error {
@@ -563,7 +563,7 @@ type SetChatTitleData struct {
 	Title  string `json:"title"`
 }
 
-func (s SetChatTitleData) Send(b Bot) (response Response, err error) {
+func (s SetChatTitleData) Send(b Bot) (Response, error) {
 	return Request("setChatTitle", b, s, &ResponseImpl{})
 }
 func (s SetChatTitleData) Check() error {
@@ -577,7 +577,7 @@ type DeleteChatPhotoData struct {
 	ChatId int `json:"chat_id"`
 }
 
-func (d DeleteChatPhotoData) Send(b Bot) (response Response, err error) {
+func (d DeleteChatPhotoData) Send(b Bot) (Response, error) {
 	return Request("deleteChatPhoto", b, d, &ResponseImpl{})
 }
 func (d DeleteChatPhotoData) Check() error {
@@ -592,7 +592,7 @@ type SetChatPhotoData struct {
 	Photo  *os.File `json:"photo"`
 }
 
-func (s SetChatPhotoData) Send(b Bot) (response Response, err error) {
+func (s SetChatPhotoData) Send(b Bot) (Response, error) {
 	return Request("setChatPhoto", b, s, &ResponseImpl{})
 }
 func (s SetChatPhotoData) Check() error {
@@ -608,7 +608,7 @@ type RevokeChatInviteLinkData struct {
 	InviteLink string `json:"invite_link"`
 }
 
-func (r RevokeChatInviteLinkData) Send(b Bot) (response Response, err error) {
+func (r RevokeChatInviteLinkData) Send(b Bot) (Response, error) {
 	return Request("revokeChatInviteLink", b, r, &ResponseImpl{Result: &ChatInviteLink{}})
 }
 func (r RevokeChatInviteLinkData) Check() error {
@@ -623,7 +623,7 @@ type ExportChatInviteLinkData struct {
 	ChatId int `json:"chat_id"`
 }
 
-func (e ExportChatInviteLinkData) Send(b Bot) (response Response, err error) {
+func (e ExportChatInviteLinkData) Send(b Bot) (Response, error) {
 	return Request("exportChatInviteLink", b, e, &ResponseImpl{})
 }
 func (e ExportChatInviteLinkData) Check() error {
@@ -639,7 +639,7 @@ type SendChatActionData struct {
 	Action string `json:"action"`
 }
 
-func (s SendChatActionData) Send(b Bot) (response Response, err error) {
+func (s SendChatActionData) Send(b Bot) (Response, error) {
 	return Request("sendChatAction", b, s, &ResponseImpl{})
 }
 func (s SendChatActionData) Check() error {
@@ -663,7 +663,7 @@ type GetFileData struct {
 	FileId string `json:"file_id"`
 }
 
-func (g GetFileData) Send(b Bot) (response Response, err error) {
+func (g GetFileData) Send(b Bot) (Response, error) {
 	return Request("getFile", b, g, &ResponseImpl{Result: &File{}})
 }
 func (g GetFileData) Check() error {
@@ -682,7 +682,7 @@ type UnbanChatMemberData struct {
 	OnlyIfBanned bool `json:"only_if_banned"`
 }
 
-func (u UnbanChatMemberData) Send(b Bot) (response Response, err error) {
+func (u UnbanChatMemberData) Send(b Bot) (Response, error) {
 	return Request("unbanChatMember", b, u, &ResponseImpl{})
 }
 func (u UnbanChatMemberData) Check() error {
@@ -697,7 +697,7 @@ type SetChatAdministratorCustomTitleData struct {
 	CustomTitle string `json:"custom_title"`
 }
 
-func (s SetChatAdministratorCustomTitleData) Send(b Bot) (response Response, err error) {
+func (s SetChatAdministratorCustomTitleData) Send(b Bot) (Response, error) {
 	return Request("setChatAdministratorCustomTitle", b, s, &ResponseImpl{})
 }
 
@@ -714,7 +714,7 @@ type SetChatPermissionsData struct {
 	Permissions ChatPermissions `json:"permissions"`
 }
 
-func (s SetChatPermissionsData) Send(b Bot) (response Response, err error) {
+func (s SetChatPermissionsData) Send(b Bot) (Response, error) {
 	return Request("setChatPermissions", b, s, &ResponseImpl{})
 }
 func (s SetChatPermissionsData) Check() error {
@@ -732,7 +732,7 @@ type GetUserProfilePhotosData struct {
 	Limit int `json:"limit"`
 }
 
-func (u GetUserProfilePhotosData) Send(b Bot) (response Response, err error) {
+func (u GetUserProfilePhotosData) Send(b Bot) (Response, error) {
 	return Request("getUserProfilePhotos", b, u, &ResponseImpl{Result: &UserProfilePhotos{}})
 }
 func (u GetUserProfilePhotosData) Check() error {
@@ -758,7 +758,7 @@ type BanChatMemberData struct {
 	RevokeMessages bool `json:"revoke_messages"`
 }
 
-func (ban BanChatMemberData) Send(b Bot) (response Response, err error) {
+func (ban BanChatMemberData) Send(b Bot) (Response, error) {
 	return Request("banChatMember", b, ban, &ResponseImpl{})
 }
 func (ban BanChatMemberData) Check() error {
@@ -775,7 +775,7 @@ type RestrictChatMemberData struct {
 	UntilDate   int             `json:"until_date"`
 }
 
-func (r RestrictChatMemberData) Send(b Bot) (response Response, err error) {
+func (r RestrictChatMemberData) Send(b Bot) (Response, error) {
 	return Request("restrictChatMember", b, r, &ResponseImpl{})
 }
 func (r RestrictChatMemberData) Check() error {
@@ -816,7 +816,7 @@ type PromoteChatMemberData struct {
 	CanPinMessages bool `json:"can_pin_messages"`
 }
 
-func (p PromoteChatMemberData) Send(b Bot) (response Response, err error) {
+func (p PromoteChatMemberData) Send(b Bot) (Response, error) {
 	return Request("promoteChatMember", b, p, &ResponseImpl{})
 }
 func (p PromoteChatMemberData) Check() error {
@@ -832,7 +832,7 @@ type CreateChatInviteLinkData struct {
 	MemberLimit int `json:"member_limit"`
 }
 
-func (c CreateChatInviteLinkData) Send(b Bot) (response Response, err error) {
+func (c CreateChatInviteLinkData) Send(b Bot) (Response, error) {
 	return Request("createChatInviteLink", b, c, &ResponseImpl{Result: &ChatInviteLink{}})
 }
 func (c CreateChatInviteLinkData) Check() error {
@@ -849,7 +849,7 @@ type EditChatInviteLinkData struct {
 	MemberLimit int    `json:"member_limit"`
 }
 
-func (e EditChatInviteLinkData) Send(b Bot) (response Response, err error) {
+func (e EditChatInviteLinkData) Send(b Bot) (Response, error) {
 	return Request("editChatInviteLink", b, e, &ResponseImpl{Result: &ChatInviteLink{}})
 }
 func (e EditChatInviteLinkData) Check() error {
@@ -866,7 +866,7 @@ type PinChatMessageData struct {
 	DisableNotification bool `json:"disable_notification"`
 }
 
-func (p PinChatMessageData) Send(b Bot) (response Response, err error) {
+func (p PinChatMessageData) Send(b Bot) (Response, error) {
 	return Request("pinChatMessage", b, p, &ResponseImpl{})
 }
 func (p PinChatMessageData) Check() error {
@@ -882,7 +882,7 @@ type UnpinChatMessageData struct {
 	MessageId int `json:"message_id"`
 }
 
-func (u UnpinChatMessageData) Send(b Bot) (response Response, err error) {
+func (u UnpinChatMessageData) Send(b Bot) (Response, error) {
 	return Request("unpinChatMessage", b, u, &ResponseImpl{})
 }
 func (u UnpinChatMessageData) Check() error {
@@ -900,7 +900,7 @@ type AnswerCallbackQueryData struct {
 	CacheTime       string `json:"cache_time"`
 }
 
-func (a AnswerCallbackQueryData) Send(b Bot) (response Response, err error) {
+func (a AnswerCallbackQueryData) Send(b Bot) (Response, error) {
 	return Request("answerCallbackQuery", b, a, &ResponseImpl{})
 }
 func (a AnswerCallbackQueryData) Check() error {
@@ -917,7 +917,7 @@ type SetMyCommandsData struct {
 	LanguageCode string          `json:"language_code"`
 }
 
-func (s SetMyCommandsData) Send(b Bot) (response Response, err error) {
+func (s SetMyCommandsData) Send(b Bot) (Response, error) {
 	return Request("setMyCommands", b, s, &ResponseImpl{})
 }
 func (s SetMyCommandsData) Check() error {
@@ -936,7 +936,7 @@ type DeleteMyCommandsData struct {
 	LanguageCode string          `json:"language_code"`
 }
 
-func (d DeleteMyCommandsData) Send(b Bot) (response Response, err error) {
+func (d DeleteMyCommandsData) Send(b Bot) (Response, error) {
 	return Request("deleteMyCommands", b, d, &ResponseImpl{})
 }
 func (d DeleteMyCommandsData) Check() error {
@@ -951,7 +951,7 @@ type GetMyCommandsData struct {
 	LanguageCode string          `json:"language_code"`
 }
 
-func (g GetMyCommandsData) Send(b Bot) (response Response, err error) {
+func (g GetMyCommandsData) Send(b Bot) (Response, error) {
 	return Request("getMyCommands", b, g, &ResponseImpl{Result: &[]BotCommand{}})
 }
 func (g GetMyCommandsData) Check() error {
@@ -972,7 +972,7 @@ type EditMessageTextData struct {
 	InlineKeyboard
 }
 
-func (e EditMessageTextData) Send(b Bot) (response Response, err error) {
+func (e EditMessageTextData) Send(b Bot) (Response, error) {
 	return Request("editMessageText", b, e, &ResponseImpl{})
 }
 func (e EditMessageTextData) Check() error {
@@ -998,7 +998,7 @@ type EditMessageCaptionData struct {
 	InlineKeyboard
 }
 
-func (e EditMessageCaptionData) Send(b Bot) (response Response, err error) {
+func (e EditMessageCaptionData) Send(b Bot) (Response, error) {
 	return Request("editMessageCaption", b, e, &ResponseImpl{})
 }
 func (e EditMessageCaptionData) Check() error {
@@ -1021,7 +1021,7 @@ type EditMessageReplyMarkupData struct {
 	InlineKeyboard
 }
 
-func (e EditMessageReplyMarkupData) Send(b Bot) (response Response, err error) {
+func (e EditMessageReplyMarkupData) Send(b Bot) (Response, error) {
 	return Request("editMessageReplyMarkup", b, e, &ResponseImpl{})
 }
 func (e EditMessageReplyMarkupData) Check() error {
@@ -1041,7 +1041,7 @@ type StopPollData struct {
 	InlineKeyboard
 }
 
-func (s StopPollData) Send(b Bot) (response Response, err error) {
+func (s StopPollData) Send(b Bot) (Response, error) {
 	return Request("stopPoll", b, s, &ResponseImpl{Result: &Poll{}})
 }
 func (s StopPollData) Check() error {
@@ -1070,7 +1070,7 @@ type EditMessageMediaData struct {
 	InlineKeyboard
 }
 
-func (e EditMessageMediaData) Send(b Bot) (response Response, err error) {
+func (e EditMessageMediaData) Send(b Bot) (Response, error) {
 	e.Files = append(e.Files, e.Media.returnFile())
 	return Request("editMessageMedia", b, e, &ResponseImpl{})
 }
@@ -1105,7 +1105,7 @@ type SetWebhookData struct {
 	DropPendingUpdates bool     `json:"drop_pending_updates"`
 }
 
-func (s SetWebhookData) Send(b Bot) (response Response, err error) {
+func (s SetWebhookData) Send(b Bot) (Response, error) {
 	return Request("setWebhook", b, s, &ResponseImpl{})
 }
 func (s SetWebhookData) Check() error {
@@ -1123,7 +1123,7 @@ type SendStickerData struct {
 	Keyboard
 }
 
-func (s SendStickerData) Send(b Bot) (response Response, err error) {
+func (s SendStickerData) Send(b Bot) (Response, error) {
 	return Request("sendSticker", b, s, &ResponseImpl{Result: &Message{}})
 }
 func (s SendStickerData) Check() error {
@@ -1135,7 +1135,7 @@ type DeleteStickerFromSetData struct {
 	Sticker string `json:"sticker"`
 }
 
-func (d DeleteStickerFromSetData) Send(b Bot) (response Response, err error) {
+func (d DeleteStickerFromSetData) Send(b Bot) (Response, error) {
 	return Request("deleteStickerFromSet", b, d, &ResponseImpl{})
 }
 func (d DeleteStickerFromSetData) Check() error {
@@ -1148,7 +1148,7 @@ type SetStickerPositionInSetData struct {
 	Position int    `json:"position"`
 }
 
-func (s SetStickerPositionInSetData) Send(b Bot) (response Response, err error) {
+func (s SetStickerPositionInSetData) Send(b Bot) (Response, error) {
 	return Request("setStickerPositionInSet", b, s, &ResponseImpl{})
 }
 func (s SetStickerPositionInSetData) Check() error {
@@ -1162,7 +1162,7 @@ type UploadStickerFileData struct {
 	PngSticker *os.File `json:"png_sticker"`
 }
 
-func (u UploadStickerFileData) Send(b Bot) (response Response, err error) {
+func (u UploadStickerFileData) Send(b Bot) (Response, error) {
 	return Request("uploadStickerFile", b, u, &ResponseImpl{Result: &File{}})
 }
 func (u UploadStickerFileData) Check() error {
@@ -1174,7 +1174,7 @@ type GetStickerSetData struct {
 	Name string `json:"name"`
 }
 
-func (g GetStickerSetData) Send(b Bot) (response Response, err error) {
+func (g GetStickerSetData) Send(b Bot) (Response, error) {
 	return Request("getStickerSet", b, g, &ResponseImpl{Result: &StickerSet{}})
 }
 func (g GetStickerSetData) Check() error {
@@ -1196,7 +1196,7 @@ type CreateNewStickerSetData struct {
 	MaskPosition  MaskPosition `json:"mask_position"`
 }
 
-func (c CreateNewStickerSetData) Send(b Bot) (response Response, err error) {
+func (c CreateNewStickerSetData) Send(b Bot) (Response, error) {
 	return Request("createNewStickerSet", b, c, &ResponseImpl{})
 }
 func (c CreateNewStickerSetData) Check() error {
@@ -1232,7 +1232,7 @@ type AddStickerToSetData struct {
 	MaskPosition MaskPosition `json:"mask_position"`
 }
 
-func (a AddStickerToSetData) Send(b Bot) (response Response, err error) {
+func (a AddStickerToSetData) Send(b Bot) (Response, error) {
 	return Request("addStickerToSet", b, a, &ResponseImpl{})
 }
 func (a AddStickerToSetData) Check() error {
@@ -1261,7 +1261,7 @@ type SetStickerSetThumbData struct {
 	Thumb  any    `json:"thumb"`
 }
 
-func (s SetStickerSetThumbData) Send(b Bot) (response Response, err error) {
+func (s SetStickerSetThumbData) Send(b Bot) (Response, error) {
 	return Request("setStickerSetThumb", b, s, &ResponseImpl{})
 }
 func (s SetStickerSetThumbData) Check() error {
@@ -1280,7 +1280,7 @@ type AnswerInlineQueryData struct {
 	SwitchPmParameter string        `json:"switch_pm_parameter"`
 }
 
-func (a AnswerInlineQueryData) Send(b Bot) (response Response, err error) {
+func (a AnswerInlineQueryData) Send(b Bot) (Response, error) {
 	return Request("answerInlineQuery", b, a, &ResponseImpl{})
 }
 func (a AnswerInlineQueryData) Check() error {
@@ -1307,7 +1307,7 @@ type SendGameData struct {
 	InlineKeyboard
 }
 
-func (s SendGameData) Send(b Bot) (response Response, err error) {
+func (s SendGameData) Send(b Bot) (Response, error) {
 	return Request("sendGame", b, s, &ResponseImpl{Result: &Message{}})
 }
 func (s SendGameData) Check() error {
@@ -1328,7 +1328,7 @@ type SetGameScoreData struct {
 	InlineMessageId    string `json:"inline_message_id"`
 }
 
-func (s SetGameScoreData) Send(b Bot) (response Response, err error) {
+func (s SetGameScoreData) Send(b Bot) (Response, error) {
 	return Request("setGameScore", b, s, &ResponseImpl{})
 }
 
@@ -1355,7 +1355,7 @@ type GetGameHighScoresData struct {
 	InlineMessageId string `json:"inline_message_id"`
 }
 
-func (g GetGameHighScoresData) Send(b Bot) (response Response, err error) {
+func (g GetGameHighScoresData) Send(b Bot) (Response, error) {
 	return Request("getGameHighScores", b, g, &ResponseImpl{})
 }
 
@@ -1400,7 +1400,7 @@ type SendInvoiceData struct {
 	InlineKeyboard
 }
 
-func (s SendInvoiceData) Send(b Bot) (response Response, err error) {
+func (s SendInvoiceData) Send(b Bot) (Response, error) {
 	return Request("sendInvoice", b, s, &ResponseImpl{Result: &Message{}})
 }
 
@@ -1420,7 +1420,7 @@ type AnswerShippingQueryData struct {
 	ErrorMessage    string            `json:"error_message"`
 }
 
-func (a AnswerShippingQueryData) Send(b Bot) (response Response, err error) {
+func (a AnswerShippingQueryData) Send(b Bot) (Response, error) {
 	return Request("answerShippingQuery", b, a, &ResponseImpl{})
 }
 func (a AnswerShippingQueryData) Check() error {
@@ -1437,7 +1437,7 @@ type AnswerPreCheckoutQuery struct {
 	ErrorMessage       string `json:"error_message"`
 }
 
-func (a AnswerPreCheckoutQuery) Send(b Bot) (response Response, err error) {
+func (a AnswerPreCheckoutQuery) Send(b Bot) (Response, error) {
 	return Request("answerPreCheckoutQuery", b, a, &ResponseImpl{})
 }
 func (a AnswerPreCheckoutQuery) Check() error {
