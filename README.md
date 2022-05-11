@@ -27,36 +27,35 @@ through the data itself.
 ## An Example:
 
 We are going to make an echo bot.
+
 ```go
 package main
 
 import (
 	"fmt"
 	"github.com/gcoder-dev/gogram-bot"
+	"log"
 	"os"
 )
 
 var bot = gogram.Bot{
-	Token: "Your Bot Token", 
-	Handler: handle, 
-	Debug: true,
+	Token:      "Your Bot Token",
+	Handler:    handle,
 	Concurrent: true,
 }
 
 func main() {
 	response, err := gogram.SetWebhookData{Url: "Your webhook url"}.Send(bot)
-	fmt.Printf("%+v\n---%+v\n", response, err)
 	if err != nil {
-		return
+		log.Fatalf("%+v---%+v\n", response, err)
 	}
-	bot.Listener(os.Getenv("PORT"))
+	bot.Listener("Port that gogram will listen to")
 }
 
-func handle(update gogram.Update) {
+func handle(update gogram.Update, bot gogram.Bot) {
 	response, err := gogram.TextData{Text: update.Message.Text, ChatId: update.Message.Chat.Id}.Send(bot)
-	fmt.Printf("%+v\n---%+v\n", response, err)
 	if err != nil {
-		return
+		log.Fatalf("%+v---%+v\n", response, err)
 	}
 }
 ```

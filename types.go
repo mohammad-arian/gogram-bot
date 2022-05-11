@@ -736,7 +736,14 @@ func (r ResponseImpl) getResult() any {
 
 func (r ResponseImpl) set(res *http.Response) (ResponseImpl, error) {
 	readRes, _ := ioutil.ReadAll(res.Body)
-	return r, json.Unmarshal(readRes, &r)
+	err := json.Unmarshal(readRes, &r)
+	if err != nil {
+		return r, err
+	}
+	if r.Ok != true {
+		return r, errors.New("telegram returned an error. check response for more details")
+	}
+	return r, nil
 }
 
 func (r ResponseImpl) isOk() bool {
