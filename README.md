@@ -90,7 +90,7 @@ when a user sends something to your bot, it will be delivered to your
 handler as an Update struct. Later we use Update to get the Text message, id of sender or many other things.
 Update might contain a Message, InlineQuery, CallbackQuery or Poll struct. 
 Go ahead and head over to types.go and take a look at Update and Message structs.<br >
-In our handler, we create a TextData, pass Text the text user sent and for ChatId we use Update to get the
-id of sender.
+In our handler, we create a TextData; use Update and pass Text the text user sent and id of sender to ChatId, and 
+finally send it with Send method.
 ***
 That was pretty much it! All data structs work the same.
