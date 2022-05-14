@@ -22,135 +22,6 @@ func (u Update) String() string {
 	return fmt.Sprintf("Update: %#v\n", u)
 }
 
-type CallbackQuery struct {
-	Id              string  `json:"id"`
-	Message         Message `json:"message"`
-	From            User    `json:"chat"`
-	InlineMessageId string  `json:"inline_message_id"`
-	ChatInstance    string  `json:"chat_instance"`
-	Data            string  `json:"data"`
-	GameShortName   string  `json:"game_short_name"`
-}
-
-type ShippingOptions struct {
-	Id     string         `json:"id"`
-	Title  string         `json:"title"`
-	Prices []LabeledPrice `json:"prices"`
-}
-
-type Audio struct {
-	FileId       string    `json:"file_Id"`
-	FileUniqueId string    `json:"file_unique_id"`
-	Duration     int       `json:"duration"`
-	Performer    string    `json:"performer"`
-	Title        string    `json:"title"`
-	FileName     string    `json:"file_name"`
-	MimeType     string    `json:"mime_type"`
-	FileSize     int       `json:"file_size"`
-	Thumb        PhotoSize `json:"thumb"`
-}
-
-type Document struct {
-	FileId       string    `json:"file_Id"`
-	FileUniqueId string    `json:"file_unique_id"`
-	Thumb        PhotoSize `json:"thumb"`
-	FileName     string    `json:"file_name"`
-	MimeType     string    `json:"mime_type"`
-	FileSize     int       `json:"file_size"`
-}
-
-type Video struct {
-	FileId       string    `json:"file_Id"`
-	FileUniqueId string    `json:"file_unique_id"`
-	Duration     int       `json:"duration"`
-	Width        int       `json:"width"`
-	Height       int       `json:"height"`
-	Thumb        PhotoSize `json:"thumb"`
-	FileName     string    `json:"file_name"`
-	MimeType     string    `json:"mime_type"`
-	FileSize     int       `json:"file_size"`
-}
-
-type VideoNote struct {
-	FileId       string    `json:"file_Id"`
-	FileUniqueId string    `json:"file_unique_id"`
-	Length       int       `json:"length"`
-	Duration     int       `json:"duration"`
-	Thumb        PhotoSize `json:"thumb"`
-	FileSize     int       `json:"file_size"`
-}
-
-type Voice struct {
-	FileId       string `json:"file_Id"`
-	FileUniqueId string `json:"file_unique_id"`
-	Duration     int    `json:"duration"`
-	MimeType     string `json:"mime_type"`
-	FileSize     int    `json:"file_size"`
-}
-
-type Contact struct {
-	PhoneNumber string `json:"phone_number"`
-	FirstName   string `json:"first_name"`
-	LastName    string `json:"last_name"`
-	UserId      int    `json:"user_id"`
-	// Additional data about the contact in the form of a vCard
-	Vcard string `json:"vcard"`
-}
-
-type Dice struct {
-	Emoji string `json:"emoji"`
-	Value int    `json:"value"`
-}
-
-type Game struct {
-	Title        string          `json:"title"`
-	Description  string          `json:"description"`
-	Photo        []PhotoSize     `json:"photo"`
-	Text         string          `json:"text"`
-	TextEntities []MessageEntity `json:"text_entities"`
-	Animation    Animation       `json:"animation"`
-}
-
-type GameHighScore struct {
-	Position int  `json:"position"`
-	User     User `json:"user"`
-	Score    int  `json:"score"`
-}
-
-type Invoice struct {
-	Title          string `json:"title"`
-	Description    string `json:"description"`
-	StartParameter string `json:"start_parameter"`
-	Currency       string `json:"currency"`
-	TotalAmount    int    `json:"total_amount"`
-}
-
-type ShippingAddress struct {
-	CountryCode string `json:"country_code"`
-	State       string `json:"state"`
-	City        string `json:"city"`
-	StreetLine1 string `json:"street_line1"`
-	StreetLine2 string `json:"street_line2"`
-	PostCode    string `json:"post_code"`
-}
-
-type OrderInfo struct {
-	Name            string          `json:"name"`
-	PhoneNumber     string          `json:"phone_number"`
-	Email           string          `json:"email"`
-	ShippingAddress ShippingAddress `json:"shipping_address"`
-}
-
-type SuccessfulPayment struct {
-	Currency                string    `json:"currency"`
-	TotalAmount             int       `json:"total_amount"`
-	InvoicePayload          string    `json:"invoice_payload"`
-	ShippingOptionId        string    `json:"shipping_option_id"`
-	OrderInfo               OrderInfo `json:"order_info"`
-	TelegramPaymentChargeId string    `json:"telegram_payment_charge_id"`
-	ProviderPaymentChargeId string    `json:"provider_payment_charge_id"`
-}
-
 type Message struct {
 	MessageId             int               `json:"message_id"`
 	User                  User              `json:"from"`
@@ -305,6 +176,135 @@ func (m Message) TypeIndicator() string {
 	default:
 		return TypeUnknown
 	}
+}
+
+type CallbackQuery struct {
+	Id              string  `json:"id"`
+	Message         Message `json:"message"`
+	From            User    `json:"chat"`
+	InlineMessageId string  `json:"inline_message_id"`
+	ChatInstance    string  `json:"chat_instance"`
+	Data            string  `json:"data"`
+	GameShortName   string  `json:"game_short_name"`
+}
+
+type ShippingOptions struct {
+	Id     string         `json:"id"`
+	Title  string         `json:"title"`
+	Prices []LabeledPrice `json:"prices"`
+}
+
+type Audio struct {
+	FileId       string    `json:"file_Id"`
+	FileUniqueId string    `json:"file_unique_id"`
+	Duration     int       `json:"duration"`
+	Performer    string    `json:"performer"`
+	Title        string    `json:"title"`
+	FileName     string    `json:"file_name"`
+	MimeType     string    `json:"mime_type"`
+	FileSize     int       `json:"file_size"`
+	Thumb        PhotoSize `json:"thumb"`
+}
+
+type Document struct {
+	FileId       string    `json:"file_Id"`
+	FileUniqueId string    `json:"file_unique_id"`
+	Thumb        PhotoSize `json:"thumb"`
+	FileName     string    `json:"file_name"`
+	MimeType     string    `json:"mime_type"`
+	FileSize     int       `json:"file_size"`
+}
+
+type Video struct {
+	FileId       string    `json:"file_Id"`
+	FileUniqueId string    `json:"file_unique_id"`
+	Duration     int       `json:"duration"`
+	Width        int       `json:"width"`
+	Height       int       `json:"height"`
+	Thumb        PhotoSize `json:"thumb"`
+	FileName     string    `json:"file_name"`
+	MimeType     string    `json:"mime_type"`
+	FileSize     int       `json:"file_size"`
+}
+
+type VideoNote struct {
+	FileId       string    `json:"file_Id"`
+	FileUniqueId string    `json:"file_unique_id"`
+	Length       int       `json:"length"`
+	Duration     int       `json:"duration"`
+	Thumb        PhotoSize `json:"thumb"`
+	FileSize     int       `json:"file_size"`
+}
+
+type Voice struct {
+	FileId       string `json:"file_Id"`
+	FileUniqueId string `json:"file_unique_id"`
+	Duration     int    `json:"duration"`
+	MimeType     string `json:"mime_type"`
+	FileSize     int    `json:"file_size"`
+}
+
+type Contact struct {
+	PhoneNumber string `json:"phone_number"`
+	FirstName   string `json:"first_name"`
+	LastName    string `json:"last_name"`
+	UserId      int    `json:"user_id"`
+	// Additional data about the contact in the form of a vCard
+	Vcard string `json:"vcard"`
+}
+
+type Dice struct {
+	Emoji string `json:"emoji"`
+	Value int    `json:"value"`
+}
+
+type Game struct {
+	Title        string          `json:"title"`
+	Description  string          `json:"description"`
+	Photo        []PhotoSize     `json:"photo"`
+	Text         string          `json:"text"`
+	TextEntities []MessageEntity `json:"text_entities"`
+	Animation    Animation       `json:"animation"`
+}
+
+type GameHighScore struct {
+	Position int  `json:"position"`
+	User     User `json:"user"`
+	Score    int  `json:"score"`
+}
+
+type Invoice struct {
+	Title          string `json:"title"`
+	Description    string `json:"description"`
+	StartParameter string `json:"start_parameter"`
+	Currency       string `json:"currency"`
+	TotalAmount    int    `json:"total_amount"`
+}
+
+type ShippingAddress struct {
+	CountryCode string `json:"country_code"`
+	State       string `json:"state"`
+	City        string `json:"city"`
+	StreetLine1 string `json:"street_line1"`
+	StreetLine2 string `json:"street_line2"`
+	PostCode    string `json:"post_code"`
+}
+
+type OrderInfo struct {
+	Name            string          `json:"name"`
+	PhoneNumber     string          `json:"phone_number"`
+	Email           string          `json:"email"`
+	ShippingAddress ShippingAddress `json:"shipping_address"`
+}
+
+type SuccessfulPayment struct {
+	Currency                string    `json:"currency"`
+	TotalAmount             int       `json:"total_amount"`
+	InvoicePayload          string    `json:"invoice_payload"`
+	ShippingOptionId        string    `json:"shipping_option_id"`
+	OrderInfo               OrderInfo `json:"order_info"`
+	TelegramPaymentChargeId string    `json:"telegram_payment_charge_id"`
+	ProviderPaymentChargeId string    `json:"provider_payment_charge_id"`
 }
 
 type MessageEntity struct {
