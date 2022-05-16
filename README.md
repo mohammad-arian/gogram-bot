@@ -93,4 +93,18 @@ Go ahead and head over to types.go and take a look at Update and Message structs
 In our handler, we create a TextData; use Update and pass Text the text user sent and id of sender to ChatId, and 
 finally send it with Send method.
 ***
+How to add [Reply Keyboard](https://core.telegram.org/bots#keyboards) and
+[Inline Keyboard](https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating)
+to message?
+```go
+func handle(update gogram.Update, bot gogram.Bot) {
+    d := PhotoData{Photo: "pass a url, file_id or a file", ChatId: "a chat id"}
+    err := d.SetInlineKeyboard(false, InlineButton{CallbackData: "hi", Text: "1"},
+    InlineButton{Text: "Bye", CallbackData: "2"})
+    if err != nil {
+        return
+    }
+    d.Send(bot)
+}
+```
 That was pretty much it! All data structs work the same.
